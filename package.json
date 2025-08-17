@@ -1,0 +1,55 @@
+{
+  "dependencies": {
+    "@aws-sdk/client-s3": "^3.859.0",
+    "@aws-sdk/s3-request-presigner": "^3.859.0",
+    "@fastify/autoload": "^6.3.1",
+    "@fastify/cookie": "^11.0.2",
+    "@fastify/jwt": "^9.1.0",
+    "@fastify/multipart": "^9.0.3",
+    "@fastify/swagger": "^9.5.1",
+    "@fastify/swagger-ui": "^5.2.3",
+    "@sendgrid/mail": "^8.1.5",
+    "bcrypt": "^6.0.0",
+    "esbuild": "^0.25.8",
+    "esbuild-plugin-tsc": "^0.5.0",
+    "fastify": "^5.4.0",
+    "fastify-type-provider-zod": "^5.0.2",
+    "pg": "^8.16.3",
+    "pino": "^9.7.0",
+    "pino-pretty": "^13.0.0",
+    "reflect-metadata": "^0.2.2",
+    "typeorm": "^0.3.25",
+    "zod": "^4.0.5"
+  },
+  "devDependencies": {
+    "@types/bcrypt": "^5.0.2",
+    "@types/node": "^24.0.14",
+    "@typescript-eslint/eslint-plugin": "^8.38.0",
+    "@typescript-eslint/parser": "^8.38.0",
+    "eslint": "^9.32.0",
+    "eslint-config-prettier": "^10.1.5",
+    "eslint-plugin-prettier": "^5.5.1",
+    "i": "^0.3.7",
+    "nodemon": "^3.1.10",
+    "npm": "^11.4.2",
+    "prettier": "^3.6.2",
+    "ts-node": "^10.9.2",
+    "tsconfig-paths": "^4.2.0",
+    "typescript": "^5.8.3"
+  },
+  "scripts": {
+    "dev": "nodemon --watch src --ext ts --exec ts-node src/api/api.ts",
+    "lint": "eslint 'src/**/*.{ts,js}'",
+    "format": "prettier --write 'src/**/*.{ts,js,json,md}'",
+    "typeorm:ts": "typeorm-ts-node-commonjs",
+    "db:show:migrations": "npm run typeorm:ts -- migration:show -d typeorm-config.ts",
+    "db:run:migrations": "npm run typeorm:ts -- migration:run -d typeorm-config.ts",
+    "db:make:migration": "npm run typeorm:ts -- migration:generate -d typeorm-config.ts",
+    "db:make:rollback": "npm run typeorm:ts -- migration:revert -d typeorm-config.ts"
+  },
+  "prettier": {
+    "semi": false,
+    "singleQuote": true,
+    "tabWidth": 2
+  }
+}

@@ -1,0 +1,29 @@
+import { z } from 'zod';
+
+export const EnvironmentSchema = z.object({
+  TZ: z.string(),
+  NODE_ENV: z.string(),
+  PORT: z.string(),
+  HOST: z.string(),
+  PGHOST: z.string(),
+  PGPORT: z.string(),
+  PGUSERNAME: z.string(),
+  PGPASSWORD: z.string(),
+  PGDATABASE: z.string(),
+  JWT_SECRET: z.string(),
+  JWT_ACCESS_TOKEN_EXPIRE: z.string(),
+  JWT_REFRESH_TOKEN_EXPIRE: z.string(),
+  JWT_CONFIRM_EMAIL_TOKEN_EXPIRE: z.string(),
+  SENDGRID_API_KEY: z.string(),
+  SENDGRID_FROM_EMAIL: z.string(),
+  SENDGRID_CONFIRM_EMAIL_TEMPLATE_ID: z.string(),
+  INVITE_TOKEN_EXPIRE_IN_MILLIS: z.string(),
+  SENDGRID_ORGANIZATION_INVITE_TEMPLATE_ID: z.string(),
+  AWS_REGION: z.string(),
+  AWS_S3_BUCKET_NAME: z.string(),
+  AWS_ACCESS_KEY_ID: z.string(),
+  AWS_SECRET_ACCESS_KEY: z.string(),
+  AWS_SIGNED_URL_EXPIRE_IN_SEC: z.string()
+});
+
+export type Environment = z.infer<typeof EnvironmentSchema>
