@@ -1,11 +1,11 @@
 import { IOrganizationRepo } from 'src/repos/organization.repo';
 import { IUserOrganizationRepo } from 'src/repos/user-organization.repo';
 import { Organization } from 'src/types/Organization';
-import { TypeOrmConnection } from 'src/types/TypeOrmConnection';
-import { TransactionService } from 'src/types/TypeOrmTransactionService';
+import { TypeOrmConnection } from 'src/types/interfaces/TypeOrmConnection';
+import { TransactionService } from 'src/types/interfaces/TypeOrmTransactionService';
 
 export type CreateOrganizationDto = {
-  data: Partial<Organization>
+  organizationData: Partial<Organization>
   organizationRepo: IOrganizationRepo
   userOrganizationRepo: IUserOrganizationRepo
   transactionService: TransactionService<TypeOrmConnection>

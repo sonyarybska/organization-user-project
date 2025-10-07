@@ -1,6 +1,6 @@
 # Organization Project
 
-This project is a backend API for managing organizations, users, attachments, and invitations. It is built with TypeScript and uses TypeORM for database interactions. The project structure is modular, separating controllers, routes, services, hooks, and types for maintainability and scalability.
+This project is a backend API for managing organizations, users, attachments, and invites. It is built with TypeScript and uses TypeORM for database interactions. The project structure is modular, separating controllers, routes, services, hooks, and types for maintainability and scalability.
 
 ## Features
 - User authentication and authorization

@@ -1,6 +1,8 @@
 {
   "dependencies": {
+    "@aws-sdk/client-cognito-identity-provider": "^3.879.0",
     "@aws-sdk/client-s3": "^3.859.0",
+    "@aws-sdk/client-sqs": "^3.879.0",
     "@aws-sdk/s3-request-presigner": "^3.859.0",
     "@fastify/autoload": "^6.3.1",
     "@fastify/cookie": "^11.0.2",
@@ -9,7 +11,9 @@
     "@fastify/swagger": "^9.5.1",
     "@fastify/swagger-ui": "^5.2.3",
     "@sendgrid/mail": "^8.1.5",
+    "aws-lambda": "^1.0.7",
     "bcrypt": "^6.0.0",
+    "csv-parse": "^6.1.0",
     "esbuild": "^0.25.8",
     "esbuild-plugin-tsc": "^0.5.0",
     "fastify": "^5.4.0",
@@ -22,6 +26,7 @@
     "zod": "^4.0.5"
   },
   "devDependencies": {
+    "@types/aws-lambda": "^8.10.152",
     "@types/bcrypt": "^5.0.2",
     "@types/node": "^24.0.14",
     "@typescript-eslint/eslint-plugin": "^8.38.0",
@@ -31,7 +36,7 @@
     "eslint-plugin-prettier": "^5.5.1",
     "i": "^0.3.7",
     "nodemon": "^3.1.10",
-    "npm": "^11.4.2",
+    "npm": "^11.6.0",
     "prettier": "^3.6.2",
     "ts-node": "^10.9.2",
     "tsconfig-paths": "^4.2.0",
@@ -45,7 +50,8 @@
     "db:show:migrations": "npm run typeorm:ts -- migration:show -d typeorm-config.ts",
     "db:run:migrations": "npm run typeorm:ts -- migration:run -d typeorm-config.ts",
     "db:make:migration": "npm run typeorm:ts -- migration:generate -d typeorm-config.ts",
-    "db:make:rollback": "npm run typeorm:ts -- migration:revert -d typeorm-config.ts"
+    "db:make:rollback": "npm run typeorm:ts -- migration:revert -d typeorm-config.ts",
+    "build:lambdas": "ts-node esbuild.config.ts"
   },
   "prettier": {
     "semi": false,

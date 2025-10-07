@@ -2,8 +2,10 @@ import { DataSource } from 'typeorm';
 import { UserEntity } from './entities/UserEntity';
 import { OrganizationEntity } from './entities/OrganizationEntity';
 import { UserOrganizationEntity } from './entities/UserOrganizationEntity';
-import { OrganizationInvitationEntity } from './entities/OrganizationInvitationEntity';
+import { OrganizationInviteEntity } from './entities/OrganizationInviteEntity';
 import { AttachmentEntity } from './entities/AttachmentEntity';
+import { ProspectEntity } from './entities/ProspectEntity';
+import { CsvImportRecordEntity } from './entities/CsvImportRecordEntity';
 
 export function getDataSource(opts: {
   host: string
@@ -23,12 +25,15 @@ export function getDataSource(opts: {
     synchronize: false,
     logging: process.env.NODE_ENV === 'local',
     migrations: opts.migrations,
+    ssl: { rejectUnauthorized: false },
     entities: [
       UserEntity,
       OrganizationEntity,
       UserOrganizationEntity,
-      OrganizationInvitationEntity,
-      AttachmentEntity
+      OrganizationInviteEntity,
+      AttachmentEntity,
+      ProspectEntity,
+      CsvImportRecordEntity
     ]
   });
 }

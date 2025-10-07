@@ -1,12 +1,13 @@
 import { AttachmentEntity } from 'src/services/typeorm/entities/AttachmentEntity';
+import { Attachment } from 'src/types/Attachment';
 import { DBError } from 'src/types/errors/DBError';
-import { Reconnector } from 'src/types/Reconnector';
-import { TypeOrmConnection } from 'src/types/TypeOrmConnection';
+import { Reconnector } from 'src/types/interfaces/Reconnector';
+import { TypeOrmConnection } from 'src/types/interfaces/TypeOrmConnection';
 import { DataSource, EntityManager } from 'typeorm';
 
 export interface IAttachmentRepo
   extends Reconnector<IAttachmentRepo, TypeOrmConnection> {
-  create(data: Partial<AttachmentEntity>): Promise<AttachmentEntity>
+  create(data: Partial<AttachmentEntity>): Promise<Attachment>
 }
 
 export function getAttachmentRepo(

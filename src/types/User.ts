@@ -4,15 +4,14 @@ import { AttachmentSchema } from './Attachment';
 
 export const UserSchema = z.object({
   id: z.uuid(),
-  name: z.string(),
+  cognitoUserId: z.string(),
+  name: z.string().nullable(),
   email: z.email(),
-  password: z.string(),
-  companyName: z.string(),
-  companyUrl: z.string(),
-  birthday: z.date(),
-  isConfirm: z.boolean().default(false),
+  companyName: z.string().nullable(),
+  companyUrl: z.string().nullable(),
+  birthday: z.date().nullable(),
   userOrganizations: z.array(UserOrganizationSchema),
-  avatarId: z.uuid().optional(),
+  avatarId: z.uuid().nullable(),
   avatar: AttachmentSchema.optional()
 });
 export type User = z.infer<typeof UserSchema>

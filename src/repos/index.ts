@@ -1,16 +1,20 @@
 import { getOrganizationRepo } from './organization.repo';
-import { getUserRepo } from './user-repo';
+import { getUserRepo } from './user.repo';
 import { DataSource } from 'typeorm';
 import { getUserOrganizationRepo } from './user-organization.repo';
-import { getOrganizationInvitationRepo } from './organization-invitation.repo';
+import { getOrganizationInviteRepo } from './organization-invite.repo';
 import { getAttachmentRepo } from './attachment.repo';
+import { getProspectRepo } from './prospect.repo';
+import { getCsvImportRecordRepo } from './csv-import-record.repo';
 
 export interface IRepos {
   userRepo: ReturnType<typeof getUserRepo>
   organizationRepo: ReturnType<typeof getOrganizationRepo>
   userOrganizationRepo: ReturnType<typeof getUserOrganizationRepo>
-  organizationInvitationRepo: ReturnType<typeof getOrganizationInvitationRepo>
+  organizationInviteRepo: ReturnType<typeof getOrganizationInviteRepo>
   attachmentRepo: ReturnType<typeof getAttachmentRepo>
+  prospectRepo: ReturnType<typeof getProspectRepo>
+  csvImportRecordRepo: ReturnType<typeof getCsvImportRecordRepo>
 }
 
 export function getRepos(db: DataSource) {
@@ -18,7 +22,9 @@ export function getRepos(db: DataSource) {
     userRepo: getUserRepo(db),
     organizationRepo: getOrganizationRepo(db),
     userOrganizationRepo: getUserOrganizationRepo(db),
-    organizationInvitationRepo: getOrganizationInvitationRepo(db),
-    attachmentRepo: getAttachmentRepo(db)
+    organizationInviteRepo: getOrganizationInviteRepo(db),
+    attachmentRepo: getAttachmentRepo(db),
+    prospectRepo: getProspectRepo(db),
+    csvImportRecordRepo: getCsvImportRecordRepo(db)
   };
 }
