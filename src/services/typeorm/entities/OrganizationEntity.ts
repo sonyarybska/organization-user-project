@@ -7,6 +7,8 @@ import {
   UpdateDateColumn
 } from 'typeorm';
 import { UserOrganizationEntity } from './UserOrganizationEntity';
+import { ProspectEntity } from './ProspectEntity';
+import { CsvImportRecordEntity } from './CsvImportRecordEntity';
 
 @Entity('Organization')
 export class OrganizationEntity {
@@ -15,9 +17,15 @@ export class OrganizationEntity {
 
   @Column({ unique: true })
   name: string;
-
+  
   @OneToMany(() => UserOrganizationEntity, (user) => user.organization)
   userOrganizations: UserOrganizationEntity[];
+
+  @OneToMany(() => ProspectEntity, (prospect) => prospect.organization)
+  prospects: ProspectEntity[];
+
+  @OneToMany(() => CsvImportRecordEntity, (csv) => csv.organization)
+  csvImports: CsvImportRecordEntity[];
 
   @CreateDateColumn()
   createdAt: Date;

@@ -1,11 +1,9 @@
-import { User } from 'src/types/User';
-import { IUserRepo } from 'src/repos/user-repo';
-import { JWT } from '@fastify/jwt';
+import { IUserRepo } from 'src/repos/user.repo';
+import { ICognitoService } from 'src/services/aws/cognito/cognito.service';
 
 export type LoginUserDto = {
   userRepo: IUserRepo
-  data: Partial<User>
-  jwt: JWT
-  accessTokenExpiresIn: string
-  refreshTokenExpiresIn: string
+  email: string;
+  password: string;
+  cognitoService:ICognitoService
 }

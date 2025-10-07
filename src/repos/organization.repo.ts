@@ -1,10 +1,10 @@
 import { OrganizationEntity } from 'src/services/typeorm/entities/OrganizationEntity';
-import { ErrorCode } from 'src/types/enums/ErrorCodes';
+import { ErrorCode } from 'src/types/enums/ErrorCodesEnum';
 import { DBDuplicateError } from 'src/types/errors/DBDuplicateError';
 import { DBError } from 'src/types/errors/DBError';
 import { Organization } from 'src/types/Organization';
-import { Reconnector } from 'src/types/Reconnector';
-import { TypeOrmConnection } from 'src/types/TypeOrmConnection';
+import { Reconnector } from 'src/types/interfaces/Reconnector';
+import { TypeOrmConnection } from 'src/types/interfaces/TypeOrmConnection';
 import { DataSource, EntityManager, QueryFailedError } from 'typeorm';
 
 export interface IOrganizationRepo
@@ -13,7 +13,8 @@ export interface IOrganizationRepo
   getByIdAndUserId(
     organizationId: string,
     userId: string,
-  ): Promise<OrganizationEntity>
+  ): Promise<Organization>
+  getByUserId(userId: string): Promise<Organization[]>
 }
 
 export function getOrganizationRepo(
@@ -25,6 +26,19 @@ export function getOrganizationRepo(
   return {
     reconnect(connection: TypeOrmConnection): IOrganizationRepo {
       return getOrganizationRepo(connection.entityManager);
+    },
+
+    async getByUserId(userId: string): Promise<OrganizationEntity[]> {
+      try {
+        return await organizationRepo.find({
+          where: { userOrganizations: { userId } }
+        });
+      } catch (error) {
+        throw new DBError(
+          `Organizations for user with id ${userId} not found`,
+          error
+        );
+      }
     },
 
     async getByIdAndUserId(

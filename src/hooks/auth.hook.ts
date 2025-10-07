@@ -1,7 +1,6 @@
 /* eslint-disable no-param-reassign */
 import { preHandlerAsyncHookHandler } from 'fastify';
 import { HttpError } from 'src/api/errors/HttpError';
-import { JwtPayload } from 'src/types/JwtPayload';
 
 export const authHook: preHandlerAsyncHookHandler = async function (request) {
   if (request.routeOptions.config.skipAuth) {
@@ -21,11 +20,13 @@ export const authHook: preHandlerAsyncHookHandler = async function (request) {
       throw new Error('Token in wrong format');
     }
 
-    request.jwtVerify();
+    const { subId } = await this.cognitoService.getCognitoUserInfoByAccessToken(
+      bearerTokenMatch[1]
+    );
 
-    const { id } = (await request.jwtDecode()) as JwtPayload;
+    const userProfile = await this.repos.userRepo.getUserByCognitoUserId(subId);
 
-    request.userProfile = await this.repos.userRepo.getById(id);
+    request.userProfile = userProfile;
   } catch (error) {
     throw new HttpError(401, 'Authorization failed', error);
   }

@@ -1,19 +1,18 @@
-import { IUserRepo } from 'src/repos/user-repo';
+import { IUserRepo } from 'src/repos/user.repo';
 import { ISendGridService } from 'src/services/send-grid/send-grid.service';
-import { TransactionService } from 'src/types/TypeOrmTransactionService';
-import { TypeOrmConnection } from 'src/types/TypeOrmConnection';
+import { TransactionService } from 'src/types/interfaces/TypeOrmTransactionService';
+import { TypeOrmConnection } from 'src/types/interfaces/TypeOrmConnection';
 import { IOrganizationRepo } from 'src/repos/organization.repo';
-import { CreateUserReq } from 'src/api/routes/users/schemas/CreateUserReqSchema';
 import { IUserOrganizationRepo } from 'src/repos/user-organization.repo';
-import { JWT } from '@fastify/jwt';
+import { ICognitoService } from 'src/services/aws/cognito/cognito.service';
+import { RegisterUserReq } from 'src/api/routes/auth/schemas/RegisterUserReqSchema';
 
-export type CreateUserDto = {
+export type RegisterUserDto = {
   userRepo: IUserRepo
   organizationRepo: IOrganizationRepo
   userOrganizationRepo: IUserOrganizationRepo
   transactionService: TransactionService<TypeOrmConnection>
   sendGridService: ISendGridService
-  jwt: JWT
-  expiresIn: string
-  data: CreateUserReq
+  cognitoService: ICognitoService
+  createData: RegisterUserReq
 }

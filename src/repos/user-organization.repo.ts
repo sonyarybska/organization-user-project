@@ -1,12 +1,12 @@
 import { UserOrganizationEntity } from 'src/services/typeorm/entities/UserOrganizationEntity';
-import { Reconnector } from 'src/types/Reconnector';
-import { TypeOrmConnection } from 'src/types/TypeOrmConnection';
+import { Reconnector } from 'src/types/interfaces/Reconnector';
+import { TypeOrmConnection } from 'src/types/interfaces/TypeOrmConnection';
 import { DataSource, EntityManager } from 'typeorm';
 import { DBError } from 'src/types/errors/DBError';
 
 export interface IUserOrganizationRepo
   extends Reconnector<IUserOrganizationRepo, TypeOrmConnection> {
-  assignUserToOrganization(data: Partial<UserOrganizationEntity>): Promise<void>
+  create(data: Partial<UserOrganizationEntity>): Promise<void>
 }
 
 export function getUserOrganizationRepo(db: DataSource | EntityManager) {
@@ -19,7 +19,7 @@ export function getUserOrganizationRepo(db: DataSource | EntityManager) {
       return getUserOrganizationRepo(conn.entityManager);
     },
 
-    async assignUserToOrganization(
+    async create(
       data: Partial<UserOrganizationEntity>
     ): Promise<void> {
       try {

@@ -1,13 +1,14 @@
 import { z } from 'zod';
 
 export const RefreshTokenSchema = z.object({
-  refreshToken: z.jwt()
+  refreshToken: z.string()
 });
 
 export const AccessTokenSchema = z.object({
-  accessToken: z.jwt()
+  accessToken: z.string()
 });
 
-export const JwtTokensSchema = RefreshTokenSchema.merge(AccessTokenSchema);
+export const JwtTokensSchema = z.intersection(AccessTokenSchema, RefreshTokenSchema);
 
 export type JwtTokens = z.infer<typeof JwtTokensSchema>
+export type AccessToken = z.infer<typeof AccessTokenSchema>

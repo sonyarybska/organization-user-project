@@ -1,7 +1,9 @@
 import { FastifyPluginAsync } from 'fastify';
 import { ZodTypeProvider } from 'fastify-type-provider-zod';
-import { IdUUIDSchema } from 'src/api/common';
+import { IdUUIDSchema } from 'src/api/common/schemas/IdUUIDSchema';
 import { createAttachment } from 'src/controllers/attachment/create-attachment';
+
+const SCHEMA_TAGS = ['Attachment'];
 
 const routes: FastifyPluginAsync = async (f) => {
   const fastify = f.withTypeProvider<ZodTypeProvider>();
@@ -12,11 +14,11 @@ const routes: FastifyPluginAsync = async (f) => {
     '/',
     {
       schema: {
-        tags: ['Attachment'],
+        tags: SCHEMA_TAGS,
         response: { 200: IdUUIDSchema }
       },
-      config:{
-        skipUserOrganization:true
+      config: {
+        skipUserOrganization: true
       }
     },
     async (req) => {

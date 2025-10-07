@@ -1,5 +1,5 @@
-import { TypeOrmConnection } from 'src/types/TypeOrmConnection';
-import { TransactionService } from 'src/types/TypeOrmTransactionService';
+import { TypeOrmConnection } from 'src/types/interfaces/TypeOrmConnection';
+import { TransactionService } from 'src/types/interfaces/TypeOrmTransactionService';
 import { DataSource } from 'typeorm';
 
 export function getTypeOrmTransactionService(

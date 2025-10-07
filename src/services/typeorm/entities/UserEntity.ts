@@ -10,32 +10,31 @@ import {
 } from 'typeorm';
 import { UserOrganizationEntity } from './UserOrganizationEntity';
 import { AttachmentEntity } from './AttachmentEntity';
+import { ProspectEntity } from './ProspectEntity';
+import { CsvImportRecordEntity } from './CsvImportRecordEntity';
 
 @Entity('User')
 export class UserEntity {
   @PrimaryGeneratedColumn('uuid')
   id: string;
 
-  @Column()
+  @Column({ unique: true })
+  cognitoUserId: string;
+
+  @Column({ nullable: true })
   name: string;
 
   @Column({ unique: true })
   email: string;
 
-  @Column()
-  password: string;
-
-  @Column()
+  @Column({ nullable: true })
   companyName: string;
 
-  @Column()
+  @Column({ nullable: true })
   companyUrl: string;
 
-  @Column()
+  @Column({ nullable: true })
   birthday: Date;
-
-  @Column({ default: false })
-  isConfirm: boolean;
 
   @OneToOne(() => AttachmentEntity, { nullable: true, onDelete: 'SET NULL' })
   @JoinColumn({ name: 'avatarId' })
@@ -46,6 +45,12 @@ export class UserEntity {
 
   @OneToMany(() => UserOrganizationEntity, (user) => user.user)
   userOrganizations: UserOrganizationEntity[];
+
+  @OneToMany(() => ProspectEntity, (prospect) => prospect.user)
+  prospects: ProspectEntity[];
+
+  @OneToMany(() => CsvImportRecordEntity, (csv) => csv.user)
+  csvImports: CsvImportRecordEntity[];
 
   @CreateDateColumn()
   createdAt: Date;

@@ -1,7 +1,6 @@
-import 'dotenv/config';
+import 'src/services/env/env.service';
 import fastify, { FastifyInstance } from 'fastify';
 import autoload from '@fastify/autoload';
-import jwt from '@fastify/jwt';
 import cookie from '@fastify/cookie';
 import { join } from 'path';
 import {
@@ -11,15 +10,16 @@ import {
 } from 'fastify-type-provider-zod';
 import fastifySwagger from '@fastify/swagger';
 import fastifySwaggerUi from '@fastify/swagger-ui';
-
-import { getDb } from '../services/typeorm/typeorm.service';
-import { getRepos } from '../repos';
+import { getDb } from 'src/services/typeorm/typeorm.service';
+import { getRepos } from 'src/repos';
 import { getSendGridService } from 'src/services/send-grid/send-grid.service';
 import { getTypeOrmTransactionService } from 'src/services/typeorm/typeorm-transaction.service';
 import { errorHandler } from './errors/error.handler';
 import { getAwsS3Service } from 'src/services/aws/s3/s3.service';
-
 import fastifyMultipart from '@fastify/multipart';
+import { getAwsCognitoService } from 'src/services/aws/cognito/cognito.service';
+import { getAwsSqsService } from 'src/services/aws/sqs/sqs.service';
+import { getHMACService } from 'src/services/hmac/hmac.service';
 
 const server = fastify({
   logger: {
@@ -43,15 +43,10 @@ function setupSwagger(server: FastifyInstance) {
         version: '1.0.0'
       },
       servers: [],
-      security: [{ auth: [] }],
+      security: [{ bearerAuth: [] }],
       components: {
         securitySchemes: {
-          auth: {
-            description: 'Authorization header token, sample: "Bearer {TOKEN}"',
-            type: 'apiKey',
-            name: 'authorization',
-            in: 'header'
-          }
+          bearerAuth: { type: 'http', scheme: 'bearer', bearerFormat: 'JWT' }
         }
       }
     },
@@ -71,10 +66,6 @@ const start = async () => {
   setupSwagger(server);
   try {
     server.register(cookie, {});
-
-    server.register(jwt, {
-      secret: process.env.JWT_SECRET
-    });
 
     await server.register(fastifyMultipart);
 
@@ -99,9 +90,15 @@ const start = async () => {
       getSendGridService(process.env.SENDGRID_API_KEY)
     );
 
+    server.decorate('s3Service', getAwsS3Service(process.env.AWS_REGION));
+
+    server.decorate('sqsService', getAwsSqsService(process.env.AWS_REGION));
+
+    server.decorate('hmacService', getHMACService());
+
     server.decorate(
-      's3Service',
-      getAwsS3Service(process.env.AWS_REGION, process.env.AWS_S3_BUCKET_NAME)
+      'cognitoService',
+      getAwsCognitoService(process.env.AWS_REGION)
     );
 
     server.decorate('repos', getRepos(server.db));
@@ -114,6 +111,7 @@ const start = async () => {
       cascadeHooks: true
     });
 
+    await server.ready();
     await server.listen({
       port: Number(process.env.PORT)
     });
