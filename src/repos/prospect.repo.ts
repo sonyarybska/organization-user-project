@@ -24,14 +24,18 @@ export function getProspectRepo(db: DataSource | EntityManager): IProspectRepo {
     },
 
     async create(prospect: Partial<Prospect>): Promise<ProspectEntity> {
-      const result = await prospectRepo
-        .createQueryBuilder()
-        .insert()
-        .values(prospect as Partial<ProspectEntity>)
-        .returning('*')
-        .execute();
+      try {
+        const result = await prospectRepo
+          .createQueryBuilder()
+          .insert()
+          .values(prospect as Partial<ProspectEntity>)
+          .returning('*')
+          .execute();
 
-      return result.raw[0];
+        return result.raw[0];
+      } catch (error) {
+        throw new DBError('Failed to create prospect', error);
+      }
     },
     async getByOrganizationId(
       organizationId: string

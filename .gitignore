@@ -26,3 +26,5 @@ override.tf.json
 terraform.rc
 *.secrets
 .DS_Store
+
+lambdas/

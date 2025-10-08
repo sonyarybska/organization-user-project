@@ -9,7 +9,9 @@ export interface IUserOrganizationRepo
   create(data: Partial<UserOrganizationEntity>): Promise<void>
 }
 
-export function getUserOrganizationRepo(db: DataSource | EntityManager) {
+export function getUserOrganizationRepo(
+  db: DataSource | EntityManager
+): IUserOrganizationRepo {
   const userOrganizationRepo = db.getRepository<UserOrganizationEntity>(
     UserOrganizationEntity
   );
@@ -19,9 +21,7 @@ export function getUserOrganizationRepo(db: DataSource | EntityManager) {
       return getUserOrganizationRepo(conn.entityManager);
     },
 
-    async create(
-      data: Partial<UserOrganizationEntity>
-    ): Promise<void> {
+    async create(data: Partial<UserOrganizationEntity>): Promise<void> {
       try {
         await userOrganizationRepo
           .createQueryBuilder('user_organization')
