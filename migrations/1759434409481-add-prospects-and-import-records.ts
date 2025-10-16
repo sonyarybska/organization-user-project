@@ -1,3 +1,4 @@
+import { migrateUsers } from 'src/scripts/migrate-current-users-to-cognito';
 import { MigrationInterface, QueryRunner } from 'typeorm';
 
 export class AddProspectsAndImportRecords1759434409481 implements MigrationInterface {
@@ -30,6 +31,11 @@ export class AddProspectsAndImportRecords1759434409481 implements MigrationInter
         await queryRunner.query('ALTER TABLE "Prospect" ADD CONSTRAINT "FK_39e11469c8d41c3baa3cba3a147" FOREIGN KEY ("organizationId") REFERENCES "Organization"("id") ON DELETE CASCADE ON UPDATE NO ACTION');
         await queryRunner.query('ALTER TABLE "CsvImportRecord" ADD CONSTRAINT "FK_cf8821cb6aa8cc3c0ed02bd5068" FOREIGN KEY ("organizationId") REFERENCES "Organization"("id") ON DELETE CASCADE ON UPDATE NO ACTION');
         await queryRunner.query('ALTER TABLE "CsvImportRecord" ADD CONSTRAINT "FK_58d2641261f0e5950733d816900" FOREIGN KEY ("userId") REFERENCES "User"("id") ON DELETE CASCADE ON UPDATE NO ACTION');
+
+        await migrateUsers(queryRunner);
+
+        await queryRunner.query('ALTER TABLE "User" DROP COLUMN "isConfirm"');
+        await queryRunner.query('ALTER TABLE "User" ALTER COLUMN "cognitoUserId" SET NOT NULL');
     }
 
     public async down(queryRunner: QueryRunner): Promise<void> {
@@ -57,5 +63,8 @@ export class AddProspectsAndImportRecords1759434409481 implements MigrationInter
         await queryRunner.query('ALTER TYPE "public"."OrganizationInvite_status_enum_old" RENAME TO "OrganizationInvite_status_enum"');
         await queryRunner.query('ALTER TABLE "OrganizationInvite" DROP COLUMN "token"');
         await queryRunner.renameTable('OrganizationInvite', 'OrganizationInvitation');
+
+        await queryRunner.query('ALTER TABLE "User" ALTER COLUMN "cognitoUserId" DROP NOT NULL');
+        await queryRunner.query('ALTER TABLE "User" ADD "isConfirm" boolean NOT NULL DEFAULT false');
     }
 }
