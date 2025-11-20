@@ -46,6 +46,7 @@ export function getOrganizationInviteRepo(db: DataSource | EntityManager): IOrga
           .returning('*')
           .execute();
 
+        // make sure the first element exists
         return result.raw[0];
       } catch (error) {
         throw new DBError('Failed to create organization invite', error);
@@ -65,7 +66,7 @@ export function getOrganizationInviteRepo(db: DataSource | EntityManager): IOrga
           .andWhere('status = :currentStatus', { currentStatus: InviteStatus.PENDING })
           .returning('*')
           .execute();
-
+        // make sure the first element exists
         return result.raw[0];
       } catch (error) {
         throw new DBError(

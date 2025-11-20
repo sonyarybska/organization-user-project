@@ -39,6 +39,7 @@ export const handler: SQSHandler = async (event: SQSEvent) => {
       if (!importRecordId || !row) {
         throw new Error('Missing required fields in the message');
       }
+      // import healthy
 
       await transactionService.run(async (connection) => {
         const prospectRepoTx = prospectRepo.reconnect(connection);
@@ -48,8 +49,9 @@ export const handler: SQSHandler = async (event: SQSEvent) => {
 
         await importRepoTx.incrementProcessedRows(importRecordId);
 
+        // move to finally better
         const isDone = await importRepoTx.checkIfDone(importRecordId);
-        
+
         if (isDone) {
           await importRepoTx.update(importRecordId, {
             status: CsvImportStatusEnum.DONE
@@ -63,11 +65,12 @@ export const handler: SQSHandler = async (event: SQSEvent) => {
       await transactionService.run(async (connection) => {
         const importRepoTx = importRepo.reconnect(connection);
 
+        // ???
         await importRepoTx.incrementFailedRows(importRecordId);
         await importRepoTx.update(importRecordId, { lastError: errorMessage });
 
         const isDone = await importRepoTx.checkIfDone(importRecordId);
-       
+
         if (isDone) {
           await importRepoTx.update(importRecordId, {
             status: CsvImportStatusEnum.DONE

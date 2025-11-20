@@ -16,6 +16,7 @@ export const ProspectSchema = z.object({
   organizationId: z.uuid(),
   createdAt: z.date(),
   updatedAt: z.date()
+  // source??
 });
 
 export type Prospect = z.infer<typeof ProspectSchema>;

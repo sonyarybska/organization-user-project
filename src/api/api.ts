@@ -21,6 +21,7 @@ import { getAwsCognitoService } from 'src/services/aws/cognito/cognito.service';
 import { getAwsSqsService } from 'src/services/aws/sqs/sqs.service';
 import { getHMACService } from 'src/services/hmac/hmac.service';
 
+// aws?
 const server = fastify({
   logger: {
     level: 'info',

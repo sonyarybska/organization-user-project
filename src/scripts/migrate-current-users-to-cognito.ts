@@ -17,6 +17,7 @@ export async function migrateUsers(queryRunner: QueryRunner) {
         Username: user.email,
         UserAttributes: [
           { Name: 'email', Value: user.email },
+          // isConfirm ????
           { Name: 'email_verified', Value: (user as any).isConfirm ? 'true' : 'false' }
         ]
       });

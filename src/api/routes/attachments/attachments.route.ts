@@ -31,7 +31,7 @@ const routes: FastifyPluginAsync = async (f) => {
           originalName: data!.filename,
           userId: req.userProfile.id,
           buffer: await data!.toBuffer(),
-          fileSizeInBytes: data!.file.bytesRead
+          fileSizeInBytes: data!.file.bytesRead // ???
         }
       });
     }

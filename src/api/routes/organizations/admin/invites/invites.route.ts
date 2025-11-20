@@ -14,6 +14,8 @@ const routes: FastifyPluginAsync = async (f) => {
   const hmacService = fastify.hmacService;
   const { organizationRepo, organizationInviteRepo } = fastify.repos;
 
+  // as for me you don't need admin folder
+  // just put on invites and check user role in preHandler hook
   fastify.post(
     '/',
     {

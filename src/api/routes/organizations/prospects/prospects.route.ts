@@ -37,8 +37,10 @@ const routes: FastifyPluginAsync = async (f) => {
   fastify.get(
     '/',
     {
+      // separate resp schema
       schema: { tags: SCHEMA_TAGS, response: { 200: ProspectSchema.array() } }
     },
+    // add pagination
     async (req) => {
       return await getProspectsByOrganizationId({
         prospectRepo,
@@ -53,6 +55,7 @@ const routes: FastifyPluginAsync = async (f) => {
       schema: {
         tags: SCHEMA_TAGS,
         params: IdUUIDSchema,
+        // separate resp schema
         response: { 200: ProspectSchema }
       }
     },
@@ -64,6 +67,7 @@ const routes: FastifyPluginAsync = async (f) => {
       });
     }
   );
+  // delete
 };
 
 export default routes;

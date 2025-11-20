@@ -17,6 +17,7 @@ const routes: FastifyPluginAsync = async (f) => {
     {
       schema: {
         tags: SCHEMA_TAGS,
+        // should be resp schema
         response: { 200: OrganizationInviteSchema.array() }
       }
     },

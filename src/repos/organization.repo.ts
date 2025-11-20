@@ -69,6 +69,7 @@ export function getOrganizationRepo(
           .returning('*')
           .execute();
 
+        // make sure the first element exists
         return result.raw[0];
       } catch (error) {
         if (error instanceof QueryFailedError) {

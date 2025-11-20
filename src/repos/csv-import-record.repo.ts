@@ -74,6 +74,7 @@ export function getCsvImportRecordRepo(
       }
     },
 
+    // async
     incrementProcessedRows(id: string): Promise<void> {
       try {
         return csvImportRecord
@@ -82,7 +83,7 @@ export function getCsvImportRecordRepo(
           .set({ processedRows: () => 'COALESCE("processedRows",0)+1' })
           .where('id = :id', { id })
           .execute()
-          .then(() => {});
+          .then(() => {}); // ??
       } catch (error) {
         throw new DBError(
           `Failed to increase processedRows for csv import record with id ${id}`,

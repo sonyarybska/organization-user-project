@@ -13,6 +13,7 @@ export async function importProspectsFromCsv(
 
   await s3Service.upload(key, data.buffer,bucket);
 
+  // i think you need calculate totalRows here
   const csvImportRecord = await csvImportRecordRepo.create({
     key,
     organizationId: data.organizationId,

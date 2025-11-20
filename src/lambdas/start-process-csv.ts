@@ -123,6 +123,7 @@ export const handler: SQSHandler = async (event: SQSEvent) => {
       const errorMessage =
         error instanceof Error ? error.message : String(error);
 
+      // src/lambdas/split-process-csv.ts:72
       await repo.update(importRecordId, {
         status: CsvImportStatusEnum.ERROR,
         lastError: errorMessage

@@ -28,6 +28,7 @@ export async function joinUserToOrganization(data: JoinUserToOrganizationDto) {
     throw new ApplicationError('Invalid invite token');
   }
 
+  // move to getByToken
   if (invite.expiresAt < new Date()) {
     throw new ApplicationError('Invite has expired');
   }
