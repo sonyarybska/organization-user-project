@@ -20,9 +20,7 @@ export function getAttachmentRepo(
       return getAttachmentRepo(connection.entityManager);
     },
 
-    async create(
-      data: Partial<AttachmentEntity>
-    ): Promise<AttachmentEntity> {
+    async create(data: Partial<AttachmentEntity>): Promise<AttachmentEntity> {
       try {
         const result = await attachmentRepo
           .createQueryBuilder('attachment')
@@ -31,6 +29,10 @@ export function getAttachmentRepo(
           .values(data as AttachmentEntity)
           .returning('*')
           .execute();
+
+        if (!result.raw[0]) {
+          throw new DBError('Failed to create attachment');
+        }
 
         return result.raw[0];
       } catch (error) {

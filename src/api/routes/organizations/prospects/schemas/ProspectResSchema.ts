@@ -1,7 +1,7 @@
+import { ProspectSourceEnum } from 'src/types/enums/ProspectSourceEnum';
 import z from 'zod';
-import { ProspectSourceEnum } from './enums/ProspectSourceEnum';
 
-export const ProspectSchema = z.object({
+export const ProspectResSchema = z.object({
   id: z.uuid(),
   firstName: z.string(),
   lastName: z.string(),
@@ -20,4 +20,3 @@ export const ProspectSchema = z.object({
   source: z.enum(ProspectSourceEnum)
 });
 
-export type Prospect = z.infer<typeof ProspectSchema>;

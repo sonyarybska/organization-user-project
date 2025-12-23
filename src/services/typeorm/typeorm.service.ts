@@ -25,7 +25,8 @@ export function getDataSource(opts: {
     synchronize: false,
     logging: process.env.NODE_ENV === 'local',
     migrations: opts.migrations,
-    ssl: { rejectUnauthorized: false },
+    ssl:
+      process.env.NODE_ENV !== 'local' ? { rejectUnauthorized: false } : false,
     entities: [
       UserEntity,
       OrganizationEntity,

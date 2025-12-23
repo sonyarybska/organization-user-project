@@ -77,7 +77,6 @@ const routes: FastifyPluginAsync = async (f) => {
         response: { 200: AccessTokenSchema }
       },
       config: {
-        skipAuth: true, // why skip?
         skipConfirmEmail: true,
         skipUserOrganization: true
       }

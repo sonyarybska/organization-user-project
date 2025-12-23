@@ -10,6 +10,7 @@ import {
 } from 'typeorm';
 import { UserEntity } from './UserEntity';
 import { OrganizationEntity } from './OrganizationEntity';
+import { ProspectSourceEnum } from 'src/types/enums/ProspectSourceEnum';
 
 @Index(['email', 'organizationId'], { unique: true })
 @Entity('Prospect')
@@ -56,9 +57,13 @@ export class ProspectEntity {
   @Column()
   userId: string;
 
-  @ManyToOne(() => OrganizationEntity, (organization) => organization.prospects, {
-    onDelete: 'CASCADE'
-  })
+  @ManyToOne(
+    () => OrganizationEntity,
+    (organization) => organization.prospects,
+    {
+      onDelete: 'CASCADE'
+    }
+  )
   @JoinColumn({ name: 'organizationId' })
   organization: OrganizationEntity;
 
@@ -70,4 +75,7 @@ export class ProspectEntity {
 
   @UpdateDateColumn()
   updatedAt: Date;
+
+  @Column()
+  source: ProspectSourceEnum;
 }

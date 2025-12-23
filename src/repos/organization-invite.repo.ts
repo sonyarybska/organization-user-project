@@ -3,32 +3,31 @@ import { DBError } from 'src/types/errors/DBError';
 import { OrganizationInvite } from 'src/types/OrganizationInvite';
 import { Reconnector } from 'src/types/interfaces/Reconnector';
 import { TypeOrmConnection } from 'src/types/interfaces/TypeOrmConnection';
-import { DataSource, EntityManager } from 'typeorm';
+import { DataSource, EntityManager, MoreThan } from 'typeorm';
 import { InviteStatus } from 'src/types/enums/InviteStatusEnum';
 
 export interface IOrganizationInviteRepo
   extends Reconnector<IOrganizationInviteRepo, TypeOrmConnection> {
-  createInvite(
-    data: Partial<OrganizationInvite>,
-  ): Promise<OrganizationInvite>
+  createInvite(data: Partial<OrganizationInvite>): Promise<OrganizationInvite>
   updateStatusById(
     id: string,
-    status: InviteStatus
+    status: InviteStatus,
   ): Promise<OrganizationInvite>
-  getByToken(id: string): Promise<OrganizationInvite>
+  getValidPendingByToken(id: string): Promise<OrganizationInvite>
   getByIdAndOrganizationId(
     id: string,
-    organizationId: string
+    organizationId: string,
   ): Promise<OrganizationInvite>
-  getByOrganizationId(
-    organizationId: string
-  ): Promise<OrganizationInvite[]>
+  getByOrganizationId(organizationId: string): Promise<OrganizationInvite[]>
   getByEmail(email: string): Promise<OrganizationInvite[]>
 }
 
-export function getOrganizationInviteRepo(db: DataSource | EntityManager): IOrganizationInviteRepo {
-  const organizationInviteRepo =
-    db.getRepository<OrganizationInviteEntity>(OrganizationInviteEntity);
+export function getOrganizationInviteRepo(
+  db: DataSource | EntityManager
+): IOrganizationInviteRepo {
+  const organizationInviteRepo = db.getRepository<OrganizationInviteEntity>(
+    OrganizationInviteEntity
+  );
 
   return {
     reconnect(connection: TypeOrmConnection): IOrganizationInviteRepo {
@@ -46,7 +45,10 @@ export function getOrganizationInviteRepo(db: DataSource | EntityManager): IOrga
           .returning('*')
           .execute();
 
-        // make sure the first element exists
+        if (!result.raw[0]) {
+          throw new DBError('Failed to create organization invite');
+        }
+
         return result.raw[0];
       } catch (error) {
         throw new DBError('Failed to create organization invite', error);
@@ -63,10 +65,18 @@ export function getOrganizationInviteRepo(db: DataSource | EntityManager): IOrga
           .update(OrganizationInviteEntity)
           .set({ status })
           .where('id = :id', { id })
-          .andWhere('status = :currentStatus', { currentStatus: InviteStatus.PENDING })
+          .andWhere('status = :currentStatus', {
+            currentStatus: InviteStatus.PENDING
+          })
           .returning('*')
           .execute();
-        // make sure the first element exists
+
+        if (!result.raw[0]) {
+          throw new DBError(
+            `Failed to update organization invite with id ${id}`
+          );
+        }
+
         return result.raw[0];
       } catch (error) {
         throw new DBError(
@@ -76,19 +86,16 @@ export function getOrganizationInviteRepo(db: DataSource | EntityManager): IOrga
       }
     },
 
-    async getByToken(
-      token: string
-    ): Promise<OrganizationInvite> {
-      try {
-        return await organizationInviteRepo.findOneOrFail({
-          where: { token }
-        });
-      } catch (error) {
-        throw new DBError(
-          `Invite with token ${token} not found`,
-          error
-        );
-      }
+    async getValidPendingByToken(token: string): Promise<OrganizationInvite> {
+      const invite = await organizationInviteRepo.findOneOrFail({
+        where: {
+          token,
+          status: InviteStatus.PENDING,
+          expiresAt: MoreThan(new Date())
+        }
+      });
+
+      return invite;
     },
 
     async getByIdAndOrganizationId(
@@ -117,10 +124,7 @@ export function getOrganizationInviteRepo(db: DataSource | EntityManager): IOrga
           }
         });
       } catch (error) {
-        throw new DBError(
-          'Failed to retrieve invites for organization',
-          error
-        );
+        throw new DBError('Failed to retrieve invites for organization', error);
       }
     },
 
@@ -132,10 +136,7 @@ export function getOrganizationInviteRepo(db: DataSource | EntityManager): IOrga
           }
         });
       } catch (error) {
-        throw new DBError(
-          'Failed to retrieve invites for user',
-          error
-        );
+        throw new DBError('Failed to retrieve invites for user', error);
       }
     }
   };

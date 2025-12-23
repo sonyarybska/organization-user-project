@@ -17,8 +17,7 @@ export async function createAttachment({
     originalName,
     key,
     publicKey,
-    userId,
-    fileSizeInBytes: buffer.length
+    userId
   });
 
   return { id };

@@ -1,5 +1,6 @@
 import { CsvImportRecordEntity } from 'src/services/typeorm/entities/CsvImportRecordEntity';
 import { CsvImportRecord } from 'src/types/CsvImportRecord';
+import { CsvImportStatusEnum } from 'src/types/enums/CsvImportStatusEnum';
 import { DBError } from 'src/types/errors/DBError';
 import { Reconnector } from 'src/types/interfaces/Reconnector';
 import { TypeOrmConnection } from 'src/types/interfaces/TypeOrmConnection';
@@ -11,7 +12,7 @@ export interface ICsvImportRecordRepo
   create(data: Partial<CsvImportRecordEntity>): Promise<CsvImportRecord>
   update(id: string, data: Partial<CsvImportRecord>): Promise<CsvImportRecord>
   incrementProcessedRows(id: string): Promise<void>
-  incrementFailedRows(id: string): Promise<void>
+  handleImportError(id: string, lastError: string): Promise<void>
   checkIfDone(id: string): Promise<boolean>
 }
 
@@ -47,6 +48,10 @@ export function getCsvImportRecordRepo(
           .returning('*')
           .execute();
 
+        if (!result.raw[0]) {
+          throw new DBError('Failed to create csv import record');
+        }
+
         return result.raw[0];
       } catch (error) {
         throw new DBError('Failed to create csv import record', error);
@@ -65,6 +70,10 @@ export function getCsvImportRecordRepo(
           .returning('*')
           .execute();
 
+        if (!result.raw[0]) {
+          throw new DBError(`Failed to update csv import record with id ${id}`);
+        }
+
         return result.raw[0];
       } catch (error) {
         throw new DBError(
@@ -74,16 +83,14 @@ export function getCsvImportRecordRepo(
       }
     },
 
-    // async
-    incrementProcessedRows(id: string): Promise<void> {
+    async incrementProcessedRows(id: string): Promise<void> {
       try {
-        return csvImportRecord
+        await csvImportRecord
           .createQueryBuilder()
           .update(CsvImportRecordEntity)
           .set({ processedRows: () => 'COALESCE("processedRows",0)+1' })
           .where('id = :id', { id })
-          .execute()
-          .then(() => {}); // ??
+          .execute();
       } catch (error) {
         throw new DBError(
           `Failed to increase processedRows for csv import record with id ${id}`,
@@ -92,18 +99,21 @@ export function getCsvImportRecordRepo(
       }
     },
 
-    incrementFailedRows(id: string): Promise<void> {
+    async handleImportError(id: string, lastError: string): Promise<void> {
       try {
-        return csvImportRecord
+        await csvImportRecord
           .createQueryBuilder()
           .update(CsvImportRecordEntity)
-          .set({ failedRows: () => 'COALESCE("failedRows",0)+1' })
+          .set({
+            failedRows: () => 'COALESCE("failedRows",0)+1',
+            status: CsvImportStatusEnum.ERROR,
+            lastError
+          })
           .where('id = :id', { id })
-          .execute()
-          .then(() => {});
+          .execute();
       } catch (error) {
         throw new DBError(
-          `Failed to increase failedRows for csv import record with id ${id}`,
+          `Failed to handle import error for csv import record with id ${id}`,
           error
         );
       }

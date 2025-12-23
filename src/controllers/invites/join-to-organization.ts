@@ -15,7 +15,7 @@ export async function joinUserToOrganization(data: JoinUserToOrganizationDto) {
     transactionService
   } = data;
 
-  const invite = await organizationInviteRepo.getByToken(data.token);
+  const invite = await organizationInviteRepo.getValidPendingByToken(data.token);
 
   const isTokenValid = hmacService.validateToken(
     data.token,
@@ -26,15 +26,6 @@ export async function joinUserToOrganization(data: JoinUserToOrganizationDto) {
 
   if (!isTokenValid) {
     throw new ApplicationError('Invalid invite token');
-  }
-
-  // move to getByToken
-  if (invite.expiresAt < new Date()) {
-    throw new ApplicationError('Invite has expired');
-  }
-
-  if (invite.status !== InviteStatus.PENDING) {
-    throw new ApplicationError('Invite is already accepted or declined');
   }
 
   let user = await userRepo.getByEmail(invite.email);

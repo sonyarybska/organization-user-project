@@ -8,6 +8,5 @@ export type CreateAttachmentDto = {
     originalName: string
     userId: string
     buffer: Buffer
-    fileSizeInBytes: number
   }
 }

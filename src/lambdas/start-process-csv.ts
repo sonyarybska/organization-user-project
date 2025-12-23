@@ -92,17 +92,17 @@ export const handler: SQSHandler = async (event: SQSEvent) => {
 
       const stream = await getCsvStreamFromS3(s3, key, bucketName);
 
-      let total = 0;
+      let rowNumber = 0;
 
       for await (const row of stream) {
-        total++;
+        rowNumber++;
         
         const prospect = mapAndValidateRow(
           row,
           mapping,
           userId,
           organizationId,
-          total
+          rowNumber
         );
 
         await sqs.sendMessageToQueue(
@@ -114,16 +114,10 @@ export const handler: SQSHandler = async (event: SQSEvent) => {
         );
       }
 
-      if (total === 0) {
-        throw new Error('CSV file is empty');
-      }
-
-      await repo.update(importRecordId, { totalRows: total });
     } catch (error) {
       const errorMessage =
         error instanceof Error ? error.message : String(error);
-
-      // src/lambdas/split-process-csv.ts:72
+ 
       await repo.update(importRecordId, {
         status: CsvImportStatusEnum.ERROR,
         lastError: errorMessage

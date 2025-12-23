@@ -1,7 +1,7 @@
 import { FastifyPluginAsync } from 'fastify';
 import { ZodTypeProvider } from 'fastify-type-provider-zod';
-import { IdUUIDSchema } from 'src/api/common/schemas/IdUUIDSchema';
 import { createAttachment } from 'src/controllers/attachment/create-attachment';
+import { IdUUIDSchema } from '../schemas/IdUUIDSchema';
 
 const SCHEMA_TAGS = ['Attachment'];
 
@@ -30,8 +30,7 @@ const routes: FastifyPluginAsync = async (f) => {
         attachmentData: {
           originalName: data!.filename,
           userId: req.userProfile.id,
-          buffer: await data!.toBuffer(),
-          fileSizeInBytes: data!.file.bytesRead // ???
+          buffer: await data!.toBuffer()
         }
       });
     }

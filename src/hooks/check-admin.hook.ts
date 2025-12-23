@@ -1,12 +1,9 @@
  
-import { FastifyPluginAsync } from 'fastify';
+import { preHandlerAsyncHookHandler } from 'fastify';
 import { HttpError } from 'src/api/errors/HttpError';
 import { UserRoleEnum } from 'src/types/enums/UserRoleEnum';
 
-
-const hooks: FastifyPluginAsync = async function (fastify) {
-  fastify.addHook('preHandler', (request) => {
-    // move to hook
+export const checkAdminHook: preHandlerAsyncHookHandler = async function (request) {
   try {
     const userRole = request.userOrganization.role;
     if (userRole !== UserRoleEnum.ADMIN) {
@@ -15,7 +12,4 @@ const hooks: FastifyPluginAsync = async function (fastify) {
   } catch (error) {
     throw new HttpError(403, 'Access denied', error);
   }
-  });
 };
-
-export default hooks;

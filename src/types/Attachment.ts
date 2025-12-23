@@ -5,8 +5,7 @@ export const AttachmentSchema = z.object({
   originalName: z.string(),
   key: z.string(),
   publicKey: z.string(),
-  userId: z.uuid(),
-  fileSizeInBytes: z.number()
+  userId: z.uuid()
 });
 
 export type Attachment = z.infer<typeof AttachmentSchema>;

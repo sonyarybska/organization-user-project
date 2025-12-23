@@ -8,11 +8,15 @@ import { DBError } from 'src/types/errors/DBError';
 export interface IProspectRepo
   extends Reconnector<IProspectRepo, TypeOrmConnection> {
   create(prospect: Partial<Prospect>): Promise<Prospect>
-  getByOrganizationId(organizationId: string): Promise<Prospect[]>
+  getByOrganizationId(organizationId: string): Promise<{prospects: Prospect[], count: number}>
   getByIdAndOrganizationId(
     prospectId: string,
     organizationId: string,
   ): Promise<Prospect>
+  deleteByIdAndOrganizationId(
+    prospectId: string,
+    organizationId: string,
+  ): Promise<void>
 }
 
 export function getProspectRepo(db: DataSource | EntityManager): IProspectRepo {
@@ -32,19 +36,25 @@ export function getProspectRepo(db: DataSource | EntityManager): IProspectRepo {
           .returning('*')
           .execute();
 
-        // make sure the first element exists
+        if (!result.raw[0]) {
+          throw new DBError('Failed to create prospect');
+        }
+
         return result.raw[0];
       } catch (error) {
         throw new DBError('Failed to create prospect', error);
       }
     },
+
     async getByOrganizationId(
       organizationId: string
-    ): Promise<ProspectEntity[]> {
+    ): Promise<{prospects: ProspectEntity[], count: number}> {
       try {
-        return await prospectRepo.find({
-          where: { organizationId }
-        });
+        const [prospects, count] = await prospectRepo.createQueryBuilder('prospect')
+          .where('prospect.organizationId = :organizationId', { organizationId })
+          .getManyAndCount();
+
+        return { prospects, count };
       } catch (error) {
         throw new DBError(
           `Prospects for organization id ${organizationId} not found`,
@@ -62,6 +72,16 @@ export function getProspectRepo(db: DataSource | EntityManager): IProspectRepo {
         });
       } catch (error) {
         throw new DBError(`Prospect with id ${prospectId} not found`, error);
+      }
+    },
+    async deleteByIdAndOrganizationId(
+      prospectId: string,
+      organizationId: string
+    ): Promise<void> {
+      try {
+        await prospectRepo.delete({ id: prospectId, organizationId });
+      } catch (error) {
+        throw new DBError(`Failed to delete prospect with id ${prospectId}`, error);
       }
     }
   };

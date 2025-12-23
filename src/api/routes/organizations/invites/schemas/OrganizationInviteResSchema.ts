@@ -1,7 +1,7 @@
+import { InviteStatus } from 'src/types/enums/InviteStatusEnum';
 import { z } from 'zod';
-import { InviteStatus } from './enums/InviteStatusEnum';
 
-export const OrganizationInviteSchema = z.object({
+export const OrganizationInviteResSchema = z.object({
   id: z.uuid(),
   email: z.email(),
   organizationId: z.uuid(),
@@ -11,4 +11,3 @@ export const OrganizationInviteSchema = z.object({
   createdAt: z.date()
 });
 
-export type OrganizationInvite = z.infer<typeof OrganizationInviteSchema>

@@ -37,7 +37,7 @@ export class UserOrganizationEntity {
   @JoinColumn({ name: 'organizationId' })
   organization: OrganizationEntity;
 
-  @Column({ type: 'enum', enum: UserRoleEnum, default: UserRoleEnum.USER })
+  @Column()
   role: UserRoleEnum;
 
   @CreateDateColumn()

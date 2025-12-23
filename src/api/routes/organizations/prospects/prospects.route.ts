@@ -2,10 +2,13 @@ import { FastifyPluginAsync } from 'fastify';
 import { ZodTypeProvider } from 'fastify-type-provider-zod';
 import { createProspect } from 'src/controllers/prospect/create-prospect';
 import { getProspectsByOrganizationId } from 'src/controllers/prospect/get-prospects-by-organization-id';
-import { ProspectSchema } from 'src/types/Prospect';
 import { getProspectByIdAndOrgId } from 'src/controllers/prospect/get-prospect-by-id-and-org-id';
 import { CreateProspectReqSchema } from './schemas/CreateProspectReqSchema';
-import { IdUUIDSchema } from 'src/api/common/schemas/IdUUIDSchema';
+import { IdUUIDSchema } from '../../schemas/IdUUIDSchema';
+import { ProspectResSchema } from './schemas/ProspectResSchema';
+import { PaginatedProspectsResSchema } from './schemas/PaginatedProspectsResSchema';
+import { deleteProspectsByIdAndOrganizationId } from 'src/controllers/prospect/delete-prospects-by-id-and-organization-id';
+import { ProspectSourceEnum } from 'src/types/enums/ProspectSourceEnum';
 
 const SCHEMA_TAGS = ['Prospect'];
 
@@ -28,7 +31,8 @@ const routes: FastifyPluginAsync = async (f) => {
         data: {
           ...req.body,
           organizationId: req.userOrganization.organizationId,
-          userId: req.userProfile.id
+          userId: req.userProfile.id,
+          source: ProspectSourceEnum.MANUAL
         }
       });
     }
@@ -37,10 +41,8 @@ const routes: FastifyPluginAsync = async (f) => {
   fastify.get(
     '/',
     {
-      // separate resp schema
-      schema: { tags: SCHEMA_TAGS, response: { 200: ProspectSchema.array() } }
+      schema: { tags: SCHEMA_TAGS, response: { 200: PaginatedProspectsResSchema } }
     },
-    // add pagination
     async (req) => {
       return await getProspectsByOrganizationId({
         prospectRepo,
@@ -55,8 +57,7 @@ const routes: FastifyPluginAsync = async (f) => {
       schema: {
         tags: SCHEMA_TAGS,
         params: IdUUIDSchema,
-        // separate resp schema
-        response: { 200: ProspectSchema }
+        response: { 200: ProspectResSchema }
       }
     },
     async (req) => {
@@ -67,7 +68,22 @@ const routes: FastifyPluginAsync = async (f) => {
       });
     }
   );
-  // delete
+
+  fastify.delete('/:id', 
+    {
+      schema: {
+        tags:SCHEMA_TAGS,
+        params:IdUUIDSchema
+      }
+    },
+    async (req) => {
+      await deleteProspectsByIdAndOrganizationId({
+        id: req.params.id,
+        organizationId: req.userOrganization.organizationId,
+        prospectRepo
+      });
+    }
+  );
 };
 
 export default routes;

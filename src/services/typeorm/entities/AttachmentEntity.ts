@@ -17,6 +17,4 @@ export class AttachmentEntity {
   @Column()
   userId: string;
 
-  @Column()
-  fileSizeInBytes: number;
 }

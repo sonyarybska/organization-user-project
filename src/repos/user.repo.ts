@@ -65,7 +65,11 @@ export function getUserRepo(db: DataSource | EntityManager): IUserRepo {
           .values(user as UserEntity)
           .returning('*')
           .execute();
-// make sure the first element exists
+
+        if (!result.raw[0]) {
+          throw new DBError('Failed to create user');
+        }
+
         return result.raw[0];
       } catch (error) {
         throw new DBError('Failed to create user', error);
@@ -89,7 +93,10 @@ export function getUserRepo(db: DataSource | EntityManager): IUserRepo {
           .where('id = :id', { id })
           .returning('*')
           .execute();
-        // make sure the first element exists
+
+        if (!user.raw[0]) {
+          throw new DBError(`Failed to update user with id ${id}`);
+        }
 
         return user.raw[0];
       } catch (error) {

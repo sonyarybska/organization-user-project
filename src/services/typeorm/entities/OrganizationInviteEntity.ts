@@ -27,11 +27,10 @@ export class OrganizationInviteEntity {
   @Column()
   expiresAt: Date;
 
-  //unique token for accepting the invite
-  @Column()
+  @Column({ unique: true })
   token: string;
 
-  @Column({ type: 'enum', enum: InviteStatus, default: InviteStatus.PENDING })
+  @Column()
   status: InviteStatus;
 
   @CreateDateColumn()

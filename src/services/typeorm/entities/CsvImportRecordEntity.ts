@@ -28,27 +28,20 @@ export class CsvImportRecordEntity {
   @Column()
   organizationId: string;
 
-  @ManyToOne(() => UserEntity, (user) => user.csvImports, {
-    onDelete: 'CASCADE' // don't need here CASCADE - DO NOTHING better
-  })
-
+  @ManyToOne(() => UserEntity, (user) => user.csvImports)
   @JoinColumn({ name: 'userId' })
   user: UserEntity;
 
   @Column()
   userId: string;
 
-  @Column({
-    type: 'enum',
-    enum: CsvImportStatusEnum,
-    default: CsvImportStatusEnum.NEW // remove
-  })
+  @Column()
   status: CsvImportStatusEnum;
 
-  @Column({  nullable: true })
+  @Column({ nullable: true })
   totalRows: number;
 
-  @Column({  nullable: true })
+  @Column({ nullable: true })
   processedRows: number;
 
   @Column({ nullable: true })

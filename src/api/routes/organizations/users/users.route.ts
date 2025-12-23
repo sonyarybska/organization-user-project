@@ -1,7 +1,8 @@
 import { FastifyPluginAsync } from 'fastify';
 import { ZodTypeProvider } from 'fastify-type-provider-zod';
-import { UserResSchema } from 'src/api/common/schemas/UserResSchema';
+
 import { getUsersByOrganizationId } from 'src/controllers/user/get-users-by-organization-id';
+import { UserResSchema } from '../../schemas/UserResSchema';
 
 const SCHEMA_TAGS = ['User'];
 
