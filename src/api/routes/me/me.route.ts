@@ -3,7 +3,7 @@ import { ZodTypeProvider } from 'fastify-type-provider-zod';
 import { getUserById } from 'src/controllers/user/get-user-by-id';
 import { updateUserById } from 'src/controllers/user/update-user-by-id';
 import { UpdateUserReqSchema } from '../organizations/users/schemas/UpdateUserReqSchema';
-import { UserResSchema } from 'src/api/common/schemas/UserResSchema';
+import { UserResSchema } from '../schemas/UserResSchema';
 
 const SCHEMA_TAGS = ['Me', 'Organization'];
 

@@ -1,4 +1,4 @@
-import { UserResSchema } from 'src/api/common/schemas/UserResSchema';
+import { UserResSchema } from 'src/api/routes/schemas/UserResSchema';
 import { GetUserByIdDto } from 'src/types/dtos/user/GetUserByIdDto';
 
 const expireInSeconds = Number(process.env.AWS_SIGNED_URL_EXPIRE_IN_SEC);

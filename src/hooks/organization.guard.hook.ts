@@ -1,7 +1,7 @@
 /* eslint-disable no-param-reassign */
 import { preHandlerAsyncHookHandler } from 'fastify';
-import { OrganizationIdUUIDSchema } from 'src/api/common/schemas/OrganizationIdUUIDSchema';
 import { HttpError } from 'src/api/errors/HttpError';
+import { OrganizationIdUUIDSchema } from 'src/api/routes/schemas/OrganizationIdUUIDSchema';
 
 export const organizationGuardHook: preHandlerAsyncHookHandler =
   async function (request) {
