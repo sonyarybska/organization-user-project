@@ -2,15 +2,18 @@
 import { SQSEvent, SQSHandler } from 'aws-lambda';
 import { getDb } from 'src/services/typeorm/typeorm.service';
 import { getProspectRepo } from 'src/repos/prospect.repo';
+import { getCompanyRepo } from 'src/repos/company.repo';
 import { getCsvImportRecordRepo } from 'src/repos/csv-import-record.repo';
 import { CsvImportStatusEnum } from 'src/types/enums/CsvImportStatusEnum';
-import { Prospect } from 'src/types/Prospect';
 import { getTypeOrmTransactionService } from 'src/services/typeorm/typeorm-transaction.service';
-import { ProspectSourceEnum } from 'src/types/enums/ProspectSourceEnum';
+import { SourceTypeEnum } from 'src/types/enums/SourceTypeEnum';
+import { normalizeDomain } from 'src/controllers/prospect/helpers/normalizeDomain';
+import { normalizeLinkedinUrl } from 'src/controllers/prospect/helpers/normalizeLinkedinUrl';
+import { ImportCsvProspect } from 'src/api/routes/organizations/prospects/csv-import-records/schemas/ImportCsvProspectSchema';
 
 interface ProcessCsvRowMessage {
   importRecordId: string
-  row: Partial<Prospect>
+  row: Partial<ImportCsvProspect>
 }
 
 export const handler: SQSHandler = async (event: SQSEvent) => {
@@ -29,6 +32,7 @@ export const handler: SQSHandler = async (event: SQSEvent) => {
   const transactionService = getTypeOrmTransactionService(db);
 
   const prospectRepo = getProspectRepo(db);
+  const companyRepo = getCompanyRepo(db);
   const importRepo = getCsvImportRecordRepo(db);
 
   for (const record of event.Records) {
@@ -51,9 +55,31 @@ export const handler: SQSHandler = async (event: SQSEvent) => {
 
       await transactionService.run(async (connection) => {
         const prospectRepoTx = prospectRepo.reconnect(connection);
+        const companyRepoTx = companyRepo.reconnect(connection);
         const importRepoTx = importRepo.reconnect(connection);
 
-        await prospectRepoTx.create({ ...row, source:ProspectSourceEnum.CSV_IMPORT });
+        const { companyName, companyAddress, companyLinkedinUrl, ...prospectData } = row;
+
+          const normalizedDomain = normalizeDomain(prospectData.domain!);
+          const normalizedCompanyLinkedinUrl = normalizeLinkedinUrl(companyLinkedinUrl);
+
+          const company = await companyRepoTx.upsert({
+            domain: normalizedDomain,
+            source: SourceTypeEnum.CSV_IMPORT,
+            linkedinUrl: normalizedCompanyLinkedinUrl,
+            name: companyName,
+            address: companyAddress,
+            organizationId: prospectData.organizationId!
+          });
+
+        const normalizedProspectLinkedinUrl = normalizeLinkedinUrl(prospectData.linkedinUrl);
+
+        await prospectRepoTx.create({
+          ...prospectData,
+          linkedinUrl: normalizedProspectLinkedinUrl,
+          companyId: company.id,
+          source: SourceTypeEnum.CSV_IMPORT
+        });
 
         await importRepoTx.incrementProcessedRows(importRecordId);
       });
@@ -62,7 +88,7 @@ export const handler: SQSHandler = async (event: SQSEvent) => {
         error instanceof Error ? error.message : String(error);
 
       await importRepo.handleImportError(importRecordId, errorMessage);
-      
+
       console.log('Error processing row for importRecordId');
     } finally {
       const isDone = await importRepo.checkIfDone(importRecordId);

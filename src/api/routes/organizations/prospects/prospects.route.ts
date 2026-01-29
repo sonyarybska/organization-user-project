@@ -8,7 +8,7 @@ import { IdUUIDSchema } from '../../schemas/IdUUIDSchema';
 import { ProspectResSchema } from './schemas/ProspectResSchema';
 import { PaginatedProspectsResSchema } from './schemas/PaginatedProspectsResSchema';
 import { deleteProspectsByIdAndOrganizationId } from 'src/controllers/prospect/delete-prospects-by-id-and-organization-id';
-import { ProspectSourceEnum } from 'src/types/enums/ProspectSourceEnum';
+import { SourceTypeEnum } from 'src/types/enums/SourceTypeEnum';
 
 const SCHEMA_TAGS = ['Prospect'];
 
@@ -32,7 +32,7 @@ const routes: FastifyPluginAsync = async (f) => {
           ...req.body,
           organizationId: req.userOrganization.organizationId,
           userId: req.userProfile.id,
-          source: ProspectSourceEnum.MANUAL
+          source: SourceTypeEnum.MANUAL
         }
       });
     }

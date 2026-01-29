@@ -10,7 +10,8 @@ import {
 } from 'typeorm';
 import { UserEntity } from './UserEntity';
 import { OrganizationEntity } from './OrganizationEntity';
-import { ProspectSourceEnum } from 'src/types/enums/ProspectSourceEnum';
+import { SourceTypeEnum } from 'src/types/enums/SourceTypeEnum';
+import { CompanyEntity } from './CompanyEntity';
 
 @Index(['email', 'organizationId'], { unique: true })
 @Entity('Prospect')
@@ -26,9 +27,6 @@ export class ProspectEntity {
 
   @Column()
   email: string;
-
-  @Column({ nullable: true })
-  companyName: string;
 
   @Column({ nullable: true })
   domain: string;
@@ -67,6 +65,13 @@ export class ProspectEntity {
   @JoinColumn({ name: 'organizationId' })
   organization: OrganizationEntity;
 
+  @Column({ nullable: true })
+  companyId: string;
+  
+  @ManyToOne(() => CompanyEntity)
+  @JoinColumn({ name: 'companyId' })
+  company: CompanyEntity;
+
   @Column()
   organizationId: string;
 
@@ -76,6 +81,6 @@ export class ProspectEntity {
   @UpdateDateColumn()
   updatedAt: Date;
 
-  @Column()
-  source: ProspectSourceEnum;
+  @Column({ type:'varchar' })
+  source: SourceTypeEnum;
 }

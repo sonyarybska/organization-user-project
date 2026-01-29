@@ -26,7 +26,8 @@ export function getUserRepo(db: DataSource | EntityManager): IUserRepo {
     ): Promise<UserEntity[]> {
       try {
         return await userRepository.find({
-          where: { userOrganizations: { organizationId } }
+          where: { userOrganizations: { organizationId } },
+          relations: ['userOrganizations', 'avatar']
         });
       } catch (error) {
         throw new DBError('Failed to get users', error);

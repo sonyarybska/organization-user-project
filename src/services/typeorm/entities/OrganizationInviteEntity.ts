@@ -30,7 +30,7 @@ export class OrganizationInviteEntity {
   @Column({ unique: true })
   token: string;
 
-  @Column()
+  @Column({ type: 'varchar' })
   status: InviteStatus;
 
   @CreateDateColumn()

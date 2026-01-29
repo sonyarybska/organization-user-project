@@ -6,6 +6,7 @@ import { getOrganizationInviteRepo } from './organization-invite.repo';
 import { getAttachmentRepo } from './attachment.repo';
 import { getProspectRepo } from './prospect.repo';
 import { getCsvImportRecordRepo } from './csv-import-record.repo';
+import { getCompanyRepo } from './company.repo';
 
 export interface IRepos {
   userRepo: ReturnType<typeof getUserRepo>
@@ -14,7 +15,8 @@ export interface IRepos {
   organizationInviteRepo: ReturnType<typeof getOrganizationInviteRepo>
   attachmentRepo: ReturnType<typeof getAttachmentRepo>
   prospectRepo: ReturnType<typeof getProspectRepo>
-  csvImportRecordRepo: ReturnType<typeof getCsvImportRecordRepo>
+  csvImportRecordRepo: ReturnType<typeof getCsvImportRecordRepo>,
+  companyRepo: ReturnType<typeof getCompanyRepo>
 }
 
 export function getRepos(db: DataSource) {
@@ -25,6 +27,7 @@ export function getRepos(db: DataSource) {
     organizationInviteRepo: getOrganizationInviteRepo(db),
     attachmentRepo: getAttachmentRepo(db),
     prospectRepo: getProspectRepo(db),
-    csvImportRecordRepo: getCsvImportRecordRepo(db)
+    csvImportRecordRepo: getCsvImportRecordRepo(db),
+    companyRepo: getCompanyRepo(db)
   };
 }

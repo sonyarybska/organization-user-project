@@ -27,7 +27,7 @@ export function getProspectRepo(db: DataSource | EntityManager): IProspectRepo {
       return getProspectRepo(connection.entityManager);
     },
 
-    async create(prospect: Partial<Prospect>): Promise<ProspectEntity> {
+    async create(prospect: Partial<Prospect>): Promise<Prospect> {
       try {
         const result = await prospectRepo
           .createQueryBuilder()
@@ -40,7 +40,7 @@ export function getProspectRepo(db: DataSource | EntityManager): IProspectRepo {
           throw new DBError('Failed to create prospect');
         }
 
-        return result.raw[0];
+        return result.raw[0] as Prospect;
       } catch (error) {
         throw new DBError('Failed to create prospect', error);
       }
@@ -48,13 +48,13 @@ export function getProspectRepo(db: DataSource | EntityManager): IProspectRepo {
 
     async getByOrganizationId(
       organizationId: string
-    ): Promise<{prospects: ProspectEntity[], count: number}> {
+    ): Promise<{prospects: Prospect[], count: number}> {
       try {
         const [prospects, count] = await prospectRepo.createQueryBuilder('prospect')
           .where('prospect.organizationId = :organizationId', { organizationId })
           .getManyAndCount();
 
-        return { prospects, count };
+        return { prospects: prospects as Prospect[], count };
       } catch (error) {
         throw new DBError(
           `Prospects for organization id ${organizationId} not found`,
@@ -65,11 +65,11 @@ export function getProspectRepo(db: DataSource | EntityManager): IProspectRepo {
     async getByIdAndOrganizationId(
       prospectId: string,
       organizationId: string
-    ): Promise<ProspectEntity> {
+    ): Promise<Prospect> {
       try {
-        return await prospectRepo.findOneOrFail({
+        return (await prospectRepo.findOneOrFail({
           where: { id: prospectId, organizationId }
-        });
+        })) as Prospect;
       } catch (error) {
         throw new DBError(`Prospect with id ${prospectId} not found`, error);
       }

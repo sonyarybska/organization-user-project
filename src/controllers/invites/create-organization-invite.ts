@@ -1,4 +1,5 @@
 import { CreateOrganizationInviteDto } from 'src/types/dtos/organization/CreateOrganizationInviteDto';
+import { InviteStatus } from 'src/types/enums/InviteStatusEnum';
 
 const inviteTokenExpireInMillis = Number(
   process.env.INVITE_TOKEN_EXPIRE_IN_MILLIS
@@ -32,7 +33,8 @@ export async function createOrganizationInvite(
     email: data.email,
     organizationId: data.organizationId,
     expiresAt,
-    token
+    token,
+    status:InviteStatus.PENDING
   });
 
   await sendGridService.sendInviteEmail(data.email, organizationName, token);

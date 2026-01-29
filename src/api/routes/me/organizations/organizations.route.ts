@@ -15,6 +15,10 @@ const routes: FastifyPluginAsync = async (f) => {
       schema: {
         tags: SCHEMA_TAGS,
         response:{ 200:OrganizationSchema.array() }
+        
+      },
+      config: {
+        skipUserOrganization: true
       }
     },
     async (req) => {

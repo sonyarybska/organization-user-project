@@ -1,5 +1,4 @@
- 
-/* eslint-disable no-console */
+ /* eslint-disable no-console */
 import { SQSEvent, SQSHandler } from 'aws-lambda';
 import { getDb } from 'src/services/typeorm/typeorm.service';
 import { getAwsS3Service, IS3Service } from 'src/services/aws/s3/s3.service';
@@ -8,8 +7,7 @@ import { parse } from 'csv-parse';
 import { Readable } from 'stream';
 import { CsvImportStatusEnum } from 'src/types/enums/CsvImportStatusEnum';
 import { getCsvImportRecordRepo } from 'src/repos/csv-import-record.repo';
-import { Prospect } from 'src/types/Prospect';
-import { CreateProspectReqSchema } from 'src/api/routes/organizations/prospects/schemas/CreateProspectReqSchema';
+import { ImportCsvProspect, ImportCsvProspectSchema } from 'src/api/routes/organizations/prospects/csv-import-records/schemas/ImportCsvProspectSchema';
 
 interface StartCsvImportMessage {
   importRecordId: string
@@ -39,11 +37,11 @@ function mapAndValidateRow(
   organizationId: string,
   rowNumber: number
 ) {
-  const mappedRow: Partial<Prospect> = Object.fromEntries(
+  const mappedRow: Partial<ImportCsvProspect> = Object.fromEntries(
     Object.entries(mapping).map(([target, source]) => [target, row[source]])
   );
 
-  const result = CreateProspectReqSchema.safeParse({
+  const result = ImportCsvProspectSchema.safeParse({
     ...mappedRow,
     salary: mappedRow.salary ? Number(mappedRow.salary) : null
   });

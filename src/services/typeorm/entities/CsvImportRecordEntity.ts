@@ -35,7 +35,7 @@ export class CsvImportRecordEntity {
   @Column()
   userId: string;
 
-  @Column()
+  @Column({ type: 'varchar' })
   status: CsvImportStatusEnum;
 
   @Column({ nullable: true })

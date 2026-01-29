@@ -6,6 +6,7 @@ import { OrganizationInviteEntity } from './entities/OrganizationInviteEntity';
 import { AttachmentEntity } from './entities/AttachmentEntity';
 import { ProspectEntity } from './entities/ProspectEntity';
 import { CsvImportRecordEntity } from './entities/CsvImportRecordEntity';
+import { CompanyEntity } from './entities/CompanyEntity';
 
 export function getDataSource(opts: {
   host: string
@@ -13,8 +14,11 @@ export function getDataSource(opts: {
   dbName: string
   user: string
   password: string
-  migrations?: string[]
+  migrations?: string[],
+  dropSchema?: boolean
 }) {
+  const isTest = process.env.NODE_ENV === 'test';
+  
   return new DataSource({
     type: 'postgres',
     host: opts.host,
@@ -25,8 +29,6 @@ export function getDataSource(opts: {
     synchronize: false,
     logging: process.env.NODE_ENV === 'local',
     migrations: opts.migrations,
-    ssl:
-      process.env.NODE_ENV !== 'local' ? { rejectUnauthorized: false } : false,
     entities: [
       UserEntity,
       OrganizationEntity,
@@ -34,8 +36,13 @@ export function getDataSource(opts: {
       OrganizationInviteEntity,
       AttachmentEntity,
       ProspectEntity,
-      CsvImportRecordEntity
-    ]
+      CsvImportRecordEntity,
+      CompanyEntity
+    ],
+    dropSchema: opts.dropSchema || false,
+    ssl: isTest ? false : {
+      rejectUnauthorized: false
+    }
   });
 }
 
