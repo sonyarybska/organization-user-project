@@ -48,6 +48,9 @@ export class CsvImportRecordEntity {
   failedRows: number;
 
   @Column({ nullable: true })
+  skippedDuplicationRows: number;
+
+  @Column({ nullable: true })
   lastError: string;
 
   @CreateDateColumn()

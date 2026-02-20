@@ -117,6 +117,7 @@ export function createTestCsvImportRecord(overrides: Partial<CsvImportRecord> = 
     totalRows: 10,
     processedRows: 0,
     failedRows: 0,
+    skippedDuplicationRows: 0,
     lastError: null,
     createdAt: new Date('2026-01-20'),
     updatedAt: new Date('2026-01-20'),

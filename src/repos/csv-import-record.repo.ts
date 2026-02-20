@@ -12,6 +12,7 @@ export interface ICsvImportRecordRepo
   create(data: Partial<CsvImportRecordEntity>): Promise<CsvImportRecord>
   update(id: string, data: Partial<CsvImportRecord>): Promise<CsvImportRecord>
   incrementProcessedRows(id: string): Promise<void>
+  incrementSkippedDuplicationRows(id: string): Promise<void>
   handleImportError(id: string, lastError: string): Promise<void>
   checkIfDone(id: string): Promise<boolean>
 }
@@ -99,6 +100,25 @@ export function getCsvImportRecordRepo(
       }
     },
 
+    async incrementSkippedDuplicationRows(id: string): Promise<void> {
+      try {
+        await csvImportRecord
+          .createQueryBuilder()
+          .update(CsvImportRecordEntity)
+          .set({
+            skippedDuplicationRows: () =>
+              'COALESCE("skippedDuplicationRows",0)+1'
+          })
+          .where('id = :id', { id })
+          .execute();
+      } catch (error) {
+        throw new DBError(
+          `Failed to increase skippedDuplicationRows for csv import record with id ${id}`,
+          error
+        );
+      }
+    },
+
     async handleImportError(id: string, lastError: string): Promise<void> {
       try {
         await csvImportRecord
@@ -127,7 +147,7 @@ export function getCsvImportRecordRepo(
           .andWhere('"totalRows" IS NOT NULL')
           .andWhere('"totalRows" > 0')
           .andWhere(
-            'COALESCE("processedRows", 0) + COALESCE("failedRows", 0) >= "totalRows"'
+            'COALESCE("processedRows", 0) + COALESCE("failedRows", 0) + COALESCE("skippedDuplicationRows", 0) >= "totalRows"'
           )
           .getCount()
           .then((count) => count > 0);

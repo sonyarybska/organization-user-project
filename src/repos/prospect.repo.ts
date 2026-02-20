@@ -9,6 +9,7 @@ export interface IProspectRepo
   extends Reconnector<IProspectRepo, TypeOrmConnection> {
   create(prospect: Partial<Prospect>): Promise<Prospect>
   getByOrganizationId(organizationId: string): Promise<{prospects: Prospect[], count: number}>
+  getEmailsByOrganizationId(organizationId: string): Promise<string[]>
   getByIdAndOrganizationId(
     prospectId: string,
     organizationId: string,
@@ -62,6 +63,26 @@ export function getProspectRepo(db: DataSource | EntityManager): IProspectRepo {
         );
       }
     },
+
+    async getEmailsByOrganizationId(
+      organizationId: string
+    ): Promise<string[]> {
+      try {
+        const prospects = await prospectRepo
+          .createQueryBuilder('prospect')
+          .select('prospect.email')
+          .where('prospect.organizationId = :organizationId', { organizationId })
+          .getMany();
+
+        return prospects.map((p) => p.email.toLowerCase());
+      } catch (error) {
+        throw new DBError(
+          `Failed to get emails for organization id ${organizationId}`,
+          error
+        );
+      }
+    },
+
     async getByIdAndOrganizationId(
       prospectId: string,
       organizationId: string
