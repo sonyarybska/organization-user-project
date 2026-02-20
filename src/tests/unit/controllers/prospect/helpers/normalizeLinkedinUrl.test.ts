@@ -1,4 +1,4 @@
-import { normalizeLinkedinUrl } from 'src/controllers/prospect/helpers/normalizeLinkedinUrl';
+import { normalizeLinkedinUrl } from 'src/api/helpers/normalizeLinkedinUrl';
 
 describe('normalizeLinkedinUrl', () => {
   it('should return null for null input', () => {

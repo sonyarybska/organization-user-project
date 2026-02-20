@@ -34,7 +34,7 @@ module.exports = [
           skipBlankLines: true
         }
       ],
-      'max-depth': ['error', 3],
+      'max-depth': ['error', 4],
       'dot-notation': 'error',
       'constructor-super': 'error',
       'no-param-reassign': ['error', { props: true }],
