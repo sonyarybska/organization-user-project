@@ -8,6 +8,7 @@ import { Readable } from 'stream';
 import { CsvImportStatusEnum } from 'src/types/enums/CsvImportStatusEnum';
 import { getCsvImportRecordRepo } from 'src/repos/csv-import-record.repo';
 import { ImportCsvProspect, ImportCsvProspectSchema } from 'src/api/routes/organizations/prospects/csv-import-records/schemas/ImportCsvProspectSchema';
+import { getProspectRepo } from 'src/repos/prospect.repo';
 
 interface StartCsvImportMessage {
   importRecordId: string
@@ -69,6 +70,7 @@ export const handler: SQSHandler = async (event: SQSEvent) => {
   });
 
   const repo = getCsvImportRecordRepo(db);
+  const prospectRepo = getProspectRepo(db);
   const s3 = getAwsS3Service(process.env.AWS_REGION);
   const sqs = getAwsSqsService(process.env.AWS_REGION);
 
@@ -85,23 +87,34 @@ export const handler: SQSHandler = async (event: SQSEvent) => {
       await repo.update(importRecordId, {
         status: CsvImportStatusEnum.BUSY,
         processedRows: 0,
-        failedRows: 0
+        failedRows: 0,
+        skippedDuplicationRows: 0
       });
+
+      const existingEmails = await prospectRepo.getEmailsByOrganizationId(organizationId);
+
+      const existingEmailsSet = new Set(existingEmails);
 
       const stream = await getCsvStreamFromS3(s3, key, bucketName);
 
       let rowNumber = 0;
+      let skippedCount = 0;
+      const seenEmails = new Set<string>();
 
       for await (const row of stream) {
         rowNumber++;
-        
-        const prospect = mapAndValidateRow(
-          row,
-          mapping,
-          userId,
-          organizationId,
-          rowNumber
-        );
+
+        const prospect = mapAndValidateRow(row, mapping, userId, organizationId, rowNumber);
+
+        const email = prospect.email.toLowerCase();
+
+        if (seenEmails.has(email) || existingEmailsSet.has(email)) {
+          console.log('Duplicate email found, skipping:', email);
+          skippedCount++;
+          continue;
+        }
+
+        seenEmails.add(email);
 
         await sqs.sendMessageToQueue(
           process.env.AWS_SQS_PROCESS_CSV_ROW_QUEUE_URL,
@@ -110,6 +123,12 @@ export const handler: SQSHandler = async (event: SQSEvent) => {
             row: prospect
           }
         );
+      }
+
+      if (skippedCount > 0) {
+        await repo.update(importRecordId, {
+          skippedDuplicationRows: skippedCount
+        });
       }
 
     } catch (error) {
