@@ -9,7 +9,7 @@ export interface IProspectRepo
   extends Reconnector<IProspectRepo, TypeOrmConnection> {
   create(prospect: Partial<Prospect>): Promise<Prospect>
   getByOrganizationId(organizationId: string): Promise<{prospects: Prospect[], count: number}>
-  getEmailsByOrganizationId(organizationId: string): Promise<string[]>
+  existsByEmailAndOrganizationId(email: string, organizationId: string): Promise<boolean>
   getByIdAndOrganizationId(
     prospectId: string,
     organizationId: string,
@@ -64,20 +64,19 @@ export function getProspectRepo(db: DataSource | EntityManager): IProspectRepo {
       }
     },
 
-    async getEmailsByOrganizationId(
+    async existsByEmailAndOrganizationId(
+      email: string,
       organizationId: string
-    ): Promise<string[]> {
+    ): Promise<boolean> {
       try {
-        const prospects = await prospectRepo
+        return await prospectRepo
           .createQueryBuilder('prospect')
-          .select('prospect.email')
-          .where('prospect.organizationId = :organizationId', { organizationId })
-          .getMany();
-
-        return prospects.map((p) => p.email.toLowerCase());
+          .where('prospect.email = :email', { email: email.toLowerCase() })
+          .andWhere('prospect.organizationId = :organizationId', { organizationId })
+          .getExists();
       } catch (error) {
         throw new DBError(
-          `Failed to get emails for organization id ${organizationId}`,
+          `Failed to check if email exists for organization id ${organizationId}`,
           error
         );
       }

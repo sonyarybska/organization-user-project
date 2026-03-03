@@ -1,4 +1,4 @@
-import { normalizeDomain } from 'src/api/helpers/normalizeDomain';
+import { normalizeDomain } from 'src/api/helpers/normalization';
 
 describe('normalizeDomain', () => {
   it('should extract domain from https URL', () => {

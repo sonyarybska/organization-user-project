@@ -9,7 +9,7 @@ export const mockCsvImportRecordRepo: jest.Mocked<ICsvImportRecordRepo> = {
   incrementProcessedRows: jest.fn(),
   handleImportError: jest.fn(),
   checkIfDone: jest.fn(),
-  incrementSkippedDuplicationRows: jest.fn()
+  incrementSkippedRows: jest.fn()
 };
 
 mockCsvImportRecordRepo.reconnect.mockImplementation(() => mockCsvImportRecordRepo);

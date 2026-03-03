@@ -7,7 +7,7 @@ export const mockProspectRepo: jest.Mocked<IProspectRepo> = {
   getByOrganizationId: jest.fn(),
   getByIdAndOrganizationId: jest.fn(),
   deleteByIdAndOrganizationId: jest.fn(),
-  getEmailsByOrganizationId: jest.fn()
+  existsByEmailAndOrganizationId: jest.fn()
 };
 
 mockProspectRepo.reconnect.mockImplementation(() => mockProspectRepo);

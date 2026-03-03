@@ -10,7 +10,7 @@ export const CsvImportRecordSchema = z.object({
   totalRows: z.number().nullable(),
   processedRows: z.number().nullable(),
   failedRows: z.number().nullable(),
-  skippedDuplicationRows: z.number().nullable(),
+  skippedRows: z.number().nullable(),
   lastError: z.string().nullable(),
   createdAt: z.date(),
   updatedAt: z.date()

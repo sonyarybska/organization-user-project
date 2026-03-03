@@ -1,4 +1,4 @@
-import { normalizePhoneNumber } from 'src/api/helpers/normalizePhoneNumber';
+import { normalizePhoneNumber } from 'src/api/helpers/normalization';
 
 describe('normalizePhoneNumber', () => {
   it('should return null for null input', () => {

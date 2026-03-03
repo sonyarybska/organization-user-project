@@ -1,8 +1,6 @@
 import { z } from 'zod';
 import { parse } from 'tldts';
-import { normalizeDomain } from 'src/api/helpers/normalizeDomain';
-import { normalizeLinkedinUrl } from 'src/api/helpers/normalizeLinkedinUrl';
-import { normalizePhoneNumber } from 'src/api/helpers/normalizePhoneNumber';
+import { normalizeDomain, normalizeLinkedinUrl, normalizePhoneNumber } from 'src/api/helpers/normalization';
 
 const domainSchema = z
   .string()
