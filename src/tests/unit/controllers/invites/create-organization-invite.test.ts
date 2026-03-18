@@ -1,73 +1,74 @@
 import { createOrganizationInvite } from 'src/controllers/invites/create-organization-invite';
-import { TEST_TOKENS } from 'src/tests/fixtures/test-constants';
 import {
-  createTestInvite,
-  createTestOrganization
-} from 'src/tests/fixtures/test-factories';
+  TEST_TOKENS,
+  TEST_USER_IDS,
+  TEST_EMAILS,
+  TEST_ORG_IDS,
+  TEST_ORG_NAMES
+} from 'src/tests/fixtures/test-constants';
+import { createTestInvite, createTestOrganization } from 'src/tests/fixtures/test-factories';
 import { mockOrganizationInviteRepo } from 'src/tests/mocks/repos/organization-invite.repo.mock';
 import { mockOrganizationRepo } from 'src/tests/mocks/repos/organization.repo.mock';
 import { mockHmacService } from 'src/tests/mocks/services/hmac.service.mock';
 import { mockSendGridService } from 'src/tests/mocks/services/send-grid.service.mock';
 import { InviteStatus } from 'src/types/enums/InviteStatusEnum';
-import { v4 as uuid } from 'uuid';
 
 describe('createOrganizationInvite', () => {
-  beforeEach(() => {
-    jest.clearAllMocks();
+  const testOrganization = createTestOrganization({
+    id: TEST_ORG_IDS.FIRST,
+    name: TEST_ORG_NAMES.TECH_CORP
   });
 
-  it('should create invite and send email', async () => {
-    const testOrganization = createTestOrganization();
-    const testOrganizationInvite = createTestInvite({
-      organizationId: testOrganization.id
+  beforeEach(() => {
+    jest.clearAllMocks();
+    jest.spyOn(global.Date, 'now').mockReturnValue(1640000000000);
+  });
+
+  describe('on successful invite creation', () => {
+    it('creates invite record and sends email', async () => {
+      const testInvite = createTestInvite({
+        email: TEST_EMAILS.INVITED_USER,
+        organizationId: TEST_ORG_IDS.FIRST
+      });
+
+      mockOrganizationRepo.getByIdAndUserId.mockResolvedValue(testOrganization);
+      mockOrganizationInviteRepo.createInvite.mockResolvedValue(testInvite);
+      mockHmacService.getSignature.mockReturnValue(TEST_TOKENS.INVITE_TOKEN);
+      mockSendGridService.sendInviteEmail.mockResolvedValue();
+
+      await createOrganizationInvite({
+        email: TEST_EMAILS.INVITED_USER,
+        organizationId: TEST_ORG_IDS.FIRST,
+        userId: TEST_USER_IDS.ADMIN,
+        sendGridService: mockSendGridService,
+        organizationInviteRepo: mockOrganizationInviteRepo,
+        organizationRepo: mockOrganizationRepo,
+        hmacService: mockHmacService
+      });
+
+      expect(mockOrganizationRepo.getByIdAndUserId).toHaveBeenCalledWith(
+        TEST_ORG_IDS.FIRST,
+        TEST_USER_IDS.ADMIN
+      );
+
+      expect(mockHmacService.getSignature).toHaveBeenCalledWith(
+        expect.stringContaining(TEST_EMAILS.INVITED_USER),
+        process.env.INVITE_TOKEN_SECRET
+      );
+
+      expect(mockOrganizationInviteRepo.createInvite).toHaveBeenCalledWith({
+        email: TEST_EMAILS.INVITED_USER,
+        organizationId: TEST_ORG_IDS.FIRST,
+        expiresAt: expect.any(Date),
+        token: TEST_TOKENS.INVITE_TOKEN,
+        status: InviteStatus.PENDING
+      });
+
+      expect(mockSendGridService.sendInviteEmail).toHaveBeenCalledWith(
+        TEST_EMAILS.INVITED_USER,
+        TEST_ORG_NAMES.TECH_CORP,
+        TEST_TOKENS.INVITE_TOKEN
+      );
     });
-    const userId = uuid();
-    const token = TEST_TOKENS.INVITE_TOKEN;
-
-    const now = Date.now();
-    jest.spyOn(global.Date, 'now').mockImplementation(() => now);
-
-    mockOrganizationRepo.getByIdAndUserId.mockResolvedValueOnce(
-      testOrganization
-    );
-    mockOrganizationInviteRepo.createInvite.mockResolvedValueOnce(
-      testOrganizationInvite
-    );
-    mockHmacService.getSignature.mockReturnValueOnce(token);
-    mockSendGridService.sendInviteEmail.mockResolvedValueOnce();
-
-    await createOrganizationInvite({
-      email: testOrganizationInvite.email,
-      organizationId: testOrganizationInvite.organizationId,
-      userId,
-      sendGridService: mockSendGridService,
-      organizationInviteRepo: mockOrganizationInviteRepo,
-      organizationRepo: mockOrganizationRepo,
-      hmacService: mockHmacService
-    });
-
-    expect(mockOrganizationRepo.getByIdAndUserId).toHaveBeenCalledWith(
-      testOrganizationInvite.organizationId,
-      userId
-    );
-
-    expect(mockHmacService.getSignature).toHaveBeenCalledWith(
-      expect.stringContaining(testOrganizationInvite.email),
-      process.env.INVITE_TOKEN_SECRET
-    );
-
-    expect(mockOrganizationInviteRepo.createInvite).toHaveBeenCalledWith({
-      email: testOrganizationInvite.email,
-      organizationId: testOrganizationInvite.organizationId,
-      expiresAt: expect.any(Date),
-      token,
-      status: InviteStatus.PENDING
-    });
-
-    expect(mockSendGridService.sendInviteEmail).toHaveBeenCalledWith(
-      testOrganizationInvite.email,
-      testOrganization.name,
-      token
-    );
   });
 });

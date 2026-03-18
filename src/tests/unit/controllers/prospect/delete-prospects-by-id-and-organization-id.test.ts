@@ -1,38 +1,43 @@
 import { deleteProspectsByIdAndOrganizationId } from 'src/controllers/prospect/delete-prospects-by-id-and-organization-id';
+import { createTestProspect } from 'src/tests/fixtures/test-factories';
 import { mockProspectRepo } from 'src/tests/mocks/repos/prospect.repo.mock';
 import { DBError } from 'src/types/errors/DBError';
-import { v4 as uuid } from 'uuid';
 
 describe('deleteProspectsByIdAndOrganizationId', () => {
   beforeEach(() => {
     jest.clearAllMocks();
   });
-  it('should call prospectRepo.deleteByIdAndOrganizationId with correct args', async () => {
-    const prospectId = uuid();
-    const organizationId = uuid();
-    await deleteProspectsByIdAndOrganizationId({
-      id: prospectId,
-      organizationId,
-      prospectRepo: mockProspectRepo
-    });
 
-    expect(mockProspectRepo.deleteByIdAndOrganizationId).toHaveBeenCalledWith(
-      prospectId,
-      organizationId
-    );
+  describe('on successful deletion', () => {
+    it('deletes prospect by id and organization', async () => {
+      const testProspect = createTestProspect();
+
+      await deleteProspectsByIdAndOrganizationId({
+        id: testProspect.id,
+        organizationId: testProspect.organizationId,
+        prospectRepo: mockProspectRepo
+      });
+
+      expect(mockProspectRepo.deleteByIdAndOrganizationId).toHaveBeenCalledWith(
+        testProspect.id,
+        testProspect.organizationId
+      );
+    });
   });
 
-  it('should throw if db error', async () => {
-    mockProspectRepo.deleteByIdAndOrganizationId.mockRejectedValueOnce(
-      new DBError('DB error')
-    );
+  describe('on deletion failure', () => {
+    it('propagates database error', async () => {
+      const testProspect = createTestProspect();
+      const dbError = new DBError('Foreign key constraint');
+      mockProspectRepo.deleteByIdAndOrganizationId.mockRejectedValue(dbError);
 
-    await expect(
-      deleteProspectsByIdAndOrganizationId({
-        id: uuid(),
-        organizationId: uuid(),
-        prospectRepo: mockProspectRepo
-      })
-    ).rejects.toThrow('DB error');
+      await expect(
+        deleteProspectsByIdAndOrganizationId({
+          id: testProspect.id,
+          organizationId: testProspect.organizationId,
+          prospectRepo: mockProspectRepo
+        })
+      ).rejects.toThrow('Foreign key constraint');
+    });
   });
 });

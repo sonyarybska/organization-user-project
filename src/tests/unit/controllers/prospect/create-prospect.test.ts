@@ -8,30 +8,33 @@ describe('createProspect', () => {
     jest.clearAllMocks();
   });
 
-  it('should create a prospect', async () => {
-    const testProspect = createTestProspect();
+  describe('on successful creation', () => {
+    it('persists prospect and returns id', async () => {
+      const testProspect = createTestProspect();
+      mockProspectRepo.create.mockResolvedValue(testProspect);
 
-    mockProspectRepo.create.mockResolvedValueOnce(testProspect);
-
-    const result = await createProspect({
-      data: testProspect,
-      prospectRepo: mockProspectRepo
-    });
-
-    expect(mockProspectRepo.create).toHaveBeenCalledWith(testProspect);
-    expect(result).toEqual({ id: testProspect.id });
-  });
-
-  it('should throw if db error', async () => {
-   const testProspect = createTestProspect();
-
-    mockProspectRepo.create.mockRejectedValueOnce(new DBError('DB error'));
-
-    await expect(
-      createProspect({
+      const result = await createProspect({
         data: testProspect,
         prospectRepo: mockProspectRepo
-      })
-    ).rejects.toThrow('DB error');
+      });
+
+      expect(mockProspectRepo.create).toHaveBeenCalledWith(testProspect);
+      expect(result).toEqual({ id: testProspect.id });
+    });
+  });
+
+  describe('on creation failure', () => {
+    it('propagates database error', async () => {
+      const testProspect = createTestProspect();
+      const dbError = new DBError('Unique constraint violation');
+      mockProspectRepo.create.mockRejectedValue(dbError);
+
+      await expect(
+        createProspect({
+          data: testProspect,
+          prospectRepo: mockProspectRepo
+        })
+      ).rejects.toThrow('Unique constraint violation');
+    });
   });
 });

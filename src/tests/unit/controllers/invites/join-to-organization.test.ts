@@ -7,142 +7,136 @@ import { mockHmacService } from 'src/tests/mocks/services/hmac.service.mock';
 import { InviteStatus } from 'src/types/enums/InviteStatusEnum';
 import { UserRoleEnum } from 'src/types/enums/UserRoleEnum';
 import { createTestInvite } from 'src/tests/fixtures/test-factories';
+import { TEST_TOKENS, TEST_EMAILS, TEST_USER_IDS, TEST_IDS, TEST_DATES, TEST_ORG_IDS } from 'src/tests/fixtures/test-constants';
 
 describe('joinUserToOrganization', () => {
+  const mockConnection = { entityManager: {} as any };
+  const mockTransactionService = {
+    run: jest.fn(async (cb: any) => cb(mockConnection))
+  };
+
   beforeEach(() => {
     jest.clearAllMocks();
   });
-  it('should throw when token is invalid', async () => {
-    const testInvite = createTestInvite();
-    mockOrganizationInviteRepo.getValidPendingByToken.mockResolvedValueOnce(
-      testInvite
-    );
-    mockHmacService.validateToken.mockReturnValueOnce(false);
 
-    const transactionService = {
-      run: jest.fn(async (cb: any) => cb({ entityManager: {} as any }))
-    };
+  describe('on invalid token', () => {
+    it('rejects join attempt', async () => {
+      const testInvite = createTestInvite({
+        token: TEST_TOKENS.INVITE_TOKEN,
+        expiresAt: TEST_DATES.FUTURE
+      });
+      mockOrganizationInviteRepo.getValidPendingByToken.mockResolvedValue(testInvite);
+      mockHmacService.validateToken.mockReturnValue(false);
 
-    await expect(
-      joinUserToOrganization({
-        token: testInvite.token,
+      await expect(
+        joinUserToOrganization({
+          token: TEST_TOKENS.INVITE_TOKEN,
+          userOrganizationRepo: mockUserOrganizationRepo,
+          organizationInviteRepo: mockOrganizationInviteRepo,
+          userRepo: mockUserRepo,
+          cognitoService: mockCognitoService,
+          transactionService: mockTransactionService,
+          hmacService: mockHmacService
+        })
+      ).rejects.toThrow('Invalid invite token');
+
+      expect(mockTransactionService.run).not.toHaveBeenCalled();
+    });
+  });
+
+  describe('on existing user', () => {
+    it('adds user to organization and marks invite accepted', async () => {
+      const testInvite = createTestInvite({
+        token: TEST_TOKENS.INVITE_TOKEN,
+        email: TEST_EMAILS.VALID_USER,
+        organizationId: TEST_ORG_IDS.FIRST,
+        expiresAt: TEST_DATES.FUTURE
+      });
+
+      mockOrganizationInviteRepo.getValidPendingByToken.mockResolvedValue(testInvite);
+      mockHmacService.validateToken.mockReturnValue(true);
+      mockUserRepo.getByEmail.mockResolvedValue({
+        id: TEST_USER_IDS.FIRST,
+        email: TEST_EMAILS.VALID_USER
+      } as any);
+
+      await joinUserToOrganization({
+        token: TEST_TOKENS.INVITE_TOKEN,
         userOrganizationRepo: mockUserOrganizationRepo,
         organizationInviteRepo: mockOrganizationInviteRepo,
         userRepo: mockUserRepo,
         cognitoService: mockCognitoService,
-        transactionService,
+        transactionService: mockTransactionService,
         hmacService: mockHmacService
-      })
-    ).rejects.toThrow('Invalid invite token');
+      });
 
-    expect(transactionService.run).not.toHaveBeenCalled();
+      expect(mockTransactionService.run).toHaveBeenCalledTimes(1);
+
+      expect(mockUserOrganizationRepo.reconnect).toHaveBeenCalledWith(mockConnection);
+      expect(mockUserOrganizationRepo.create).toHaveBeenCalledWith({
+        userId: TEST_USER_IDS.FIRST,
+        organizationId: TEST_ORG_IDS.FIRST,
+        role: UserRoleEnum.USER
+      });
+
+      expect(mockOrganizationInviteRepo.reconnect).toHaveBeenCalledWith(mockConnection);
+      expect(mockOrganizationInviteRepo.updateStatusById).toHaveBeenCalledWith(
+        testInvite.id,
+        InviteStatus.ACCEPTED
+      );
+
+      expect(mockCognitoService.createCognitoUser).not.toHaveBeenCalled();
+      expect(mockUserRepo.create).not.toHaveBeenCalled();
+    });
   });
 
-  it('should join existing user to organization and mark invite accepted', async () => {
-    const testInvite = createTestInvite({
-      expiresAt: new Date('2026-02-01T00:00:00.000Z')
+  describe('on new user', () => {
+    it('creates user in cognito and database, then adds to organization', async () => {
+      const testInvite = createTestInvite({
+        token: TEST_TOKENS.INVITE_TOKEN,
+        email: TEST_EMAILS.INVITED_USER,
+        organizationId: TEST_ORG_IDS.FIRST,
+        expiresAt: TEST_DATES.FUTURE
+      });
+
+      mockOrganizationInviteRepo.getValidPendingByToken.mockResolvedValue(testInvite);
+      mockHmacService.validateToken.mockReturnValue(true);
+      mockUserRepo.getByEmail.mockResolvedValue(null as any);
+      mockCognitoService.createCognitoUser.mockResolvedValue(TEST_IDS.COGNITO_1);
+      mockUserRepo.create.mockResolvedValue({
+        id: TEST_USER_IDS.SECOND,
+        email: TEST_EMAILS.INVITED_USER,
+        cognitoUserId: TEST_IDS.COGNITO_1
+      } as any);
+
+      await joinUserToOrganization({
+        token: TEST_TOKENS.INVITE_TOKEN,
+        userOrganizationRepo: mockUserOrganizationRepo,
+        organizationInviteRepo: mockOrganizationInviteRepo,
+        userRepo: mockUserRepo,
+        cognitoService: mockCognitoService,
+        transactionService: mockTransactionService,
+        hmacService: mockHmacService
+      });
+
+      expect(mockCognitoService.createCognitoUser).toHaveBeenCalledWith(TEST_EMAILS.INVITED_USER);
+
+      expect(mockUserRepo.reconnect).toHaveBeenCalledWith(mockConnection);
+      expect(mockUserRepo.create).toHaveBeenCalledWith({
+        email: TEST_EMAILS.INVITED_USER,
+        cognitoUserId: TEST_IDS.COGNITO_1
+      });
+
+      expect(mockUserOrganizationRepo.create).toHaveBeenCalledWith({
+        userId: TEST_USER_IDS.SECOND,
+        organizationId: TEST_ORG_IDS.FIRST,
+        role: UserRoleEnum.USER
+      });
+
+      expect(mockOrganizationInviteRepo.updateStatusById).toHaveBeenCalledWith(
+        testInvite.id,
+        InviteStatus.ACCEPTED
+      );
     });
-
-    const connection = { entityManager: {} as any };
-
-    const transactionService = {
-      run: jest.fn(async (cb: any) => cb(connection))
-    };
-
-    mockOrganizationInviteRepo.getValidPendingByToken.mockResolvedValueOnce(
-      testInvite
-    );
-    mockHmacService.validateToken.mockReturnValueOnce(true);
-
-    mockUserRepo.getByEmail.mockResolvedValueOnce({
-      id: 'user-1',
-      email: testInvite.email
-    } as any);
-
-    await joinUserToOrganization({
-      token: testInvite.token,
-      userOrganizationRepo: mockUserOrganizationRepo,
-      organizationInviteRepo: mockOrganizationInviteRepo,
-      userRepo: mockUserRepo,
-      cognitoService: mockCognitoService,
-      transactionService,
-      hmacService: mockHmacService
-    });
-
-    expect(transactionService.run).toHaveBeenCalledTimes(1);
-
-    expect(mockUserOrganizationRepo.reconnect).toHaveBeenCalledWith(connection);
-    expect(mockUserOrganizationRepo.create).toHaveBeenCalledWith({
-      userId: 'user-1',
-      organizationId: testInvite.organizationId,
-      role: UserRoleEnum.USER
-    });
-
-    expect(mockOrganizationInviteRepo.reconnect).toHaveBeenCalledWith(
-      connection
-    );
-    expect(mockOrganizationInviteRepo.updateStatusById).toHaveBeenCalledWith(
-      testInvite.id,
-      InviteStatus.ACCEPTED
-    );
-
-    expect(mockCognitoService.createCognitoUser).not.toHaveBeenCalled();
-    expect(mockUserRepo.create).not.toHaveBeenCalled();
-  });
-
-  it('should create user in transaction when not exists', async () => {
-    const testInvite = createTestInvite({
-      expiresAt: new Date('2026-02-01T00:00:00.000Z')
-    });
-    const connection = { entityManager: {} as any };
-
-    const transactionService = {
-      run: jest.fn(async (cb: any) => cb(connection))
-    };
-
-    mockOrganizationInviteRepo.getValidPendingByToken.mockResolvedValueOnce(
-      testInvite
-    );
-    mockHmacService.validateToken.mockReturnValueOnce(true);
-
-    mockUserRepo.getByEmail.mockResolvedValueOnce(null as any);
-    mockCognitoService.createCognitoUser.mockResolvedValueOnce('cognito-1');
-
-    mockUserRepo.create.mockResolvedValueOnce({
-      id: 'new-user-1',
-      email: testInvite.email,
-      cognitoUserId: 'cognito-1'
-    } as any);
-
-    await joinUserToOrganization({
-      token: testInvite.token,
-      userOrganizationRepo: mockUserOrganizationRepo,
-      organizationInviteRepo: mockOrganizationInviteRepo,
-      userRepo: mockUserRepo,
-      cognitoService: mockCognitoService,
-      transactionService,
-      hmacService: mockHmacService
-    });
-
-    expect(mockCognitoService.createCognitoUser).toHaveBeenCalledWith(
-      testInvite.email
-    );
-
-    expect(mockUserRepo.reconnect).toHaveBeenCalledWith(connection);
-    expect(mockUserRepo.create).toHaveBeenCalledWith({
-      email: testInvite.email,
-      cognitoUserId: 'cognito-1'
-    });
-
-    expect(mockUserOrganizationRepo.create).toHaveBeenCalledWith({
-      userId: 'new-user-1',
-      organizationId: testInvite.organizationId,
-      role: UserRoleEnum.USER
-    });
-
-    expect(mockOrganizationInviteRepo.updateStatusById).toHaveBeenCalledWith(
-      testInvite.id,
-      InviteStatus.ACCEPTED
-    );
   });
 });

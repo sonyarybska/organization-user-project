@@ -3,10 +3,14 @@ import { File, Blob } from 'node:buffer';
 (global as any).File = File;
 (global as any).Blob = Blob;
 
+process.env.TESTCONTAINERS_REUSE_ENABLE = 'true';
+
 import { PostgreSqlContainer } from '@testcontainers/postgresql';
 
 export default async () => {
-  const container = await new PostgreSqlContainer('postgres:15').start();
+  const container = await new PostgreSqlContainer('postgres:15')
+    .withReuse()
+    .start();
 
   (global as any).__TESTCONTAINER__ = container;
 

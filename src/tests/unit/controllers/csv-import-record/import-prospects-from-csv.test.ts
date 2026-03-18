@@ -1,120 +1,122 @@
+import { importProspectsFromCsv } from 'src/controllers/csv-import-record/import-prospects-from-csv';
 import { createTestCsvImportRecord } from 'src/tests/fixtures/test-factories';
 import { mockCsvImportRecordRepo } from 'src/tests/mocks/repos/csv-import-record.repo.mock';
 import { mockS3Service } from 'src/tests/mocks/services/s3.service.mock';
 import { mockSqsService } from 'src/tests/mocks/services/sqs.service.mock';
 import { CsvImportStatusEnum } from 'src/types/enums/CsvImportStatusEnum';
-import { v4 as uuid } from 'uuid';
+import { TEST_USER_IDS, TEST_ORG_IDS } from 'src/tests/fixtures/test-constants';
 
 describe('importProspectsFromCsv', () => {
+  const MOCK_TIMESTAMP = 1700000000000;
+  const csvMapping = { email: 'email', firstName: 'firstName' };
+  
+  const sampleCsvBuffer = Buffer.from(
+    'email,firstName\n' +
+    'john@test.com,John\n' +
+    'jane@test.com,Jane\n'
+  );
+
   beforeEach(() => {
     jest.clearAllMocks();
+    jest.spyOn(Date, 'now').mockReturnValue(MOCK_TIMESTAMP);
   });
 
-  it('should upload csv, create import record and enqueue SQS message', async () => {
-    const {
-      importProspectsFromCsv
-    } = require('src/controllers/csv-import-record/import-prospects-from-csv');
-    jest.spyOn(Date, 'now').mockReturnValue(1700000000000);
+  describe('on successful import', () => {
+    it('uploads CSV to S3, creates import record, and enqueues processing', async () => {
+      const testCsvImportRecord = createTestCsvImportRecord({
+        organizationId: TEST_ORG_IDS.FIRST,
+        userId: TEST_USER_IDS.FIRST
+      });
+      const expectedKey = `csv-imports/${TEST_ORG_IDS.FIRST}/${TEST_USER_IDS.FIRST}/${MOCK_TIMESTAMP}.csv`;
 
-    const testCsvImportRecord = createTestCsvImportRecord();
+      mockCsvImportRecordRepo.create.mockResolvedValue(testCsvImportRecord);
 
-    const buffer = Buffer.from(
-      'email,firstName\n' + 'john@test.com,John\n' + 'jane@test.com,Jane\n'
-    );
-
-    mockCsvImportRecordRepo.create.mockResolvedValueOnce(testCsvImportRecord);
-
-    const result = await importProspectsFromCsv({
-      s3Service: mockS3Service,
-      sqsService: mockSqsService,
-      csvImportRecordRepo: mockCsvImportRecordRepo,
-      buffer,
-      mapping: { email: 'email', firstName: 'firstName' },
-      organizationId: testCsvImportRecord.organizationId,
-      userId: testCsvImportRecord.userId
-    });
-
-    const expectedKey = `csv-imports/${testCsvImportRecord.organizationId}/${testCsvImportRecord.userId}/1700000000000.csv`;
-
-    expect(mockS3Service.upload).toHaveBeenCalledWith(
-      expectedKey,
-      buffer,
-      process.env.AWS_S3_BUCKET_NAME
-    );
-
-    expect(mockCsvImportRecordRepo.create).toHaveBeenCalledWith({
-      key: expectedKey,
-      organizationId: testCsvImportRecord.organizationId,
-      userId: testCsvImportRecord.userId,
-      totalRows: 2,
-      status: CsvImportStatusEnum.NEW
-    });
-
-    expect(mockSqsService.sendMessageToQueue).toHaveBeenCalledWith(
-      process.env.AWS_SQS_START_CSV_IMPORT_QUEUE_URL,
-      {
-        importRecordId: testCsvImportRecord.id,
-        mapping: { email: 'email', firstName: 'firstName' },
-        userId: testCsvImportRecord.userId,
-        organizationId: testCsvImportRecord.organizationId,
-        key: expectedKey
-      }
-    );
-
-    expect(result).toEqual({ csvImportRecordId: testCsvImportRecord.id });
-  });
-
-  it('should throw on S3 upload failure', async () => {
-    const {
-      importProspectsFromCsv
-    } = require('src/controllers/csv-import-record/import-prospects-from-csv');
-    jest.spyOn(Date, 'now').mockReturnValue(1700000000000);
-
-    const buffer = Buffer.from('email\njohn@test.com\n');
-
-    mockS3Service.upload.mockRejectedValueOnce(new Error('S3 error'));
-
-    await expect(
-      importProspectsFromCsv({
+      const result = await importProspectsFromCsv({
         s3Service: mockS3Service,
         sqsService: mockSqsService,
         csvImportRecordRepo: mockCsvImportRecordRepo,
-        buffer,
-        mapping: { email: 'email' },
-        organizationId: uuid(),
-        userId: uuid()
-      })
-    ).rejects.toThrow('S3 error');
+        buffer: sampleCsvBuffer,
+        mapping: csvMapping,
+        organizationId: TEST_ORG_IDS.FIRST,
+        userId: TEST_USER_IDS.FIRST
+      });
 
-    expect(mockCsvImportRecordRepo.create).not.toHaveBeenCalled();
-    expect(mockSqsService.sendMessageToQueue).not.toHaveBeenCalled();
+      expect(mockS3Service.upload).toHaveBeenCalledWith(
+        expectedKey,
+        sampleCsvBuffer,
+        process.env.AWS_S3_BUCKET_NAME
+      );
+
+      expect(mockCsvImportRecordRepo.create).toHaveBeenCalledWith({
+        key: expectedKey,
+        organizationId: TEST_ORG_IDS.FIRST,
+        userId: TEST_USER_IDS.FIRST,
+        totalRows: 2,
+        status: CsvImportStatusEnum.NEW
+      });
+
+      expect(mockSqsService.sendMessageToQueue).toHaveBeenCalledWith(
+        process.env.AWS_SQS_START_CSV_IMPORT_QUEUE_URL,
+        {
+          importRecordId: testCsvImportRecord.id,
+          mapping: csvMapping,
+          userId: TEST_USER_IDS.FIRST,
+          organizationId: TEST_ORG_IDS.FIRST,
+          key: expectedKey
+        }
+      );
+
+      expect(result).toEqual({ csvImportRecordId: testCsvImportRecord.id });
+    });
   });
 
-  it('should throw on SQS send failure', async () => {
-    const {
-      importProspectsFromCsv
-    } = require('src/controllers/csv-import-record/import-prospects-from-csv');
-    jest.spyOn(Date, 'now').mockReturnValue(1700000000000);
-    const defaultCsvImportRecord = createTestCsvImportRecord();
+  describe('on S3 upload failure', () => {
+    it('propagates error without creating import record', async () => {
+      const s3Error = new Error('Connection timeout');
+      const singleRowCsv = Buffer.from('email\njohn@test.com\n');
+      mockS3Service.upload.mockRejectedValue(s3Error);
 
-    const buffer = Buffer.from('email\njohn@test.com\n');
+      await expect(
+        importProspectsFromCsv({
+          s3Service: mockS3Service,
+          sqsService: mockSqsService,
+          csvImportRecordRepo: mockCsvImportRecordRepo,
+          buffer: singleRowCsv,
+          mapping: { email: 'email' },
+          organizationId: TEST_ORG_IDS.FIRST,
+          userId: TEST_USER_IDS.FIRST
+        })
+      ).rejects.toThrow('Connection timeout');
 
-    mockCsvImportRecordRepo.create.mockResolvedValueOnce(defaultCsvImportRecord);
+      expect(mockCsvImportRecordRepo.create).not.toHaveBeenCalled();
+      expect(mockSqsService.sendMessageToQueue).not.toHaveBeenCalled();
+    });
+  });
 
-    mockSqsService.sendMessageToQueue.mockRejectedValueOnce(
-      new Error('SQS error')
-    );
+  describe('on SQS queue failure', () => {
+    it('propagates error after creating import record', async () => {
+      const testCsvImportRecord = createTestCsvImportRecord({
+        organizationId: TEST_ORG_IDS.FIRST,
+        userId: TEST_USER_IDS.FIRST
+      });
+      const singleRowCsv = Buffer.from('email\njohn@test.com\n');
+      const sqsError = new Error('Queue unavailable');
 
-    await expect(
-      importProspectsFromCsv({
-        s3Service: mockS3Service,
-        sqsService: mockSqsService,
-        csvImportRecordRepo: mockCsvImportRecordRepo,
-        buffer,
-        mapping: { email: 'email' },
-        organizationId: uuid(),
-        userId: uuid()
-      })
-    ).rejects.toThrow('SQS error');
+      mockS3Service.upload.mockResolvedValue(undefined);
+      mockCsvImportRecordRepo.create.mockResolvedValue(testCsvImportRecord);
+      mockSqsService.sendMessageToQueue.mockRejectedValue(sqsError);
+
+      await expect(
+        importProspectsFromCsv({
+          s3Service: mockS3Service,
+          sqsService: mockSqsService,
+          csvImportRecordRepo: mockCsvImportRecordRepo,
+          buffer: singleRowCsv,
+          mapping: { email: 'email' },
+          organizationId: TEST_ORG_IDS.FIRST,
+          userId: TEST_USER_IDS.FIRST
+        })
+      ).rejects.toThrow('Queue unavailable');
+    });
   });
 });

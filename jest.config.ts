@@ -11,7 +11,6 @@ const config: Config = {
   },
   setupFiles: ['<rootDir>/jest.setup.ts'],
   globalSetup: '<rootDir>/jest.global-setup.ts',
-  globalTeardown: '<rootDir>/jest.global-teardown.ts',
   maxWorkers: 1,
   transform: {
     '^.+\\.ts$': [

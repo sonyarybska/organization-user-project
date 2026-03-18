@@ -7,30 +7,33 @@ describe('refreshAccessToken', () => {
     jest.clearAllMocks();
   });
 
-  it('should delegate refresh to cognitoService', async () => {
-    mockCognitoService.refreshAccessToken.mockResolvedValueOnce({
-      accessToken: TEST_TOKENS.ACCESS
-    });
+  describe('on successful refresh', () => {
+    it('returns new access token', async () => {
+      mockCognitoService.refreshAccessToken.mockResolvedValue({
+        accessToken: TEST_TOKENS.ACCESS
+      });
 
-    const result = await refreshAccessToken({
-      refreshToken: TEST_TOKENS.REFRESH,
-      cognitoService: mockCognitoService
-    });
+      const result = await refreshAccessToken({
+        refreshToken: TEST_TOKENS.REFRESH,
+        cognitoService: mockCognitoService
+      });
 
-    expect(mockCognitoService.refreshAccessToken).toHaveBeenCalledWith(TEST_TOKENS.REFRESH);
-    expect(result).toEqual({ accessToken: TEST_TOKENS.ACCESS });
+      expect(mockCognitoService.refreshAccessToken).toHaveBeenCalledWith(TEST_TOKENS.REFRESH);
+      expect(result).toEqual({ accessToken: TEST_TOKENS.ACCESS });
+    });
   });
 
-  it('should throw on cognito error', async () => {
-    mockCognitoService.refreshAccessToken.mockRejectedValueOnce(
-      new Error('Cognito error')
-    );
+  describe('on refresh failure', () => {
+    it('propagates cognito error', async () => {
+      const refreshError = new Error('Invalid refresh token');
+      mockCognitoService.refreshAccessToken.mockRejectedValue(refreshError);
 
-    await expect(
-      refreshAccessToken({
-        refreshToken: 'refresh-2',
-        cognitoService: mockCognitoService
-      })
-    ).rejects.toThrow('Cognito error');
+      await expect(
+        refreshAccessToken({
+          refreshToken: TEST_TOKENS.REFRESH,
+          cognitoService: mockCognitoService
+        })
+      ).rejects.toThrow('Invalid refresh token');
+    });
   });
 });

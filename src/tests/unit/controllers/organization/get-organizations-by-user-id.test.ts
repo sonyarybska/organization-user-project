@@ -1,41 +1,44 @@
 import { getOrganizationsByUserId } from 'src/controllers/organization/get-organizations-by-user-id';
 import { createTestOrganization } from 'src/tests/fixtures/test-factories';
 import { mockOrganizationRepo } from 'src/tests/mocks/repos/organization.repo.mock';
-import { v4 as uuid } from 'uuid';
+import { TEST_USER_IDS } from 'src/tests/fixtures/test-constants';
 
 describe('getOrganizationsByUserId', () => {
   beforeEach(() => {
     jest.clearAllMocks();
   });
-  it('should call organizationRepo.getByUserId with correct args', async () => {
-    const testOrganization1 = createTestOrganization();
-    const testOrganization2 = createTestOrganization();
-    const userId = uuid();
 
-    mockOrganizationRepo.getByUserId.mockResolvedValueOnce([
-      testOrganization1,
-      testOrganization2
-    ]);
+  describe('on successful retrieval', () => {
+    it('returns all organizations for user', async () => {
+      const testOrganization1 = createTestOrganization();
+      const testOrganization2 = createTestOrganization();
 
-    const result = await getOrganizationsByUserId({
-      userId,
-      organizationRepo: mockOrganizationRepo
+      mockOrganizationRepo.getByUserId.mockResolvedValue([
+        testOrganization1,
+        testOrganization2
+      ]);
+
+      const result = await getOrganizationsByUserId({
+        userId: TEST_USER_IDS.FIRST,
+        organizationRepo: mockOrganizationRepo
+      });
+
+      expect(mockOrganizationRepo.getByUserId).toHaveBeenCalledWith(TEST_USER_IDS.FIRST);
+      expect(result).toEqual([testOrganization1, testOrganization2]);
     });
-
-    expect(mockOrganizationRepo.getByUserId).toHaveBeenCalledWith(userId);
-    expect(result).toEqual([testOrganization1, testOrganization2]);
   });
 
-  it('should throw if db error', async () => {
-    mockOrganizationRepo.getByUserId.mockRejectedValueOnce(
-      new Error('DB error')
-    );
+  describe('on retrieval failure', () => {
+    it('propagates database error', async () => {
+      const dbError = new Error('User not found');
+      mockOrganizationRepo.getByUserId.mockRejectedValue(dbError);
 
-    await expect(
-      getOrganizationsByUserId({
-        userId: uuid(),
-        organizationRepo: mockOrganizationRepo
-      })
-    ).rejects.toThrow('DB error');
+      await expect(
+        getOrganizationsByUserId({
+          userId: TEST_USER_IDS.FIRST,
+          organizationRepo: mockOrganizationRepo
+        })
+      ).rejects.toThrow('User not found');
+    });
   });
 });

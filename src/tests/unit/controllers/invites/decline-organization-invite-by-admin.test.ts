@@ -2,70 +2,76 @@ import { declineOrganizationInviteByAdmin } from 'src/controllers/invites/declin
 import { createTestInvite } from 'src/tests/fixtures/test-factories';
 import { mockOrganizationInviteRepo } from 'src/tests/mocks/repos/organization-invite.repo.mock';
 import { InviteStatus } from 'src/types/enums/InviteStatusEnum';
+import { TEST_DATES, TEST_ORG_IDS } from 'src/tests/fixtures/test-constants';
 
 describe('declineOrganizationInviteByAdmin', () => {
   beforeEach(() => {
     jest.clearAllMocks();
   });
-  it('should throw when invite is expired', async () => {
-    const testInvite = createTestInvite({ expiresAt: new Date('2020-01-01') });
-    mockOrganizationInviteRepo.getByIdAndOrganizationId.mockResolvedValueOnce(
-      testInvite
-    );
 
-    await expect(
-      declineOrganizationInviteByAdmin({
-        inviteId: testInvite.id,
-        organizationId: testInvite.organizationId,
-        organizationInviteRepo: mockOrganizationInviteRepo,
-        status: InviteStatus.DECLINED_BY_ADMIN
-      })
-    ).rejects.toThrow('Invite has expired');
+  describe('on expired invite', () => {
+    it('rejects decline attempt', async () => {
+      const expiredInvite = createTestInvite({
+        expiresAt: TEST_DATES.PAST,
+        organizationId: TEST_ORG_IDS.FIRST
+      });
+      mockOrganizationInviteRepo.getByIdAndOrganizationId.mockResolvedValue(expiredInvite);
 
-    expect(mockOrganizationInviteRepo.updateStatusById).not.toHaveBeenCalled();
+      await expect(
+        declineOrganizationInviteByAdmin({
+          inviteId: expiredInvite.id,
+          organizationId: TEST_ORG_IDS.FIRST,
+          organizationInviteRepo: mockOrganizationInviteRepo,
+          status: InviteStatus.DECLINED_BY_ADMIN
+        })
+      ).rejects.toThrow('Invite has expired');
+
+      expect(mockOrganizationInviteRepo.updateStatusById).not.toHaveBeenCalled();
+    });
   });
 
-  it('should throw when invite is not pending', async () => {
-    const testInvite = createTestInvite({
-      expiresAt: new Date('2026-12-31'),
-      status: InviteStatus.ACCEPTED
+  describe('on non-pending invite', () => {
+    it('rejects decline attempt for already processed invite', async () => {
+      const acceptedInvite = createTestInvite({
+        expiresAt: TEST_DATES.FUTURE,
+        status: InviteStatus.ACCEPTED,
+        organizationId: TEST_ORG_IDS.FIRST
+      });
+      mockOrganizationInviteRepo.getByIdAndOrganizationId.mockResolvedValue(acceptedInvite);
+
+      await expect(
+        declineOrganizationInviteByAdmin({
+          inviteId: acceptedInvite.id,
+          organizationId: TEST_ORG_IDS.FIRST,
+          organizationInviteRepo: mockOrganizationInviteRepo,
+          status: InviteStatus.DECLINED_BY_ADMIN
+        })
+      ).rejects.toThrow('Invite is already accepted or declined');
+
+      expect(mockOrganizationInviteRepo.updateStatusById).not.toHaveBeenCalled();
     });
-
-    mockOrganizationInviteRepo.getByIdAndOrganizationId.mockResolvedValueOnce(
-      testInvite
-    );
-
-    await expect(
-      declineOrganizationInviteByAdmin({
-        inviteId: testInvite.id,
-        organizationId: testInvite.organizationId,
-        organizationInviteRepo: mockOrganizationInviteRepo,
-        status: InviteStatus.DECLINED_BY_ADMIN
-      })
-    ).rejects.toThrow('Invite is already accepted or declined');
-
-    expect(mockOrganizationInviteRepo.updateStatusById).not.toHaveBeenCalled();
   });
 
-  it('should update status for valid invite', async () => {
-    const testInvite = createTestInvite({
-      expiresAt: new Date('2026-12-31'),
-      status: InviteStatus.PENDING
-    });
-    mockOrganizationInviteRepo.getByIdAndOrganizationId.mockResolvedValueOnce(
-      testInvite
-    );
+  describe('on valid pending invite', () => {
+    it('updates status to declined by admin', async () => {
+      const validInvite = createTestInvite({
+        expiresAt: TEST_DATES.FUTURE,
+        status: InviteStatus.PENDING,
+        organizationId: TEST_ORG_IDS.FIRST
+      });
+      mockOrganizationInviteRepo.getByIdAndOrganizationId.mockResolvedValue(validInvite);
 
-    await declineOrganizationInviteByAdmin({
-      inviteId: testInvite.id,
-      organizationId: testInvite.organizationId,
-      organizationInviteRepo: mockOrganizationInviteRepo,
-      status: InviteStatus.DECLINED_BY_ADMIN
-    });
+      await declineOrganizationInviteByAdmin({
+        inviteId: validInvite.id,
+        organizationId: TEST_ORG_IDS.FIRST,
+        organizationInviteRepo: mockOrganizationInviteRepo,
+        status: InviteStatus.DECLINED_BY_ADMIN
+      });
 
-    expect(mockOrganizationInviteRepo.updateStatusById).toHaveBeenCalledWith(
-      testInvite.id,
-      InviteStatus.DECLINED_BY_ADMIN
-    );
+      expect(mockOrganizationInviteRepo.updateStatusById).toHaveBeenCalledWith(
+        validInvite.id,
+        InviteStatus.DECLINED_BY_ADMIN
+      );
+    });
   });
 });

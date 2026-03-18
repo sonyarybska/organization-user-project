@@ -3,67 +3,65 @@ import { createTestOrganization } from 'src/tests/fixtures/test-factories';
 import { mockOrganizationRepo } from 'src/tests/mocks/repos/organization.repo.mock';
 import { mockUserOrganizationRepo } from 'src/tests/mocks/repos/user-organization.repo.mock';
 import { UserRoleEnum } from 'src/types/enums/UserRoleEnum';
-import { v4 as uuid } from 'uuid';
+import { TEST_USER_IDS, TEST_ORG_NAMES } from 'src/tests/fixtures/test-constants';
 
 describe('createOrganization', () => {
+  const mockConnection = { entityManager: {} as any };
+  const mockTransactionService = {
+    run: jest.fn(async (cb: any) => cb(mockConnection))
+  };
+
+  const organizationData = { name: TEST_ORG_NAMES.TECH_CORP };
+
   beforeEach(() => {
     jest.clearAllMocks();
   });
-  it('should create organization and assign admin role', async () => {
-    const testOrganization = createTestOrganization();
-    const userId = uuid();
 
-    const connection = { entityManager: {} as any };
-    const transactionService = {
-      run: jest.fn(async (cb) => cb(connection))
-    };
+  describe('on successful creation', () => {
+    it('creates organization and assigns user as admin in transaction', async () => {
+      const testOrganization = createTestOrganization({ name: TEST_ORG_NAMES.TECH_CORP });
+      mockOrganizationRepo.create.mockResolvedValue(testOrganization);
 
-    mockOrganizationRepo.create.mockResolvedValueOnce(testOrganization);
-
-    const result = await createOrganization({
-      userId,
-      organizationData: { name: testOrganization.name },
-      organizationRepo: mockOrganizationRepo,
-      userOrganizationRepo: mockUserOrganizationRepo,
-      transactionService
-    });
-
-    expect(transactionService.run).toHaveBeenCalledTimes(1);
-
-    expect(mockOrganizationRepo.reconnect).toHaveBeenCalledWith(connection);
-    expect(mockOrganizationRepo.create).toHaveBeenCalledWith({
-      name: testOrganization.name
-    });
-
-    expect(mockUserOrganizationRepo.reconnect).toHaveBeenCalledWith(connection);
-    expect(mockUserOrganizationRepo.create).toHaveBeenCalledWith({
-      userId,
-      organizationId: testOrganization.id,
-      role: UserRoleEnum.ADMIN
-    });
-
-    expect(result).toEqual({ ...testOrganization, name: testOrganization.name });
-  });
-
-  it('should throw if db error occurs during creation', async () => {
-    const connection = { entityManager: {} as any };
-
-    const transactionService = {
-      run: jest.fn(async (cb: any) => cb(connection))
-    };
-
-    mockOrganizationRepo.create.mockRejectedValueOnce(new Error('DB error'));
-
-    await expect(
-      createOrganization({
-        userId: 'user-123',
-        organizationData: { name: 'Acme' },
+      const result = await createOrganization({
+        userId: TEST_USER_IDS.FIRST,
+        organizationData,
         organizationRepo: mockOrganizationRepo,
         userOrganizationRepo: mockUserOrganizationRepo,
-        transactionService
-      })
-    ).rejects.toThrow('DB error');
+        transactionService: mockTransactionService
+      });
 
-    expect(mockUserOrganizationRepo.create).not.toHaveBeenCalled();
+      expect(mockTransactionService.run).toHaveBeenCalledTimes(1);
+
+      expect(mockOrganizationRepo.reconnect).toHaveBeenCalledWith(mockConnection);
+      expect(mockOrganizationRepo.create).toHaveBeenCalledWith(organizationData);
+
+      expect(mockUserOrganizationRepo.reconnect).toHaveBeenCalledWith(mockConnection);
+      expect(mockUserOrganizationRepo.create).toHaveBeenCalledWith({
+        userId: TEST_USER_IDS.FIRST,
+        organizationId: testOrganization.id,
+        role: UserRoleEnum.ADMIN
+      });
+
+      expect(result).toEqual(testOrganization);
+    });
+  });
+
+  describe('on transaction failure', () => {
+    it('rolls back when organization creation fails', async () => {
+      const dbError = new Error('Organization name already exists');
+      mockOrganizationRepo.create.mockRejectedValue(dbError);
+
+      await expect(
+        createOrganization({
+          userId: TEST_USER_IDS.FIRST,
+          organizationData,
+          organizationRepo: mockOrganizationRepo,
+          userOrganizationRepo: mockUserOrganizationRepo,
+          transactionService: mockTransactionService
+        })
+      ).rejects.toThrow('Organization name already exists');
+
+      expect(mockUserOrganizationRepo.create).not.toHaveBeenCalled();
+    });
   });
 });

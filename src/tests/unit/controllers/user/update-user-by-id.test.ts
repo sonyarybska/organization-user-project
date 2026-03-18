@@ -1,35 +1,46 @@
 import { updateUserById } from 'src/controllers/user/update-user-by-id';
 import { mockUserRepo } from 'src/tests/mocks/repos/user.repo.mock';
+import { TEST_USER_IDS } from 'src/tests/fixtures/test-constants';
 
 describe('updateUserById', () => {
+  const updatedData = { name: 'Updated Name' };
+
   beforeEach(() => {
     jest.clearAllMocks();
   });
-  it('should call userRepo.updateUser', async () => {
-    await updateUserById({
-      userId: 'user-123',
-      userData: { name: 'New Name' },
-      userRepo: mockUserRepo
-    });
 
-    expect(mockUserRepo.updateUser).toHaveBeenCalledWith('user-123', {
-      name: 'New Name'
+  describe('on successful update', () => {
+    it('updates user data via repository', async () => {
+      await updateUserById({
+        userId: TEST_USER_IDS.FIRST,
+        userData: updatedData,
+        userRepo: mockUserRepo
+      });
+
+      expect(mockUserRepo.updateUser).toHaveBeenCalledWith(
+        TEST_USER_IDS.FIRST,
+        updatedData
+      );
     });
   });
 
-  it('should throw if db error', async () => {
-    mockUserRepo.updateUser.mockRejectedValueOnce(new Error('DB error'));
+  describe('on update failure', () => {
+    it('propagates database error', async () => {
+      const dbError = new Error('Connection timeout');
+      mockUserRepo.updateUser.mockRejectedValue(dbError);
 
-    await expect(
-      updateUserById({
-        userId: 'user-123',
-        userData: { name: 'New Name' },
-        userRepo: mockUserRepo
-      })
-    ).rejects.toThrow('DB error');
+      await expect(
+        updateUserById({
+          userId: TEST_USER_IDS.FIRST,
+          userData: updatedData,
+          userRepo: mockUserRepo
+        })
+      ).rejects.toThrow('Connection timeout');
 
-    expect(mockUserRepo.updateUser).toHaveBeenCalledWith('user-123', {
-      name: 'New Name'
+      expect(mockUserRepo.updateUser).toHaveBeenCalledWith(
+        TEST_USER_IDS.FIRST,
+        updatedData
+      );
     });
   });
 });
