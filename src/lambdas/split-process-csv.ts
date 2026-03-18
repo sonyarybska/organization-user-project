@@ -7,13 +7,13 @@ import { getCsvImportRecordRepo } from 'src/repos/csv-import-record.repo';
 import { CsvImportStatusEnum } from 'src/types/enums/CsvImportStatusEnum';
 import { getTypeOrmTransactionService } from 'src/services/typeorm/typeorm-transaction.service';
 import { SourceTypeEnum } from 'src/types/enums/SourceTypeEnum';
-import { normalizeDomain } from 'src/controllers/prospect/helpers/normalizeDomain';
-import { normalizeLinkedinUrl } from 'src/controllers/prospect/helpers/normalizeLinkedinUrl';
+import { normalizeDomain, normalizeLinkedinUrl, normalizePhoneNumber } from 'src/api/helpers/normalization';
 import { ImportCsvProspect } from 'src/api/routes/organizations/prospects/csv-import-records/schemas/ImportCsvProspectSchema';
 
 interface ProcessCsvRowMessage {
   importRecordId: string
   row: Partial<ImportCsvProspect>
+  isDuplicate: boolean
 }
 
 export const handler: SQSHandler = async (event: SQSEvent) => {
@@ -36,7 +36,7 @@ export const handler: SQSHandler = async (event: SQSEvent) => {
   const importRepo = getCsvImportRecordRepo(db);
 
   for (const record of event.Records) {
-    const { importRecordId, row } = JSON.parse(
+    const { importRecordId, row, isDuplicate } = JSON.parse(
       record.body
     ) as ProcessCsvRowMessage;
 
@@ -50,6 +50,22 @@ export const handler: SQSHandler = async (event: SQSEvent) => {
         console.log(
           `Skipping processing for importRecordId ${importRecordId} with status ${status}`
         );
+        continue;
+      }
+      if (isDuplicate) {
+        console.log('Duplicate email found in database, skipping:', row.email);
+        await importRepo.incrementSkippedRows(importRecordId);
+        continue;
+      }
+
+      const emailExists = await prospectRepo.existsByEmailAndOrganizationId(
+        row.email!.toLowerCase(),
+        row.organizationId!
+      );
+
+      if (emailExists) {
+        console.log('Duplicate email found in database, skipping:', row.email);
+        await importRepo.incrementSkippedRows(importRecordId);
         continue;
       }
 
@@ -73,10 +89,12 @@ export const handler: SQSHandler = async (event: SQSEvent) => {
           });
 
         const normalizedProspectLinkedinUrl = normalizeLinkedinUrl(prospectData.linkedinUrl);
+        const normalizedPhone = normalizePhoneNumber(prospectData.phone);
 
         await prospectRepoTx.create({
           ...prospectData,
           linkedinUrl: normalizedProspectLinkedinUrl,
+          phone: normalizedPhone,
           companyId: company.id,
           source: SourceTypeEnum.CSV_IMPORT
         });
@@ -89,7 +107,7 @@ export const handler: SQSHandler = async (event: SQSEvent) => {
 
       await importRepo.handleImportError(importRecordId, errorMessage);
 
-      console.log('Error processing row for importRecordId');
+      console.log('Error processing row for importRecordId', importRecordId, ':', errorMessage);
     } finally {
       const isDone = await importRepo.checkIfDone(importRecordId);
 

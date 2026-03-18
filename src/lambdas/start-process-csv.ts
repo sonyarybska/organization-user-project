@@ -85,29 +85,42 @@ export const handler: SQSHandler = async (event: SQSEvent) => {
       await repo.update(importRecordId, {
         status: CsvImportStatusEnum.BUSY,
         processedRows: 0,
-        failedRows: 0
+        failedRows: 0,
+        skippedRows: 0
       });
 
       const stream = await getCsvStreamFromS3(s3, key, bucketName);
 
       let rowNumber = 0;
+      const seenEmails = new Set<string>();
 
       for await (const row of stream) {
         rowNumber++;
-        
-        const prospect = mapAndValidateRow(
-          row,
-          mapping,
-          userId,
-          organizationId,
-          rowNumber
-        );
+
+        const prospect = mapAndValidateRow(row, mapping, userId, organizationId, rowNumber);
+
+        const email = prospect.email.toLowerCase();
+
+        if (seenEmails.has(email)) {
+          await sqs.sendMessageToQueue(
+            process.env.AWS_SQS_PROCESS_CSV_ROW_QUEUE_URL,
+            {
+              importRecordId,
+              row: prospect,
+              isDuplicate: true
+            }
+          );
+          continue;
+        }
+
+        seenEmails.add(email);
 
         await sqs.sendMessageToQueue(
           process.env.AWS_SQS_PROCESS_CSV_ROW_QUEUE_URL,
           {
             importRecordId,
-            row: prospect
+            row: prospect,
+            isDuplicate: false
           }
         );
       }

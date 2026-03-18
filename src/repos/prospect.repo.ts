@@ -9,6 +9,7 @@ export interface IProspectRepo
   extends Reconnector<IProspectRepo, TypeOrmConnection> {
   create(prospect: Partial<Prospect>): Promise<Prospect>
   getByOrganizationId(organizationId: string): Promise<{prospects: Prospect[], count: number}>
+  existsByEmailAndOrganizationId(email: string, organizationId: string): Promise<boolean>
   getByIdAndOrganizationId(
     prospectId: string,
     organizationId: string,
@@ -62,6 +63,25 @@ export function getProspectRepo(db: DataSource | EntityManager): IProspectRepo {
         );
       }
     },
+
+    async existsByEmailAndOrganizationId(
+      email: string,
+      organizationId: string
+    ): Promise<boolean> {
+      try {
+        return await prospectRepo
+          .createQueryBuilder('prospect')
+          .where('prospect.email = :email', { email: email.toLowerCase() })
+          .andWhere('prospect.organizationId = :organizationId', { organizationId })
+          .getExists();
+      } catch (error) {
+        throw new DBError(
+          `Failed to check if email exists for organization id ${organizationId}`,
+          error
+        );
+      }
+    },
+
     async getByIdAndOrganizationId(
       prospectId: string,
       organizationId: string

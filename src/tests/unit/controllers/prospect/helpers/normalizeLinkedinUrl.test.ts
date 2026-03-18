@@ -1,4 +1,4 @@
-import { normalizeLinkedinUrl } from 'src/api/helpers/normalizeLinkedinUrl';
+import { normalizeLinkedinUrl } from 'src/api/helpers/normalization';
 
 describe('normalizeLinkedinUrl', () => {
   it('should return null for null input', () => {
