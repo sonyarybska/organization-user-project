@@ -28,6 +28,7 @@ export const EnvironmentSchema = z.object({
   AWS_SIGNED_URL_EXPIRE_IN_SEC: z.string(),
   AWS_SQS_START_CSV_IMPORT_QUEUE_URL: z.string(),
   AWS_SQS_PROCESS_CSV_ROW_QUEUE_URL: z.string(),
+  AWS_SQS_TRACKING_QUEUE_URL: z.string(),
   COGNITO_CLIENT_ID: z.string(),
   COGNITO_USER_POOL_ID: z.string()
 });

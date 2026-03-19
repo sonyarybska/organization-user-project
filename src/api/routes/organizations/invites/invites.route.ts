@@ -16,6 +16,7 @@ const routes: FastifyPluginAsync = async (f) => {
   const { organizationInviteRepo, organizationRepo } = fastify.repos;
   const sendGridService = fastify.sendGridService;
   const hmacService = fastify.hmacService;
+  const trackingService = fastify.trackingService;
 
   fastify.get(
     '/',
@@ -50,7 +51,9 @@ const routes: FastifyPluginAsync = async (f) => {
         organizationRepo,
         organizationInviteRepo,
         userId: req.userProfile.id,
-        hmacService
+        hmacService,
+        trackingContext: req.trackingContext,
+        trackingService
       });
     }
   );
@@ -69,7 +72,10 @@ const routes: FastifyPluginAsync = async (f) => {
         inviteId: req.params.id,
         organizationInviteRepo,
         status: InviteStatus.DECLINED_BY_ADMIN,
-        organizationId: req.userOrganization.organizationId
+        organizationId: req.userOrganization.organizationId,
+        userId: req.userProfile.id,
+        trackingService,
+        trackingContext: req.trackingContext
       });
     }
   );

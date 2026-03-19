@@ -1,6 +1,7 @@
 import { updateUserById } from 'src/controllers/user/update-user-by-id';
 import { mockUserRepo } from 'src/tests/mocks/repos/user.repo.mock';
-import { TEST_USER_IDS } from 'src/tests/fixtures/test-constants';
+import { TEST_TRACKING_CONTEXT, TEST_USER_IDS } from 'src/tests/fixtures/test-constants';
+import { trackingServiceMock } from 'src/tests/mocks/services/tracking.service.mock';
 
 describe('updateUserById', () => {
   const updatedData = { name: 'Updated Name' };
@@ -14,7 +15,9 @@ describe('updateUserById', () => {
       await updateUserById({
         userId: TEST_USER_IDS.FIRST,
         userData: updatedData,
-        userRepo: mockUserRepo
+        userRepo: mockUserRepo,
+        trackingService: trackingServiceMock,
+        trackingContext: TEST_TRACKING_CONTEXT
       });
 
       expect(mockUserRepo.updateUser).toHaveBeenCalledWith(TEST_USER_IDS.FIRST, updatedData);
@@ -30,7 +33,9 @@ describe('updateUserById', () => {
         updateUserById({
           userId: TEST_USER_IDS.FIRST,
           userData: updatedData,
-          userRepo: mockUserRepo
+          userRepo: mockUserRepo,
+          trackingService: trackingServiceMock,
+          trackingContext: TEST_TRACKING_CONTEXT
         })
       ).rejects.toThrow('Connection timeout');
 

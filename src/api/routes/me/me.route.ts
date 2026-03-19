@@ -11,6 +11,7 @@ const routes: FastifyPluginAsync = async (f) => {
   const fastify = f.withTypeProvider<ZodTypeProvider>();
   const { userRepo } = fastify.repos;
   const s3Service = fastify.s3Service;
+  const trackingService = fastify.trackingService;
 
   fastify.get(
     '/',
@@ -49,7 +50,9 @@ const routes: FastifyPluginAsync = async (f) => {
       await updateUserById({
         userId: id,
         userData: req.body,
-        userRepo
+        userRepo,
+        trackingService,
+        trackingContext: req.trackingContext
       });
     }
   );

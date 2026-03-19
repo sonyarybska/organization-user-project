@@ -7,6 +7,7 @@ import { AttachmentEntity } from './entities/AttachmentEntity';
 import { ProspectEntity } from './entities/ProspectEntity';
 import { CsvImportRecordEntity } from './entities/CsvImportRecordEntity';
 import { CompanyEntity } from './entities/CompanyEntity';
+import { TrackingEventEntity } from './entities/TrackingEventEntity';
 
 export function getDataSource(opts: {
   host: string;
@@ -37,7 +38,8 @@ export function getDataSource(opts: {
       AttachmentEntity,
       ProspectEntity,
       CsvImportRecordEntity,
-      CompanyEntity
+      CompanyEntity,
+      TrackingEventEntity
     ],
     dropSchema: opts.dropSchema || false,
     ssl: isTest

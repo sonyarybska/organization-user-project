@@ -47,3 +47,8 @@ export const TEST_DATES = {
   PAST: new Date('2020-01-01'),
   FUTURE: new Date('2030-12-31')
 } as const;
+
+export const TEST_TRACKING_CONTEXT = {
+  ipAddress: '127.0.0.1',
+  userAgent: 'Mozilla/5.0'
+} as const;

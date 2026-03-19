@@ -1,12 +1,17 @@
 import { randomUUID } from 'crypto';
 import { CreateAttachmentDto } from 'src/types/dtos/attachment/CreateAttachmentDto';
+import { EventResourceTypeEnum } from 'src/types/enums/EventResourceTypeEnum';
+import { EventTypeEnum } from 'src/types/enums/EventTypeEnum';
 
 const bucket = process.env.AWS_S3_BUCKET_NAME;
 
 export async function createAttachment({
   s3Service,
   attachmentRepo,
-  attachmentData: { userId, originalName, buffer }
+  attachmentData: { userId, originalName, buffer },
+  organizationId,
+  trackingContext,
+  trackingService
 }: CreateAttachmentDto) {
   const publicKey = `attachments/${userId}/${randomUUID()}-${originalName}`;
   const key = `public/${publicKey}`;
@@ -18,6 +23,15 @@ export async function createAttachment({
     key,
     publicKey,
     userId
+  });
+
+  trackingService.track({
+    eventType: EventTypeEnum.AttachmentUploaded,
+    resourceType: EventResourceTypeEnum.Attachment,
+    resourceId: id,
+    userId,
+    organizationId,
+    trackingContext
   });
 
   return { id };

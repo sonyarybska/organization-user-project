@@ -8,6 +8,7 @@ const SCHEMA_TAGS = ['Organization'];
 const routes: FastifyPluginAsync = async (f) => {
   const fastify = f.withTypeProvider<ZodTypeProvider>();
   const transactionService = fastify.transactionService;
+  const trackingService = fastify.trackingService;
   const { organizationRepo, userOrganizationRepo } = fastify.repos;
 
   fastify.post(
@@ -27,7 +28,9 @@ const routes: FastifyPluginAsync = async (f) => {
         userOrganizationRepo,
         organizationData: req.body,
         transactionService,
-        userId: id
+        userId: id,
+        trackingContext: req.trackingContext,
+        trackingService
       });
     }
   );

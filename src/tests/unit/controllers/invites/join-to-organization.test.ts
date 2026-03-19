@@ -7,7 +7,8 @@ import { mockHmacService } from 'src/tests/mocks/services/hmac.service.mock';
 import { InviteStatus } from 'src/types/enums/InviteStatusEnum';
 import { UserRoleEnum } from 'src/types/enums/UserRoleEnum';
 import { createTestInvite } from 'src/tests/fixtures/test-factories';
-import { TEST_TOKENS, TEST_EMAILS, TEST_USER_IDS, TEST_IDS, TEST_DATES, TEST_ORG_IDS } from 'src/tests/fixtures/test-constants';
+import { TEST_TOKENS, TEST_EMAILS, TEST_USER_IDS, TEST_IDS, TEST_DATES, TEST_ORG_IDS, TEST_TRACKING_CONTEXT } from 'src/tests/fixtures/test-constants';
+import { trackingServiceMock } from 'src/tests/mocks/services/tracking.service.mock';
 
 describe('joinUserToOrganization', () => {
   const mockConnection = { entityManager: {} as any };
@@ -36,7 +37,9 @@ describe('joinUserToOrganization', () => {
           userRepo: mockUserRepo,
           cognitoService: mockCognitoService,
           transactionService: mockTransactionService,
-          hmacService: mockHmacService
+          hmacService: mockHmacService,
+          trackingService: trackingServiceMock,
+          trackingContext: TEST_TRACKING_CONTEXT
         })
       ).rejects.toThrow('Invalid invite token');
 
@@ -67,7 +70,9 @@ describe('joinUserToOrganization', () => {
         userRepo: mockUserRepo,
         cognitoService: mockCognitoService,
         transactionService: mockTransactionService,
-        hmacService: mockHmacService
+        hmacService: mockHmacService,
+        trackingService: trackingServiceMock,
+        trackingContext: TEST_TRACKING_CONTEXT
       });
 
       expect(mockTransactionService.run).toHaveBeenCalledTimes(1);
@@ -113,7 +118,9 @@ describe('joinUserToOrganization', () => {
         userRepo: mockUserRepo,
         cognitoService: mockCognitoService,
         transactionService: mockTransactionService,
-        hmacService: mockHmacService
+        hmacService: mockHmacService,
+        trackingService: trackingServiceMock,
+        trackingContext: TEST_TRACKING_CONTEXT
       });
 
       expect(mockCognitoService.createCognitoUser).toHaveBeenCalledWith(TEST_EMAILS.INVITED_USER);

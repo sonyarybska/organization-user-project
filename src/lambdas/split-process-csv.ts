@@ -8,13 +8,11 @@ import { CsvImportStatusEnum } from 'src/types/enums/CsvImportStatusEnum';
 import { getTypeOrmTransactionService } from 'src/services/typeorm/typeorm-transaction.service';
 import { SourceTypeEnum } from 'src/types/enums/SourceTypeEnum';
 import { normalizeDomain, normalizeLinkedinUrl, normalizePhoneNumber } from 'src/api/helpers/normalization';
-import { ImportCsvProspect } from 'src/api/routes/organizations/prospects/csv-import-records/schemas/ImportCsvProspectSchema';
-
-interface ProcessCsvRowMessage {
-  importRecordId: string;
-  row: Partial<ImportCsvProspect>;
-  isDuplicate: boolean;
-}
+import { getAwsSqsService } from 'src/services/aws/sqs/sqs.service';
+import { EventTypeEnum } from 'src/types/enums/EventTypeEnum';
+import { EventResourceTypeEnum } from 'src/types/enums/EventResourceTypeEnum';
+import { CreateTrackingEventDto } from 'src/types/dtos/tracking/CreateTrackingEventDto';
+import { ProcessProspectCsvRowMessageDto } from 'src/types/dtos/prospect/ProcessProspectCsvRowMessageDto';
 
 export const handler: SQSHandler = async (event: SQSEvent) => {
   if (!event.Records.length) {
@@ -34,9 +32,10 @@ export const handler: SQSHandler = async (event: SQSEvent) => {
   const prospectRepo = getProspectRepo(db);
   const companyRepo = getCompanyRepo(db);
   const importRepo = getCsvImportRecordRepo(db);
+  const sqs = getAwsSqsService(process.env.AWS_REGION);
 
   for (const record of event.Records) {
-    const { importRecordId, row, isDuplicate } = JSON.parse(record.body) as ProcessCsvRowMessage;
+    const { importRecordId, row, isDuplicate } = JSON.parse(record.body) as ProcessProspectCsvRowMessageDto;
 
     try {
       if (!importRecordId || !row) {
@@ -104,8 +103,20 @@ export const handler: SQSHandler = async (event: SQSEvent) => {
       const isDone = await importRepo.checkIfDone(importRecordId);
 
       if (isDone) {
+        const importRecord = await importRepo.getById(importRecordId);
+
         await importRepo.update(importRecordId, {
           status: CsvImportStatusEnum.DONE
+        });
+
+        await sqs.sendMessageToQueue<CreateTrackingEventDto>(process.env.AWS_SQS_TRACKING_QUEUE_URL, {
+          eventType: EventTypeEnum.CsvImportCompleted,
+          ipAddress: null,
+          userAgent: null,
+          organizationId: importRecord.organizationId,
+          userId: importRecord.userId,
+          resourceType: EventResourceTypeEnum.CsvImport,
+          resourceId: importRecordId
         });
       }
     }

@@ -14,6 +14,7 @@ const routes: FastifyPluginAsync = async (f) => {
   const cognitoService = fastify.cognitoService;
   const transactionService = fastify.transactionService;
   const hmacService = fastify.hmacService;
+  const trackingService = fastify.trackingService;
 
   fastify.post(
     '/join',
@@ -36,7 +37,9 @@ const routes: FastifyPluginAsync = async (f) => {
         userRepo,
         cognitoService,
         transactionService,
-        hmacService
+        hmacService,
+        trackingService,
+        trackingContext: req.trackingContext
       });
     }
   );

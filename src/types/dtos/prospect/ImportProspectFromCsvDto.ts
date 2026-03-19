@@ -1,6 +1,8 @@
 import { ICsvImportRecordRepo } from 'src/repos/csv-import-record.repo';
 import { IS3Service } from 'src/services/aws/s3/s3.service';
 import { ISqsService } from 'src/services/aws/sqs/sqs.service';
+import { ITrackingService } from 'src/services/tracking/tracking.service';
+import { TrackingContext } from 'src/types/interfaces/TrackingContext';
 
 export type ImportProspectsFromCsvDto = {
   s3Service: IS3Service;
@@ -10,4 +12,6 @@ export type ImportProspectsFromCsvDto = {
   userId: string;
   csvImportRecordRepo: ICsvImportRecordRepo;
   sqsService: ISqsService;
+  trackingService: ITrackingService;
+  trackingContext: TrackingContext;
 };

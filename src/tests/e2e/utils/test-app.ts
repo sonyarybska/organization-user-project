@@ -14,6 +14,7 @@ import { mockSendGridService } from 'src/tests/mocks/services/send-grid.service.
 import { mockS3Service } from 'src/tests/mocks/services/s3.service.mock';
 import { mockSqsService } from 'src/tests/mocks/services/sqs.service.mock';
 import { mockHmacService } from 'src/tests/mocks/services/hmac.service.mock';
+import { trackingServiceMock } from 'src/tests/mocks/services/tracking.service.mock';
 
 export async function buildTestApp(db: DataSource): Promise<FastifyInstance> {
   const app = fastify({ logger: false });
@@ -45,6 +46,7 @@ export async function buildTestApp(db: DataSource): Promise<FastifyInstance> {
   app.decorate('s3Service', mockS3Service);
   app.decorate('sqsService', mockSqsService);
   app.decorate('hmacService', mockHmacService);
+  app.decorate('trackingService', trackingServiceMock);
 
   await app.register(autoload, {
     dir: join(__dirname, '../../../api/routes'),

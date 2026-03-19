@@ -1,12 +1,17 @@
 import { DeclineOrganizationInviteByAdminDto } from 'src/types/dtos/invites/DeclineOrganizationInviteByAdminDto';
 import { InviteStatus } from 'src/types/enums/InviteStatusEnum';
 import { ApplicationError } from 'src/types/errors/ApplicationError';
+import { EventTypeEnum } from 'src/types/enums/EventTypeEnum';
+import { EventResourceTypeEnum } from 'src/types/enums/EventResourceTypeEnum';
 
 export async function declineOrganizationInviteByAdmin({
   inviteId,
   organizationInviteRepo,
   status,
-  organizationId
+  organizationId,
+  userId,
+  trackingService,
+  trackingContext
 }: DeclineOrganizationInviteByAdminDto) {
   const invite = await organizationInviteRepo.getByIdAndOrganizationId(inviteId, organizationId);
 
@@ -19,4 +24,13 @@ export async function declineOrganizationInviteByAdmin({
   }
 
   await organizationInviteRepo.updateStatusById(inviteId, status);
+
+  trackingService.track({
+    eventType: EventTypeEnum.InviteDeclined,
+    resourceType: EventResourceTypeEnum.Invite,
+    resourceId: inviteId,
+    userId,
+    organizationId,
+    trackingContext
+  });
 }

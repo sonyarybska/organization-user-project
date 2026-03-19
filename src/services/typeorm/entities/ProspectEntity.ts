@@ -64,7 +64,7 @@ export class ProspectEntity {
   @Column({ nullable: true })
   companyId: string;
 
-  @ManyToOne(() => CompanyEntity)
+  @ManyToOne(() => CompanyEntity, { onDelete: 'SET NULL' })
   @JoinColumn({ name: 'companyId' })
   company: CompanyEntity;
 
