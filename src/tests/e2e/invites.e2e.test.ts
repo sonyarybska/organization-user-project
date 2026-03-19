@@ -5,16 +5,9 @@ import { OrganizationEntity } from 'src/services/typeorm/entities/OrganizationEn
 import { OrganizationInviteEntity } from 'src/services/typeorm/entities/OrganizationInviteEntity';
 import { UserOrganizationEntity } from 'src/services/typeorm/entities/UserOrganizationEntity';
 import { InviteStatus } from 'src/types/enums/InviteStatusEnum';
-import {
-  setupTestDatabase,
-  teardownTestDatabase,
-  clearDatabase
-} from '../utils/test-db-setup';
+import { setupTestDatabase, teardownTestDatabase, clearDatabase } from '../utils/test-db-setup';
 import { buildTestApp } from './utils/test-app';
-import {
-  createTestUserInDb,
-  createAuthHeaders
-} from 'src/tests/e2e/utils/e2e-helpers';
+import { createTestUserInDb, createAuthHeaders } from 'src/tests/e2e/utils/e2e-helpers';
 import { mockCognitoService } from 'src/tests/mocks/services/cognito.service.mock';
 import { mockHmacService } from 'src/tests/mocks/services/hmac.service.mock';
 
@@ -47,9 +40,7 @@ describe('Invites e2e', () => {
   });
 
   it('should accept an invite', async () => {
-    const org = await dataSource
-      .getRepository(OrganizationEntity)
-      .save({ name: 'Test Org' });
+    const org = await dataSource.getRepository(OrganizationEntity).save({ name: 'Test Org' });
 
     const token = 'test-invite-token';
 
@@ -70,20 +61,16 @@ describe('Invites e2e', () => {
 
     expect(res.statusCode).toBe(200);
 
-    const membership = await dataSource
-      .getRepository(UserOrganizationEntity)
-      .findOne({
-        where: {
-          userId: user.id,
-          organizationId: org.id
-        }
-      });
+    const membership = await dataSource.getRepository(UserOrganizationEntity).findOne({
+      where: {
+        userId: user.id,
+        organizationId: org.id
+      }
+    });
 
     expect(membership).toBeTruthy();
 
-    const invite = await dataSource
-      .getRepository(OrganizationInviteEntity)
-      .findOne({ where: { token } });
+    const invite = await dataSource.getRepository(OrganizationInviteEntity).findOne({ where: { token } });
 
     expect(invite?.status).toBe(InviteStatus.ACCEPTED);
   });

@@ -1,5 +1,14 @@
 import { SourceTypeEnum } from 'src/types/enums/SourceTypeEnum';
-import { Column, CreateDateColumn, Entity, Index, PrimaryGeneratedColumn, UpdateDateColumn, ManyToOne, JoinColumn } from 'typeorm';
+import {
+  Column,
+  CreateDateColumn,
+  Entity,
+  Index,
+  PrimaryGeneratedColumn,
+  UpdateDateColumn,
+  ManyToOne,
+  JoinColumn
+} from 'typeorm';
 import { OrganizationEntity } from './OrganizationEntity';
 
 @Index(['domain', 'organizationId'], { unique: true })
@@ -11,7 +20,7 @@ export class CompanyEntity {
   @Column()
   domain: string;
 
-  @Column({ type:'varchar' })
+  @Column({ type: 'varchar' })
   source: SourceTypeEnum;
 
   @ManyToOne(() => OrganizationEntity, { onDelete: 'CASCADE' })

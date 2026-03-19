@@ -1,22 +1,14 @@
 import sgMail from '@sendgrid/mail';
 
 export interface ISendGridService {
-  sendInviteEmail: (
-    to: string,
-    organizationName: string,
-    inviteUrl: string,
-  ) => Promise<void>
+  sendInviteEmail: (to: string, organizationName: string, inviteUrl: string) => Promise<void>;
 }
 
 export function getSendGridService(apiKey: string): ISendGridService {
   sgMail.setApiKey(apiKey);
 
   return {
-    sendInviteEmail: async (
-      to: string,
-      organizationName: string,
-      token: string
-    ) => {
+    sendInviteEmail: async (to: string, organizationName: string, token: string) => {
       await sgMail.send({
         to,
         from: process.env.SENDGRID_FROM_EMAIL,

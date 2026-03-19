@@ -13,7 +13,7 @@ export async function createAttachment({
 
   await s3Service.upload(key, buffer, bucket);
 
-  const { id }  = await attachmentRepo.create({
+  const { id } = await attachmentRepo.create({
     originalName,
     key,
     publicKey,

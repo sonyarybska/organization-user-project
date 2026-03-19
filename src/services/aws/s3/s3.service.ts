@@ -1,24 +1,11 @@
-import {
-  GetObjectCommand,
-  PutObjectCommand,
-  S3Client,
-  GetObjectCommandOutput
-} from '@aws-sdk/client-s3';
+import { GetObjectCommand, PutObjectCommand, S3Client, GetObjectCommandOutput } from '@aws-sdk/client-s3';
 import { getSignedUrl } from '@aws-sdk/s3-request-presigner';
 import { ApplicationError } from 'src/types/errors/ApplicationError';
 
 export interface IS3Service {
-  upload: (
-    key: string,
-    body: Buffer | string,
-    bucketName: string,
-  ) => Promise<void>
-  getSignedUrl: (
-    key: string,
-    expiresIn: number,
-    bucketName: string,
-  ) => Promise<string>
-  getFile: (key: string, bucket: string) => Promise<GetObjectCommandOutput>
+  upload: (key: string, body: Buffer | string, bucketName: string) => Promise<void>;
+  getSignedUrl: (key: string, expiresIn: number, bucketName: string) => Promise<string>;
+  getFile: (key: string, bucket: string) => Promise<GetObjectCommandOutput>;
 }
 
 export function getAwsS3Service(region: string): IS3Service {
@@ -27,11 +14,7 @@ export function getAwsS3Service(region: string): IS3Service {
   });
 
   return {
-    async upload(
-      key: string,
-      body: Buffer | string,
-      bucketName: string
-    ): Promise<void> {
+    async upload(key: string, body: Buffer | string, bucketName: string): Promise<void> {
       try {
         const command = new PutObjectCommand({
           Bucket: bucketName,
@@ -45,11 +28,7 @@ export function getAwsS3Service(region: string): IS3Service {
       }
     },
 
-    async getSignedUrl(
-      key: string,
-      expiresIn: number,
-      bucketName: string
-    ): Promise<string> {
+    async getSignedUrl(key: string, expiresIn: number, bucketName: string): Promise<string> {
       try {
         const command = new GetObjectCommand({
           Bucket: bucketName,
@@ -62,10 +41,7 @@ export function getAwsS3Service(region: string): IS3Service {
       }
     },
 
-    async getFile(
-      key: string,
-      bucket: string
-    ): Promise<GetObjectCommandOutput> {
+    async getFile(key: string, bucket: string): Promise<GetObjectCommandOutput> {
       try {
         const file = await client.send(
           new GetObjectCommand({

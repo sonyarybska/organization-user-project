@@ -1,4 +1,4 @@
-import {  QueryRunner, IsNull } from 'typeorm';
+import { QueryRunner, IsNull } from 'typeorm';
 import { CognitoIdentityProvider } from '@aws-sdk/client-cognito-identity-provider';
 import { UserEntity } from 'src/services/typeorm/entities/UserEntity';
 
@@ -21,13 +21,16 @@ export async function migrateUsers(queryRunner: QueryRunner) {
         ]
       });
 
-      const sub = result.User?.Attributes?.find(a => a.Name === 'sub')?.Value;
+      const sub = result.User?.Attributes?.find((a) => a.Name === 'sub')?.Value;
 
-      if (!sub) {throw new Error('No sub returned');}
+      if (!sub) {
+        throw new Error('No sub returned');
+      }
 
       user.cognitoUserId = sub;
       await userRepo.save(user);
     } catch (err) {
+      // eslint-disable-next-line no-console
       console.error('Error migrating user', user.email, err);
     }
   }

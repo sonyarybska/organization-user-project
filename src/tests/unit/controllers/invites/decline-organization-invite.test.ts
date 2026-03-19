@@ -42,10 +42,7 @@ describe('declineOrganizationInvite', () => {
         hmacService: mockHmacService
       });
 
-      expect(mockOrganizationInviteRepo.updateStatusById).toHaveBeenCalledWith(
-        testInvite.id,
-        InviteStatus.DECLINED_BY_USER
-      );
+      expect(mockOrganizationInviteRepo.updateStatusById).toHaveBeenCalledWith(testInvite.id, InviteStatus.DECLINED_BY_USER);
     });
   });
 });

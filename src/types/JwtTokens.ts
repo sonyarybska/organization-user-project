@@ -10,5 +10,5 @@ export const AccessTokenSchema = z.object({
 
 export const JwtTokensSchema = z.intersection(AccessTokenSchema, RefreshTokenSchema);
 
-export type JwtTokens = z.infer<typeof JwtTokensSchema>
-export type AccessToken = z.infer<typeof AccessTokenSchema>
+export type JwtTokens = z.infer<typeof JwtTokensSchema>;
+export type AccessToken = z.infer<typeof AccessTokenSchema>;

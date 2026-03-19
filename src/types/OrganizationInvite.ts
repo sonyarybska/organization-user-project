@@ -11,4 +11,4 @@ export const OrganizationInviteSchema = z.object({
   createdAt: z.date()
 });
 
-export type OrganizationInvite = z.infer<typeof OrganizationInviteSchema>
+export type OrganizationInvite = z.infer<typeof OrganizationInviteSchema>;

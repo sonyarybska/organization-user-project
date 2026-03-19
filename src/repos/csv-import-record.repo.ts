@@ -6,23 +6,18 @@ import { Reconnector } from 'src/types/interfaces/Reconnector';
 import { TypeOrmConnection } from 'src/types/interfaces/TypeOrmConnection';
 import { DataSource, EntityManager } from 'typeorm';
 
-export interface ICsvImportRecordRepo
-  extends Reconnector<ICsvImportRecordRepo, TypeOrmConnection> {
-  getById(id: string): Promise<CsvImportRecord>
-  create(data: Partial<CsvImportRecordEntity>): Promise<CsvImportRecord>
-  update(id: string, data: Partial<CsvImportRecord>): Promise<CsvImportRecord>
-  incrementProcessedRows(id: string): Promise<void>
-  incrementSkippedRows(id: string): Promise<void>
-  handleImportError(id: string, lastError: string): Promise<void>
-  checkIfDone(id: string): Promise<boolean>
+export interface ICsvImportRecordRepo extends Reconnector<ICsvImportRecordRepo, TypeOrmConnection> {
+  getById(id: string): Promise<CsvImportRecord>;
+  create(data: Partial<CsvImportRecordEntity>): Promise<CsvImportRecord>;
+  update(id: string, data: Partial<CsvImportRecord>): Promise<CsvImportRecord>;
+  incrementProcessedRows(id: string): Promise<void>;
+  incrementSkippedRows(id: string): Promise<void>;
+  handleImportError(id: string, lastError: string): Promise<void>;
+  checkIfDone(id: string): Promise<boolean>;
 }
 
-export function getCsvImportRecordRepo(
-  db: DataSource | EntityManager
-): ICsvImportRecordRepo {
-  const csvImportRecord = db.getRepository<CsvImportRecordEntity>(
-    CsvImportRecordEntity
-  );
+export function getCsvImportRecordRepo(db: DataSource | EntityManager): ICsvImportRecordRepo {
+  const csvImportRecord = db.getRepository<CsvImportRecordEntity>(CsvImportRecordEntity);
 
   return {
     reconnect(connection: TypeOrmConnection): ICsvImportRecordRepo {
@@ -33,10 +28,7 @@ export function getCsvImportRecordRepo(
       try {
         return await csvImportRecord.findOneByOrFail({ id });
       } catch (error) {
-        throw new DBError(
-          `Failed to get csv import record with id ${id}`,
-          error
-        );
+        throw new DBError(`Failed to get csv import record with id ${id}`, error);
       }
     },
 
@@ -58,10 +50,7 @@ export function getCsvImportRecordRepo(
         throw new DBError('Failed to create csv import record', error);
       }
     },
-    async update(
-      id: string,
-      data: Partial<CsvImportRecord>
-    ): Promise<CsvImportRecord> {
+    async update(id: string, data: Partial<CsvImportRecord>): Promise<CsvImportRecord> {
       try {
         const result = await csvImportRecord
           .createQueryBuilder('csvImportRecord')
@@ -77,10 +66,7 @@ export function getCsvImportRecordRepo(
 
         return result.raw[0];
       } catch (error) {
-        throw new DBError(
-          `Failed to update csv import record with id ${id}`,
-          error
-        );
+        throw new DBError(`Failed to update csv import record with id ${id}`, error);
       }
     },
 
@@ -93,10 +79,7 @@ export function getCsvImportRecordRepo(
           .where('id = :id', { id })
           .execute();
       } catch (error) {
-        throw new DBError(
-          `Failed to increase processedRows for csv import record with id ${id}`,
-          error
-        );
+        throw new DBError(`Failed to increase processedRows for csv import record with id ${id}`, error);
       }
     },
 
@@ -106,16 +89,12 @@ export function getCsvImportRecordRepo(
           .createQueryBuilder()
           .update(CsvImportRecordEntity)
           .set({
-            skippedRows: () =>
-              'COALESCE("skippedRows",0)+1'
+            skippedRows: () => 'COALESCE("skippedRows",0)+1'
           })
           .where('id = :id', { id })
           .execute();
       } catch (error) {
-        throw new DBError(
-          `Failed to increase skippedRows for csv import record with id ${id}`,
-          error
-        );
+        throw new DBError(`Failed to increase skippedRows for csv import record with id ${id}`, error);
       }
     },
 
@@ -132,10 +111,7 @@ export function getCsvImportRecordRepo(
           .where('id = :id', { id })
           .execute();
       } catch (error) {
-        throw new DBError(
-          `Failed to handle import error for csv import record with id ${id}`,
-          error
-        );
+        throw new DBError(`Failed to handle import error for csv import record with id ${id}`, error);
       }
     },
 
@@ -146,16 +122,11 @@ export function getCsvImportRecordRepo(
           .where('id = :id', { id })
           .andWhere('"totalRows" IS NOT NULL')
           .andWhere('"totalRows" > 0')
-          .andWhere(
-            'COALESCE("processedRows", 0) + COALESCE("failedRows", 0) + COALESCE("skippedRows", 0) >= "totalRows"'
-          )
+          .andWhere('COALESCE("processedRows", 0) + COALESCE("failedRows", 0) + COALESCE("skippedRows", 0) >= "totalRows"')
           .getCount()
           .then((count) => count > 0);
       } catch (error) {
-        throw new DBError(
-          `Failed to check if csv import record with id ${id} is done`,
-          error
-        );
+        throw new DBError(`Failed to check if csv import record with id ${id} is done`, error);
       }
     }
   };

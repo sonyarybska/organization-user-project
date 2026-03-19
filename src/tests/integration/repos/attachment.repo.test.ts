@@ -39,9 +39,7 @@ describe('AttachmentRepo', () => {
     expect(result.id).toBeDefined();
     expect(result.originalName).toBe('file.pdf');
 
-    const fromDb = await queryRunner.manager
-      .getRepository(AttachmentEntity)
-      .findOneBy({ id: result.id });
+    const fromDb = await queryRunner.manager.getRepository(AttachmentEntity).findOneBy({ id: result.id });
 
     expect(fromDb?.key).toBe('attachments/file.pdf');
   });

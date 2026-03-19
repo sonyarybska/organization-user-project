@@ -10,4 +10,3 @@ export const OrganizationInviteResSchema = z.object({
   status: z.enum(InviteStatus),
   createdAt: z.date()
 });
-

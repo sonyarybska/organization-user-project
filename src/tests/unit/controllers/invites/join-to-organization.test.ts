@@ -80,10 +80,7 @@ describe('joinUserToOrganization', () => {
       });
 
       expect(mockOrganizationInviteRepo.reconnect).toHaveBeenCalledWith(mockConnection);
-      expect(mockOrganizationInviteRepo.updateStatusById).toHaveBeenCalledWith(
-        testInvite.id,
-        InviteStatus.ACCEPTED
-      );
+      expect(mockOrganizationInviteRepo.updateStatusById).toHaveBeenCalledWith(testInvite.id, InviteStatus.ACCEPTED);
 
       expect(mockCognitoService.createCognitoUser).not.toHaveBeenCalled();
       expect(mockUserRepo.create).not.toHaveBeenCalled();
@@ -133,10 +130,7 @@ describe('joinUserToOrganization', () => {
         role: UserRoleEnum.USER
       });
 
-      expect(mockOrganizationInviteRepo.updateStatusById).toHaveBeenCalledWith(
-        testInvite.id,
-        InviteStatus.ACCEPTED
-      );
+      expect(mockOrganizationInviteRepo.updateStatusById).toHaveBeenCalledWith(testInvite.id, InviteStatus.ACCEPTED);
     });
   });
 });

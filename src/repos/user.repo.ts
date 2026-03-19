@@ -6,12 +6,12 @@ import { TypeOrmConnection } from 'src/types/interfaces/TypeOrmConnection';
 import { DBError } from 'src/types/errors/DBError';
 
 export interface IUserRepo extends Reconnector<IUserRepo, TypeOrmConnection> {
-  getUsersByOrganizationId(organizationId: string): Promise<User[]>
-  getById(id: string): Promise<User>
-  create(user: Partial<User>): Promise<User>
-  getByEmail(email: string): Promise<User | null>
-  updateUser(id: string, userData: Partial<User>): Promise<User>
-  getUserByCognitoUserId(cognitoUserId: string): Promise<User>
+  getUsersByOrganizationId(organizationId: string): Promise<User[]>;
+  getById(id: string): Promise<User>;
+  create(user: Partial<User>): Promise<User>;
+  getByEmail(email: string): Promise<User | null>;
+  updateUser(id: string, userData: Partial<User>): Promise<User>;
+  getUserByCognitoUserId(cognitoUserId: string): Promise<User>;
 }
 
 export function getUserRepo(db: DataSource | EntityManager): IUserRepo {
@@ -21,9 +21,7 @@ export function getUserRepo(db: DataSource | EntityManager): IUserRepo {
     reconnect(connection: TypeOrmConnection): IUserRepo {
       return getUserRepo(connection.entityManager);
     },
-    async getUsersByOrganizationId(
-      organizationId: string
-    ): Promise<UserEntity[]> {
+    async getUsersByOrganizationId(organizationId: string): Promise<UserEntity[]> {
       try {
         return await userRepository.find({
           where: { userOrganizations: { organizationId } },
@@ -51,10 +49,7 @@ export function getUserRepo(db: DataSource | EntityManager): IUserRepo {
           relations: ['userOrganizations', 'avatar']
         });
       } catch (error) {
-        throw new DBError(
-          `User with Cognito User ID ${cognitoUserId} not found`,
-          error
-        );
+        throw new DBError(`User with Cognito User ID ${cognitoUserId} not found`, error);
       }
     },
 

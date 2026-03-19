@@ -69,11 +69,12 @@ const routes: FastifyPluginAsync = async (f) => {
     }
   );
 
-  fastify.delete('/:id', 
+  fastify.delete(
+    '/:id',
     {
       schema: {
-        tags:SCHEMA_TAGS,
-        params:IdUUIDSchema
+        tags: SCHEMA_TAGS,
+        params: IdUUIDSchema
       }
     },
     async (req) => {

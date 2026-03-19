@@ -10,4 +10,4 @@ export const RegisterUserReqSchema = z.object({
   birthday: z.coerce.date()
 });
 
-export type RegisterUserReq = z.infer<typeof RegisterUserReqSchema>
+export type RegisterUserReq = z.infer<typeof RegisterUserReqSchema>;

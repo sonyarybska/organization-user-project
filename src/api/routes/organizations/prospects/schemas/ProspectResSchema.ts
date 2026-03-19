@@ -19,4 +19,3 @@ export const ProspectResSchema = z.object({
   updatedAt: z.date(),
   source: z.enum(SourceTypeEnum)
 });
-

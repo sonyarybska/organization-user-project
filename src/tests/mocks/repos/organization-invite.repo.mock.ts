@@ -12,4 +12,3 @@ export const mockOrganizationInviteRepo: jest.Mocked<IOrganizationInviteRepo> = 
 };
 
 mockOrganizationInviteRepo.reconnect.mockImplementation(() => mockOrganizationInviteRepo);
-

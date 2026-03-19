@@ -61,9 +61,7 @@ describe('CsvImportRecordRepo', () => {
     expect(result.key).toBe('imports/import.csv');
     expect(result.status).toBe(CsvImportStatusEnum.NEW);
 
-    const fromDb = await queryRunner.manager
-      .getRepository(CsvImportRecordEntity)
-      .findOneBy({ id: result.id });
+    const fromDb = await queryRunner.manager.getRepository(CsvImportRecordEntity).findOneBy({ id: result.id });
 
     expect(fromDb?.totalRows).toBe(100);
     expect(fromDb?.organizationId).toBe(organizationId);
@@ -89,114 +87,106 @@ describe('CsvImportRecordRepo', () => {
     const repo = getCsvImportRecordRepo(queryRunner.manager);
     const { organizationId, userId } = await createUserAndOrg();
 
-        const created = await repo.create({
-            key: 'imports/file.csv',
-            organizationId,
-            userId,
-            status: CsvImportStatusEnum.NEW
-        });
-
-        const updated = await repo.update(created.id, {
-            status: CsvImportStatusEnum.BUSY,
-            totalRows: 5
-        });
-
-        expect(updated.id).toBe(created.id);
-        expect(updated.status).toBe(CsvImportStatusEnum.BUSY);
-        expect(updated.totalRows).toBe(5);
+    const created = await repo.create({
+      key: 'imports/file.csv',
+      organizationId,
+      userId,
+      status: CsvImportStatusEnum.NEW
     });
 
-    it('should increment processedRows', async () => {
-        const repo = getCsvImportRecordRepo(queryRunner.manager);
-        const { organizationId, userId } = await createUserAndOrg();
-
-        const created = await repo.create({
-            key: 'imports/file.csv',
-            organizationId,
-            userId,
-            status: CsvImportStatusEnum.BUSY
-        });
-
-        await repo.incrementProcessedRows(created.id);
-        await repo.incrementProcessedRows(created.id);
-
-        const fromDb = await queryRunner.manager
-            .getRepository(CsvImportRecordEntity)
-            .findOneByOrFail({ id: created.id });
-
-        expect(fromDb.processedRows).toBe(2);
+    const updated = await repo.update(created.id, {
+      status: CsvImportStatusEnum.BUSY,
+      totalRows: 5
     });
 
-    it('should handle import error (set status=ERROR and increment failedRows)', async () => {
-        const repo = getCsvImportRecordRepo(queryRunner.manager);
-        const { organizationId, userId } = await createUserAndOrg();
+    expect(updated.id).toBe(created.id);
+    expect(updated.status).toBe(CsvImportStatusEnum.BUSY);
+    expect(updated.totalRows).toBe(5);
+  });
 
-        const created = await repo.create({
-            key: 'imports/file.csv',
-            organizationId,
-            userId,
-            status: CsvImportStatusEnum.BUSY
-        });
+  it('should increment processedRows', async () => {
+    const repo = getCsvImportRecordRepo(queryRunner.manager);
+    const { organizationId, userId } = await createUserAndOrg();
 
-        await repo.handleImportError(created.id, 'Bad row');
-        await repo.handleImportError(created.id, 'Bad row');
-
-        const fromDb = await queryRunner.manager
-            .getRepository(CsvImportRecordEntity)
-            .findOneByOrFail({ id: created.id });
-
-        expect(fromDb.status).toBe(CsvImportStatusEnum.ERROR);
-        expect(fromDb.failedRows).toBe(2);
-        expect(fromDb.lastError).toBe('Bad row');
+    const created = await repo.create({
+      key: 'imports/file.csv',
+      organizationId,
+      userId,
+      status: CsvImportStatusEnum.BUSY
     });
 
-    it('should return true only when processed+failed >= totalRows', async () => {
-        const repo = getCsvImportRecordRepo(queryRunner.manager);
-        const { organizationId, userId } = await createUserAndOrg();
+    await repo.incrementProcessedRows(created.id);
+    await repo.incrementProcessedRows(created.id);
 
-        const recordDone = await repo.create({
-            key: 'imports/done.csv',
-            organizationId,
-            userId,
-            status: CsvImportStatusEnum.BUSY,
-            totalRows: 2
-        });
+    const fromDb = await queryRunner.manager.getRepository(CsvImportRecordEntity).findOneByOrFail({ id: created.id });
 
-        await repo.update(recordDone.id, { processedRows: 1, failedRows: 1 });
-        await expect(repo.checkIfDone(recordDone.id)).resolves.toBe(true);
+    expect(fromDb.processedRows).toBe(2);
+  });
 
-        const recordNotDone = await repo.create({
-            key: 'imports/not-done.csv',
-            organizationId,
-            userId,
-            status: CsvImportStatusEnum.BUSY,
-            totalRows: 3
-        });
+  it('should handle import error (set status=ERROR and increment failedRows)', async () => {
+    const repo = getCsvImportRecordRepo(queryRunner.manager);
+    const { organizationId, userId } = await createUserAndOrg();
 
-        await repo.update(recordNotDone.id, { processedRows: 1, failedRows: 1 });
-        await expect(repo.checkIfDone(recordNotDone.id)).resolves.toBe(false);
+    const created = await repo.create({
+      key: 'imports/file.csv',
+      organizationId,
+      userId,
+      status: CsvImportStatusEnum.BUSY
     });
 
-    it('should throw DBError on invalid create', async () => {
-        const repo = getCsvImportRecordRepo(queryRunner.manager);
-        await expect(repo.create({} as any)).rejects.toThrow(
-            'Failed to create csv import record'
-        );
+    await repo.handleImportError(created.id, 'Bad row');
+    await repo.handleImportError(created.id, 'Bad row');
+
+    const fromDb = await queryRunner.manager.getRepository(CsvImportRecordEntity).findOneByOrFail({ id: created.id });
+
+    expect(fromDb.status).toBe(CsvImportStatusEnum.ERROR);
+    expect(fromDb.failedRows).toBe(2);
+    expect(fromDb.lastError).toBe('Bad row');
+  });
+
+  it('should return true only when processed+failed >= totalRows', async () => {
+    const repo = getCsvImportRecordRepo(queryRunner.manager);
+    const { organizationId, userId } = await createUserAndOrg();
+
+    const recordDone = await repo.create({
+      key: 'imports/done.csv',
+      organizationId,
+      userId,
+      status: CsvImportStatusEnum.BUSY,
+      totalRows: 2
     });
 
-    it('should throw DBError on missing getById', async () => {
-        const repo = getCsvImportRecordRepo(queryRunner.manager);
-        const missingId = '00000000-0000-0000-0000-000000000000';
-        await expect(repo.getById(missingId)).rejects.toThrow(
-            `Failed to get csv import record with id ${missingId}`
-        );
+    await repo.update(recordDone.id, { processedRows: 1, failedRows: 1 });
+    await expect(repo.checkIfDone(recordDone.id)).resolves.toBe(true);
+
+    const recordNotDone = await repo.create({
+      key: 'imports/not-done.csv',
+      organizationId,
+      userId,
+      status: CsvImportStatusEnum.BUSY,
+      totalRows: 3
     });
 
-    it('should throw DBError on update of missing record', async () => {
-        const repo = getCsvImportRecordRepo(queryRunner.manager);
-        const missingId = '00000000-0000-0000-0000-000000000000';
-        await expect(
-            repo.update(missingId, { status: CsvImportStatusEnum.DONE })
-        ).rejects.toThrow(`Failed to update csv import record with id ${missingId}`);
-    });
+    await repo.update(recordNotDone.id, { processedRows: 1, failedRows: 1 });
+    await expect(repo.checkIfDone(recordNotDone.id)).resolves.toBe(false);
+  });
+
+  it('should throw DBError on invalid create', async () => {
+    const repo = getCsvImportRecordRepo(queryRunner.manager);
+    await expect(repo.create({} as any)).rejects.toThrow('Failed to create csv import record');
+  });
+
+  it('should throw DBError on missing getById', async () => {
+    const repo = getCsvImportRecordRepo(queryRunner.manager);
+    const missingId = '00000000-0000-0000-0000-000000000000';
+    await expect(repo.getById(missingId)).rejects.toThrow(`Failed to get csv import record with id ${missingId}`);
+  });
+
+  it('should throw DBError on update of missing record', async () => {
+    const repo = getCsvImportRecordRepo(queryRunner.manager);
+    const missingId = '00000000-0000-0000-0000-000000000000';
+    await expect(repo.update(missingId, { status: CsvImportStatusEnum.DONE })).rejects.toThrow(
+      `Failed to update csv import record with id ${missingId}`
+    );
+  });
 });

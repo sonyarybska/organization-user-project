@@ -3,11 +3,7 @@ import autoload from '@fastify/autoload';
 import cookie from '@fastify/cookie';
 import fastifyMultipart from '@fastify/multipart';
 import { join } from 'path';
-import {
-  jsonSchemaTransform,
-  serializerCompiler,
-  validatorCompiler
-} from 'fastify-type-provider-zod';
+import { jsonSchemaTransform, serializerCompiler, validatorCompiler } from 'fastify-type-provider-zod';
 import fastifySwagger from '@fastify/swagger';
 import { DataSource } from 'typeorm';
 import { getRepos } from 'src/repos';

@@ -1,10 +1,7 @@
 import { getOrganizationInviteRepo } from 'src/repos/organization-invite.repo';
 import { getOrganizationRepo } from 'src/repos/organization.repo';
 import { OrganizationInviteEntity } from 'src/services/typeorm/entities/OrganizationInviteEntity';
-import {
-  setupTestDatabase,
-  teardownTestDatabase
-} from 'src/tests/utils/test-db-setup';
+import { setupTestDatabase, teardownTestDatabase } from 'src/tests/utils/test-db-setup';
 import { InviteStatus } from 'src/types/enums/InviteStatusEnum';
 import { DataSource, QueryRunner } from 'typeorm';
 
@@ -51,9 +48,7 @@ describe('OrganizationInviteRepo', () => {
     expect(result.id).toBeDefined();
     expect(result.organizationId).toBe(org.id);
 
-    const fromDb = await queryRunner.manager
-      .getRepository(OrganizationInviteEntity)
-      .findOneBy({ id: result.id });
+    const fromDb = await queryRunner.manager.getRepository(OrganizationInviteEntity).findOneBy({ id: result.id });
 
     expect(fromDb?.organizationId).toBe(org.id);
   });
@@ -88,9 +83,7 @@ describe('OrganizationInviteRepo', () => {
 
     expect(updated.status).toBe(InviteStatus.ACCEPTED);
 
-    const fromDb = await queryRunner.manager
-      .getRepository(OrganizationInviteEntity)
-      .findOneByOrFail({ id: created.id });
+    const fromDb = await queryRunner.manager.getRepository(OrganizationInviteEntity).findOneByOrFail({ id: created.id });
 
     expect(fromDb.status).toBe(InviteStatus.ACCEPTED);
   });
@@ -109,9 +102,9 @@ describe('OrganizationInviteRepo', () => {
 
     await repo.updateStatusById(created.id, InviteStatus.ACCEPTED);
 
-    await expect(
-      repo.updateStatusById(created.id, InviteStatus.DECLINED_BY_ADMIN)
-    ).rejects.toThrow(`Failed to update organization invite with id ${created.id}`);
+    await expect(repo.updateStatusById(created.id, InviteStatus.DECLINED_BY_ADMIN)).rejects.toThrow(
+      `Failed to update organization invite with id ${created.id}`
+    );
   });
 
   it('should get valid pending by token', async () => {
@@ -180,7 +173,7 @@ describe('OrganizationInviteRepo', () => {
     const invites = await repo.getByOrganizationId(org.id);
 
     expect(invites).toHaveLength(2);
-    expect(invites.every(i => i.organizationId === org.id)).toBe(true);
+    expect(invites.every((i) => i.organizationId === org.id)).toBe(true);
   });
 
   it('should get invites by email', async () => {
@@ -207,6 +200,6 @@ describe('OrganizationInviteRepo', () => {
     const invites = await repo.getByEmail('same@test.com');
 
     expect(invites).toHaveLength(2);
-    expect(invites.every(i => i.email === 'same@test.com')).toBe(true);
+    expect(invites.every((i) => i.email === 'same@test.com')).toBe(true);
   });
 });

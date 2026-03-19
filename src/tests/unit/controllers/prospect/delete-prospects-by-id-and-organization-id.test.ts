@@ -18,10 +18,7 @@ describe('deleteProspectsByIdAndOrganizationId', () => {
         prospectRepo: mockProspectRepo
       });
 
-      expect(mockProspectRepo.deleteByIdAndOrganizationId).toHaveBeenCalledWith(
-        testProspect.id,
-        testProspect.organizationId
-      );
+      expect(mockProspectRepo.deleteByIdAndOrganizationId).toHaveBeenCalledWith(testProspect.id, testProspect.organizationId);
     });
   });
 

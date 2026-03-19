@@ -8,11 +8,11 @@ import { ICognitoService } from 'src/services/aws/cognito/cognito.service';
 import { RegisterUserReq } from 'src/api/routes/auth/schemas/RegisterUserReqSchema';
 
 export type RegisterUserDto = {
-  userRepo: IUserRepo
-  organizationRepo: IOrganizationRepo
-  userOrganizationRepo: IUserOrganizationRepo
-  transactionService: TransactionService<TypeOrmConnection>
-  sendGridService: ISendGridService
-  cognitoService: ICognitoService
-  createData: RegisterUserReq
-}
+  userRepo: IUserRepo;
+  organizationRepo: IOrganizationRepo;
+  userOrganizationRepo: IUserOrganizationRepo;
+  transactionService: TransactionService<TypeOrmConnection>;
+  sendGridService: ISendGridService;
+  cognitoService: ICognitoService;
+  createData: RegisterUserReq;
+};

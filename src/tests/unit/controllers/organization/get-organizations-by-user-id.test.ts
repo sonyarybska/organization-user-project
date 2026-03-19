@@ -13,10 +13,7 @@ describe('getOrganizationsByUserId', () => {
       const testOrganization1 = createTestOrganization();
       const testOrganization2 = createTestOrganization();
 
-      mockOrganizationRepo.getByUserId.mockResolvedValue([
-        testOrganization1,
-        testOrganization2
-      ]);
+      mockOrganizationRepo.getByUserId.mockResolvedValue([testOrganization1, testOrganization2]);
 
       const result = await getOrganizationsByUserId({
         userId: TEST_USER_IDS.FIRST,

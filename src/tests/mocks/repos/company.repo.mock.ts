@@ -11,4 +11,3 @@ export const mockCompanyRepo: jest.Mocked<ICompanyRepo> = {
 };
 
 mockCompanyRepo.reconnect.mockImplementation(() => mockCompanyRepo);
-

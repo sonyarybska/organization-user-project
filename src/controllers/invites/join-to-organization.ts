@@ -6,14 +6,7 @@ import { ApplicationError } from 'src/types/errors/ApplicationError';
 const inviteTokenSecret = process.env.INVITE_TOKEN_SECRET;
 
 export async function joinUserToOrganization(data: JoinUserToOrganizationDto) {
-  const {
-    organizationInviteRepo,
-    userRepo,
-    userOrganizationRepo,
-    cognitoService,
-    hmacService,
-    transactionService
-  } = data;
+  const { organizationInviteRepo, userRepo, userOrganizationRepo, cognitoService, hmacService, transactionService } = data;
 
   const invite = await organizationInviteRepo.getValidPendingByToken(data.token);
 
@@ -46,8 +39,6 @@ export async function joinUserToOrganization(data: JoinUserToOrganizationDto) {
       role: UserRoleEnum.USER
     });
 
-    await organizationInviteRepo
-      .reconnect(connection)
-      .updateStatusById(invite.id, InviteStatus.ACCEPTED);
+    await organizationInviteRepo.reconnect(connection).updateStatusById(invite.id, InviteStatus.ACCEPTED);
   });
 }

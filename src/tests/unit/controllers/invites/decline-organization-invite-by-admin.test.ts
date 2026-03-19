@@ -68,10 +68,7 @@ describe('declineOrganizationInviteByAdmin', () => {
         status: InviteStatus.DECLINED_BY_ADMIN
       });
 
-      expect(mockOrganizationInviteRepo.updateStatusById).toHaveBeenCalledWith(
-        validInvite.id,
-        InviteStatus.DECLINED_BY_ADMIN
-      );
+      expect(mockOrganizationInviteRepo.updateStatusById).toHaveBeenCalledWith(validInvite.id, InviteStatus.DECLINED_BY_ADMIN);
     });
   });
 });

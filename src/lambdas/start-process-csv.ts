@@ -1,4 +1,4 @@
- /* eslint-disable no-console */
+/* eslint-disable no-console */
 import { SQSEvent, SQSHandler } from 'aws-lambda';
 import { getDb } from 'src/services/typeorm/typeorm.service';
 import { getAwsS3Service, IS3Service } from 'src/services/aws/s3/s3.service';
@@ -7,14 +7,17 @@ import { parse } from 'csv-parse';
 import { Readable } from 'stream';
 import { CsvImportStatusEnum } from 'src/types/enums/CsvImportStatusEnum';
 import { getCsvImportRecordRepo } from 'src/repos/csv-import-record.repo';
-import { ImportCsvProspect, ImportCsvProspectSchema } from 'src/api/routes/organizations/prospects/csv-import-records/schemas/ImportCsvProspectSchema';
+import {
+  ImportCsvProspect,
+  ImportCsvProspectSchema
+} from 'src/api/routes/organizations/prospects/csv-import-records/schemas/ImportCsvProspectSchema';
 
 interface StartCsvImportMessage {
-  importRecordId: string
-  mapping: Record<string, any>
-  userId: string
-  organizationId: string
-  key: string
+  importRecordId: string;
+  mapping: Record<string, any>;
+  userId: string;
+  organizationId: string;
+  key: string;
 }
 
 const bucketName = process.env.AWS_S3_BUCKET_NAME;
@@ -47,12 +50,10 @@ function mapAndValidateRow(
   });
 
   if (!result.success) {
-    throw new Error(
-      `Row ${rowNumber} validation failed: ${result.error.message}`
-    );
+    throw new Error(`Row ${rowNumber} validation failed: ${result.error.message}`);
   }
 
-  return { ...result.data, userId,organizationId };
+  return { ...result.data, userId, organizationId };
 }
 
 export const handler: SQSHandler = async (event: SQSEvent) => {
@@ -73,9 +74,7 @@ export const handler: SQSHandler = async (event: SQSEvent) => {
   const sqs = getAwsSqsService(process.env.AWS_REGION);
 
   for (const record of event.Records) {
-    const { importRecordId, key, mapping, organizationId, userId } = JSON.parse(
-      record.body
-    ) as StartCsvImportMessage;
+    const { importRecordId, key, mapping, organizationId, userId } = JSON.parse(record.body) as StartCsvImportMessage;
 
     try {
       if (!importRecordId || !key || !mapping || !userId || !organizationId) {
@@ -102,33 +101,25 @@ export const handler: SQSHandler = async (event: SQSEvent) => {
         const email = prospect.email.toLowerCase();
 
         if (seenEmails.has(email)) {
-          await sqs.sendMessageToQueue(
-            process.env.AWS_SQS_PROCESS_CSV_ROW_QUEUE_URL,
-            {
-              importRecordId,
-              row: prospect,
-              isDuplicate: true
-            }
-          );
+          await sqs.sendMessageToQueue(process.env.AWS_SQS_PROCESS_CSV_ROW_QUEUE_URL, {
+            importRecordId,
+            row: prospect,
+            isDuplicate: true
+          });
           continue;
         }
 
         seenEmails.add(email);
 
-        await sqs.sendMessageToQueue(
-          process.env.AWS_SQS_PROCESS_CSV_ROW_QUEUE_URL,
-          {
-            importRecordId,
-            row: prospect,
-            isDuplicate: false
-          }
-        );
+        await sqs.sendMessageToQueue(process.env.AWS_SQS_PROCESS_CSV_ROW_QUEUE_URL, {
+          importRecordId,
+          row: prospect,
+          isDuplicate: false
+        });
       }
-
     } catch (error) {
-      const errorMessage =
-        error instanceof Error ? error.message : String(error);
- 
+      const errorMessage = error instanceof Error ? error.message : String(error);
+
       await repo.update(importRecordId, {
         status: CsvImportStatusEnum.ERROR,
         lastError: errorMessage

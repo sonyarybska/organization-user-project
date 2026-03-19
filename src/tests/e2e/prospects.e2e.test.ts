@@ -1,17 +1,10 @@
 import { FastifyInstance } from 'fastify';
-import {
-  clearDatabase,
-  setupTestDatabase,
-  teardownTestDatabase
-} from 'src/tests/utils/test-db-setup';
+import { clearDatabase, setupTestDatabase, teardownTestDatabase } from 'src/tests/utils/test-db-setup';
 import { DataSource } from 'typeorm';
 import { buildTestApp } from './utils/test-app';
 import { OrganizationEntity } from 'src/services/typeorm/entities/OrganizationEntity';
 import { UserRoleEnum } from 'src/types/enums/UserRoleEnum';
-import {
-  createTestUserInDb,
-  createAuthHeaders
-} from 'src/tests/e2e/utils/e2e-helpers';
+import { createTestUserInDb, createAuthHeaders } from 'src/tests/e2e/utils/e2e-helpers';
 import { UserEntity } from 'src/services/typeorm/entities/UserEntity';
 import { UserOrganizationEntity } from 'src/services/typeorm/entities/UserOrganizationEntity';
 import { mockCognitoService } from 'src/tests/mocks/services/cognito.service.mock';
@@ -38,9 +31,7 @@ describe('Prospects e2e', () => {
       subId: user.cognitoUserId
     });
 
-    organization = await dataSource
-      .getRepository(OrganizationEntity)
-      .save({ name: 'Test Organization' });
+    organization = await dataSource.getRepository(OrganizationEntity).save({ name: 'Test Organization' });
 
     await dataSource.getRepository(UserOrganizationEntity).save({
       organizationId: organization.id,
@@ -87,9 +78,7 @@ describe('Prospects e2e', () => {
 
       expect(result.id).toBeDefined();
 
-      const prospect = await dataSource
-        .getRepository(ProspectEntity)
-        .findOne({ where: { id: result.id } });
+      const prospect = await dataSource.getRepository(ProspectEntity).findOne({ where: { id: result.id } });
 
       expect(prospect?.firstName).toBe('John');
       expect(prospect?.lastName).toBe('Doe');

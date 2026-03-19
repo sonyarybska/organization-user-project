@@ -47,9 +47,7 @@ describe('UserOrganizationRepo', () => {
       role: UserRoleEnum.ADMIN
     });
 
-    const result = await queryRunner.manager
-      .getRepository(UserOrganizationEntity)
-      .findOneBy({ userId, organizationId });
+    const result = await queryRunner.manager.getRepository(UserOrganizationEntity).findOneBy({ userId, organizationId });
 
     expect(result?.userId).toBe(userId);
     expect(result?.organizationId).toBe(organizationId);
@@ -58,8 +56,8 @@ describe('UserOrganizationRepo', () => {
   it('should throw error on invalid data', async () => {
     const userOrgRepo = getUserOrganizationRepo(queryRunner.manager);
 
-    await expect(
-      userOrgRepo.create({ userId: undefined, organizationId: undefined, role: undefined })
-    ).rejects.toThrow('Failed to assign user to organization');
+    await expect(userOrgRepo.create({ userId: undefined, organizationId: undefined, role: undefined })).rejects.toThrow(
+      'Failed to assign user to organization'
+    );
   });
 });

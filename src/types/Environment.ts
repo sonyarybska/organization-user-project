@@ -32,4 +32,4 @@ export const EnvironmentSchema = z.object({
   COGNITO_USER_POOL_ID: z.string()
 });
 
-export type Environment = z.infer<typeof EnvironmentSchema>
+export type Environment = z.infer<typeof EnvironmentSchema>;

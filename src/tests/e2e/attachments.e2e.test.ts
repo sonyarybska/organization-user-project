@@ -1,16 +1,9 @@
-import {
-  clearDatabase,
-  setupTestDatabase,
-  teardownTestDatabase
-} from 'src/tests/utils/test-db-setup';
+import { clearDatabase, setupTestDatabase, teardownTestDatabase } from 'src/tests/utils/test-db-setup';
 import { DataSource } from 'typeorm';
 import { buildTestApp } from './utils/test-app';
 import { FastifyInstance } from 'fastify';
 
-import {
-  createTestUserInDb,
-  createAuthHeaders
-} from 'src/tests/e2e/utils/e2e-helpers';
+import { createTestUserInDb, createAuthHeaders } from 'src/tests/e2e/utils/e2e-helpers';
 import { mockCognitoService } from 'src/tests/mocks/services/cognito.service.mock';
 
 describe('Attachments e2e', () => {
@@ -24,7 +17,7 @@ describe('Attachments e2e', () => {
 
   beforeEach(async () => {
     jest.clearAllMocks();
-    const user =await createTestUserInDb(dataSource);
+    const user = await createTestUserInDb(dataSource);
     mockCognitoService.getCognitoUserInfoByAccessToken.mockResolvedValue({
       subId: user.cognitoUserId
     });
@@ -43,11 +36,7 @@ describe('Attachments e2e', () => {
     it('should upload an attachment', async () => {
       const form = new FormData();
 
-      form.append(
-        'file',
-        new Blob([Buffer.from('HELLO WORLD')], { type: 'text/plain' }),
-        'hello.txt'
-      );
+      form.append('file', new Blob([Buffer.from('HELLO WORLD')], { type: 'text/plain' }), 'hello.txt');
 
       const res = await app.inject({
         method: 'POST',
@@ -59,7 +48,7 @@ describe('Attachments e2e', () => {
       expect(res.statusCode).toBe(200);
 
       const body = res.json();
-      
+
       expect(body).toMatchObject({
         id: expect.any(String)
       });

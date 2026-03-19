@@ -3,11 +3,7 @@ import fastify, { FastifyInstance } from 'fastify';
 import autoload from '@fastify/autoload';
 import cookie from '@fastify/cookie';
 import { join } from 'path';
-import {
-  jsonSchemaTransform,
-  serializerCompiler,
-  validatorCompiler
-} from 'fastify-type-provider-zod';
+import { jsonSchemaTransform, serializerCompiler, validatorCompiler } from 'fastify-type-provider-zod';
 import fastifySwagger from '@fastify/swagger';
 import fastifySwaggerUi from '@fastify/swagger-ui';
 import { getDb } from 'src/services/typeorm/typeorm.service';
@@ -80,15 +76,9 @@ const start = async () => {
       })
     );
 
-    server.decorate(
-      'transactionService',
-      getTypeOrmTransactionService(server.db)
-    );
+    server.decorate('transactionService', getTypeOrmTransactionService(server.db));
 
-    server.decorate(
-      'sendGridService',
-      getSendGridService(process.env.SENDGRID_API_KEY)
-    );
+    server.decorate('sendGridService', getSendGridService(process.env.SENDGRID_API_KEY));
 
     server.decorate('s3Service', getAwsS3Service(process.env.AWS_REGION));
 
@@ -96,10 +86,7 @@ const start = async () => {
 
     server.decorate('hmacService', getHMACService());
 
-    server.decorate(
-      'cognitoService',
-      getAwsCognitoService(process.env.AWS_REGION)
-    );
+    server.decorate('cognitoService', getAwsCognitoService(process.env.AWS_REGION));
 
     server.decorate('repos', getRepos(server.db));
 

@@ -5,23 +5,12 @@ import { DataSource, EntityManager } from 'typeorm';
 import { CompanyEntity } from 'src/services/typeorm/entities/CompanyEntity';
 import { Company } from 'src/types/Company';
 
-export interface ICompanyRepo
-  extends Reconnector<ICompanyRepo, TypeOrmConnection> {
-  create(data: Partial<Company>): Promise<Company>
-  upsert(data: Partial<Company>): Promise<Company>
-  getByIdAndOrganizationId(
-    companyId: string,
-    organizationId: string
-  ): Promise<Company>
-  updateByIdAndOrganizationId(
-    companyId: string,
-    organizationId: string,
-    companyData: Partial<Company>
-  ): Promise<void>
-  deleteByIdAndOrganizationId(
-    companyId: string,
-    organizationId: string
-  ): Promise<void>
+export interface ICompanyRepo extends Reconnector<ICompanyRepo, TypeOrmConnection> {
+  create(data: Partial<Company>): Promise<Company>;
+  upsert(data: Partial<Company>): Promise<Company>;
+  getByIdAndOrganizationId(companyId: string, organizationId: string): Promise<Company>;
+  updateByIdAndOrganizationId(companyId: string, organizationId: string, companyData: Partial<Company>): Promise<void>;
+  deleteByIdAndOrganizationId(companyId: string, organizationId: string): Promise<void>;
 }
 
 export function getCompanyRepo(db: DataSource | EntityManager): ICompanyRepo {
@@ -59,18 +48,14 @@ export function getCompanyRepo(db: DataSource | EntityManager): ICompanyRepo {
           .insert()
           .into(CompanyEntity)
           .values(data as CompanyEntity)
-          .orUpdate(
-            ['linkedinUrl', 'name', 'address', 'updatedAt'],
-            ['domain', 'organizationId'],
-            {
-              skipUpdateIfNoValuesChanged: true,
-              upsertType: 'on-conflict-do-update'
-            }
-          )
+          .orUpdate(['linkedinUrl', 'name', 'address', 'updatedAt'], ['domain', 'organizationId'], {
+            skipUpdateIfNoValuesChanged: true,
+            upsertType: 'on-conflict-do-update'
+          })
           .returning('*')
           .execute();
 
-          if (!result.raw[0]) {
+        if (!result.raw[0]) {
           throw new DBError('Failed to upsert company');
         }
 
@@ -80,10 +65,7 @@ export function getCompanyRepo(db: DataSource | EntityManager): ICompanyRepo {
       }
     },
 
-    async getByIdAndOrganizationId(
-      companyId: string,
-      organizationId: string
-    ): Promise<Company> {
+    async getByIdAndOrganizationId(companyId: string, organizationId: string): Promise<Company> {
       try {
         const result = await companyRepo.findOneOrFail({
           where: { id: companyId, organizationId }
@@ -91,46 +73,26 @@ export function getCompanyRepo(db: DataSource | EntityManager): ICompanyRepo {
 
         return result;
       } catch (error) {
-        throw new DBError(
-          `Company with id ${companyId} not found for organization ${organizationId}`,
-          error
-        );
+        throw new DBError(`Company with id ${companyId} not found for organization ${organizationId}`, error);
       }
     },
 
-    async updateByIdAndOrganizationId(
-      companyId: string,
-      organizationId: string,
-      companyData: Partial<Company>
-    ): Promise<void> {
+    async updateByIdAndOrganizationId(companyId: string, organizationId: string, companyData: Partial<Company>): Promise<void> {
       try {
-      await companyRepo.update(
-          { id: companyId, organizationId },
-          companyData as any
-        );
-   
+        await companyRepo.update({ id: companyId, organizationId }, companyData as any);
       } catch (error) {
-        throw new DBError(
-          `Failed to update company with id ${companyId}`,
-          error
-        );
+        throw new DBError(`Failed to update company with id ${companyId}`, error);
       }
     },
 
-    async deleteByIdAndOrganizationId(
-      companyId: string,
-      organizationId: string
-    ): Promise<void> {
+    async deleteByIdAndOrganizationId(companyId: string, organizationId: string): Promise<void> {
       try {
-      await companyRepo.delete({
+        await companyRepo.delete({
           id: companyId,
           organizationId
         });
       } catch (error) {
-        throw new DBError(
-          `Failed to delete company with id ${companyId}`,
-          error
-        );
+        throw new DBError(`Failed to delete company with id ${companyId}`, error);
       }
     }
   };

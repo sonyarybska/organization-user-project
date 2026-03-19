@@ -3,11 +3,7 @@ import { FastifyPluginAsync } from 'fastify';
 import { loginUser } from 'src/controllers/auth/login-user';
 import { refreshAccessToken } from 'src/controllers/auth/refresh-access-token';
 import { registerUser } from 'src/controllers/auth/register-user';
-import {
-  AccessTokenSchema,
-  JwtTokensSchema,
-  RefreshTokenSchema
-} from 'src/types/JwtTokens';
+import { AccessTokenSchema, JwtTokensSchema, RefreshTokenSchema } from 'src/types/JwtTokens';
 import { RegisterUserReqSchema } from './schemas/RegisterUserReqSchema';
 import { LoginUserReqSchema } from './schemas/LoginUserReqSchema';
 
@@ -32,7 +28,7 @@ const routes: FastifyPluginAsync = async (f) => {
       }
     },
     async (req) => {
-       await registerUser({
+      await registerUser({
         userRepo,
         cognitoService,
         createData: { ...req.body },

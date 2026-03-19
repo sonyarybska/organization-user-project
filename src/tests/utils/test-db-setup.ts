@@ -36,17 +36,17 @@ export async function teardownTestDatabase() {
 }
 
 export async function clearDatabase() {
-  if (!dataSource) {return;}
+  if (!dataSource) {
+    return;
+  }
 
-  const tableNames = dataSource.entityMetadatas
-    .map(m => `"${m.tableName}"`)
-    .join(', ');
+  const tableNames = dataSource.entityMetadatas.map((m) => `"${m.tableName}"`).join(', ');
 
-  if (!tableNames) {return;}
+  if (!tableNames) {
+    return;
+  }
 
-  await dataSource.query(
-    `TRUNCATE TABLE ${tableNames} RESTART IDENTITY CASCADE;`
-  );
+  await dataSource.query(`TRUNCATE TABLE ${tableNames} RESTART IDENTITY CASCADE;`);
 }
 
 export function getTestDataSource() {

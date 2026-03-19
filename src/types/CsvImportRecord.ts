@@ -16,4 +16,4 @@ export const CsvImportRecordSchema = z.object({
   updatedAt: z.date()
 });
 
-export type CsvImportRecord = z.infer<typeof CsvImportRecordSchema>
+export type CsvImportRecord = z.infer<typeof CsvImportRecordSchema>;

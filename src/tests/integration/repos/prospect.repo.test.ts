@@ -2,10 +2,7 @@ import { getProspectRepo } from 'src/repos/prospect.repo';
 import { getOrganizationRepo } from 'src/repos/organization.repo';
 import { getUserRepo } from 'src/repos/user.repo';
 import { ProspectEntity } from 'src/services/typeorm/entities/ProspectEntity';
-import {
-  setupTestDatabase,
-  teardownTestDatabase
-} from 'src/tests/utils/test-db-setup';
+import { setupTestDatabase, teardownTestDatabase } from 'src/tests/utils/test-db-setup';
 import { SourceTypeEnum } from 'src/types/enums/SourceTypeEnum';
 import { DataSource, QueryRunner } from 'typeorm';
 
@@ -63,9 +60,7 @@ describe('ProspectRepo', () => {
       expect(result.email).toBe('john.doe@example.com');
       expect(result.title).toBe('Software Engineer');
 
-      const fromDb = await queryRunner.manager
-        .getRepository(ProspectEntity)
-        .findOneBy({ id: result.id });
+      const fromDb = await queryRunner.manager.getRepository(ProspectEntity).findOneBy({ id: result.id });
 
       expect(fromDb?.firstName).toBe('John');
       expect(fromDb?.email).toBe('john.doe@example.com');
@@ -113,9 +108,7 @@ describe('ProspectRepo', () => {
 
       expect(result.count).toBe(2);
       expect(result.prospects).toHaveLength(2);
-      expect(result.prospects.map(p => p.firstName)).toEqual(
-        expect.arrayContaining(['John', 'Jane'])
-      );
+      expect(result.prospects.map((p) => p.firstName)).toEqual(expect.arrayContaining(['John', 'Jane']));
     });
 
     it('should return empty array for organization with no prospects', async () => {
@@ -133,9 +126,9 @@ describe('ProspectRepo', () => {
     it('should throw error on getByOrganizationId with invalid organizationId', async () => {
       const prospectRepo = getProspectRepo(queryRunner.manager);
 
-      await expect(
-        prospectRepo.getByOrganizationId('invalid')
-      ).rejects.toThrow('Prospects for organization id invalid not found');
+      await expect(prospectRepo.getByOrganizationId('invalid')).rejects.toThrow(
+        'Prospects for organization id invalid not found'
+      );
     });
   });
 
@@ -160,10 +153,7 @@ describe('ProspectRepo', () => {
         source: SourceTypeEnum.MANUAL
       });
 
-      const result = await prospectRepo.getByIdAndOrganizationId(
-        prospect.id,
-        org.id
-      );
+      const result = await prospectRepo.getByIdAndOrganizationId(prospect.id, org.id);
 
       expect(result.id).toBe(prospect.id);
       expect(result.firstName).toBe('John');
@@ -177,9 +167,9 @@ describe('ProspectRepo', () => {
 
       const org = await orgRepo.create({ name: 'Test Org' });
 
-      await expect(
-        prospectRepo.getByIdAndOrganizationId('invalid-id', org.id)
-      ).rejects.toThrow('Prospect with id invalid-id not found');
+      await expect(prospectRepo.getByIdAndOrganizationId('invalid-id', org.id)).rejects.toThrow(
+        'Prospect with id invalid-id not found'
+      );
     });
 
     it('should throw error when organization id does not match', async () => {
@@ -204,9 +194,9 @@ describe('ProspectRepo', () => {
         source: SourceTypeEnum.MANUAL
       });
 
-      await expect(
-        prospectRepo.getByIdAndOrganizationId(prospect.id, org2.id)
-      ).rejects.toThrow(`Prospect with id ${prospect.id} not found`);
+      await expect(prospectRepo.getByIdAndOrganizationId(prospect.id, org2.id)).rejects.toThrow(
+        `Prospect with id ${prospect.id} not found`
+      );
     });
   });
 
@@ -233,9 +223,7 @@ describe('ProspectRepo', () => {
 
       await prospectRepo.deleteByIdAndOrganizationId(prospect.id, org.id);
 
-      const fromDb = await queryRunner.manager
-        .getRepository(ProspectEntity)
-        .findOneBy({ id: prospect.id });
+      const fromDb = await queryRunner.manager.getRepository(ProspectEntity).findOneBy({ id: prospect.id });
 
       expect(fromDb).toBeNull();
     });
@@ -264,9 +252,7 @@ describe('ProspectRepo', () => {
 
       await prospectRepo.deleteByIdAndOrganizationId(prospect.id, org2.id);
 
-      const fromDb = await queryRunner.manager
-        .getRepository(ProspectEntity)
-        .findOneBy({ id: prospect.id });
+      const fromDb = await queryRunner.manager.getRepository(ProspectEntity).findOneBy({ id: prospect.id });
 
       expect(fromDb).not.toBeNull();
       expect(fromDb?.organizationId).toBe(org1.id);

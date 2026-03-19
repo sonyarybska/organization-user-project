@@ -21,7 +21,7 @@ export async function importProspectsFromCsv(data: ImportProspectsFromCsvDto) {
   const csvImportRecord = await csvImportRecordRepo.create({
     key,
     organizationId: data.organizationId,
-    status:CsvImportStatusEnum.NEW,
+    status: CsvImportStatusEnum.NEW,
     userId: data.userId,
     totalRows: rows.length
   });

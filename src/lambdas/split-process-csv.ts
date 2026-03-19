@@ -11,9 +11,9 @@ import { normalizeDomain, normalizeLinkedinUrl, normalizePhoneNumber } from 'src
 import { ImportCsvProspect } from 'src/api/routes/organizations/prospects/csv-import-records/schemas/ImportCsvProspectSchema';
 
 interface ProcessCsvRowMessage {
-  importRecordId: string
-  row: Partial<ImportCsvProspect>
-  isDuplicate: boolean
+  importRecordId: string;
+  row: Partial<ImportCsvProspect>;
+  isDuplicate: boolean;
 }
 
 export const handler: SQSHandler = async (event: SQSEvent) => {
@@ -36,9 +36,7 @@ export const handler: SQSHandler = async (event: SQSEvent) => {
   const importRepo = getCsvImportRecordRepo(db);
 
   for (const record of event.Records) {
-    const { importRecordId, row, isDuplicate } = JSON.parse(
-      record.body
-    ) as ProcessCsvRowMessage;
+    const { importRecordId, row, isDuplicate } = JSON.parse(record.body) as ProcessCsvRowMessage;
 
     try {
       if (!importRecordId || !row) {
@@ -47,9 +45,7 @@ export const handler: SQSHandler = async (event: SQSEvent) => {
       const { status } = await importRepo.getById(importRecordId);
 
       if (status !== CsvImportStatusEnum.BUSY) {
-        console.log(
-          `Skipping processing for importRecordId ${importRecordId} with status ${status}`
-        );
+        console.log(`Skipping processing for importRecordId ${importRecordId} with status ${status}`);
         continue;
       }
       if (isDuplicate) {
@@ -58,10 +54,7 @@ export const handler: SQSHandler = async (event: SQSEvent) => {
         continue;
       }
 
-      const emailExists = await prospectRepo.existsByEmailAndOrganizationId(
-        row.email!.toLowerCase(),
-        row.organizationId!
-      );
+      const emailExists = await prospectRepo.existsByEmailAndOrganizationId(row.email!.toLowerCase(), row.organizationId!);
 
       if (emailExists) {
         console.log('Duplicate email found in database, skipping:', row.email);
@@ -76,17 +69,17 @@ export const handler: SQSHandler = async (event: SQSEvent) => {
 
         const { companyName, companyAddress, companyLinkedinUrl, ...prospectData } = row;
 
-          const normalizedDomain = normalizeDomain(prospectData.domain!);
-          const normalizedCompanyLinkedinUrl = normalizeLinkedinUrl(companyLinkedinUrl);
+        const normalizedDomain = normalizeDomain(prospectData.domain!);
+        const normalizedCompanyLinkedinUrl = normalizeLinkedinUrl(companyLinkedinUrl);
 
-          const company = await companyRepoTx.upsert({
-            domain: normalizedDomain,
-            source: SourceTypeEnum.CSV_IMPORT,
-            linkedinUrl: normalizedCompanyLinkedinUrl,
-            name: companyName,
-            address: companyAddress,
-            organizationId: prospectData.organizationId!
-          });
+        const company = await companyRepoTx.upsert({
+          domain: normalizedDomain,
+          source: SourceTypeEnum.CSV_IMPORT,
+          linkedinUrl: normalizedCompanyLinkedinUrl,
+          name: companyName,
+          address: companyAddress,
+          organizationId: prospectData.organizationId!
+        });
 
         const normalizedProspectLinkedinUrl = normalizeLinkedinUrl(prospectData.linkedinUrl);
         const normalizedPhone = normalizePhoneNumber(prospectData.phone);
@@ -102,8 +95,7 @@ export const handler: SQSHandler = async (event: SQSEvent) => {
         await importRepoTx.incrementProcessedRows(importRecordId);
       });
     } catch (error) {
-      const errorMessage =
-        error instanceof Error ? error.message : String(error);
+      const errorMessage = error instanceof Error ? error.message : String(error);
 
       await importRepo.handleImportError(importRecordId, errorMessage);
 

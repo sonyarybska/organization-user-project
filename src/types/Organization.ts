@@ -5,4 +5,4 @@ export const OrganizationSchema = z.object({
   name: z.string()
 });
 
-export type Organization = z.infer<typeof OrganizationSchema>
+export type Organization = z.infer<typeof OrganizationSchema>;

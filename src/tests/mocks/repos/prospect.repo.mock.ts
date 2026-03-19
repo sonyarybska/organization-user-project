@@ -11,4 +11,3 @@ export const mockProspectRepo: jest.Mocked<IProspectRepo> = {
 };
 
 mockProspectRepo.reconnect.mockImplementation(() => mockProspectRepo);
-

@@ -9,14 +9,14 @@ import { getCsvImportRecordRepo } from './csv-import-record.repo';
 import { getCompanyRepo } from './company.repo';
 
 export interface IRepos {
-  userRepo: ReturnType<typeof getUserRepo>
-  organizationRepo: ReturnType<typeof getOrganizationRepo>
-  userOrganizationRepo: ReturnType<typeof getUserOrganizationRepo>
-  organizationInviteRepo: ReturnType<typeof getOrganizationInviteRepo>
-  attachmentRepo: ReturnType<typeof getAttachmentRepo>
-  prospectRepo: ReturnType<typeof getProspectRepo>
-  csvImportRecordRepo: ReturnType<typeof getCsvImportRecordRepo>,
-  companyRepo: ReturnType<typeof getCompanyRepo>
+  userRepo: ReturnType<typeof getUserRepo>;
+  organizationRepo: ReturnType<typeof getOrganizationRepo>;
+  userOrganizationRepo: ReturnType<typeof getUserOrganizationRepo>;
+  organizationInviteRepo: ReturnType<typeof getOrganizationInviteRepo>;
+  attachmentRepo: ReturnType<typeof getAttachmentRepo>;
+  prospectRepo: ReturnType<typeof getProspectRepo>;
+  csvImportRecordRepo: ReturnType<typeof getCsvImportRecordRepo>;
+  companyRepo: ReturnType<typeof getCompanyRepo>;
 }
 
 export function getRepos(db: DataSource) {

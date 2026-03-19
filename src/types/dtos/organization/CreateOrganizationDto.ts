@@ -5,9 +5,9 @@ import { TypeOrmConnection } from 'src/types/interfaces/TypeOrmConnection';
 import { TransactionService } from 'src/types/interfaces/TypeOrmTransactionService';
 
 export type CreateOrganizationDto = {
-  organizationData: Partial<Organization>
-  organizationRepo: IOrganizationRepo
-  userOrganizationRepo: IUserOrganizationRepo
-  transactionService: TransactionService<TypeOrmConnection>
-  userId: string
-}
+  organizationData: Partial<Organization>;
+  organizationRepo: IOrganizationRepo;
+  userOrganizationRepo: IUserOrganizationRepo;
+  transactionService: TransactionService<TypeOrmConnection>;
+  userId: string;
+};

@@ -7,4 +7,4 @@ export const CreateCompanyReqSchema = z.object({
   address: z.string().nullish()
 });
 
-export type CreateCompanyReq = z.infer<typeof CreateCompanyReqSchema>
+export type CreateCompanyReq = z.infer<typeof CreateCompanyReqSchema>;

@@ -1,10 +1,6 @@
 import { FastifyInstance } from 'fastify';
 import { DataSource } from 'typeorm';
-import {
-  setupTestDatabase,
-  teardownTestDatabase,
-  clearDatabase
-} from '../utils/test-db-setup';
+import { setupTestDatabase, teardownTestDatabase, clearDatabase } from '../utils/test-db-setup';
 import { buildTestApp } from './utils/test-app';
 import { UserEntity } from 'src/services/typeorm/entities/UserEntity';
 import { OrganizationEntity } from 'src/services/typeorm/entities/OrganizationEntity';
@@ -12,10 +8,7 @@ import { OrganizationInviteEntity } from 'src/services/typeorm/entities/Organiza
 import { UserOrganizationEntity } from 'src/services/typeorm/entities/UserOrganizationEntity';
 import { InviteStatus } from 'src/types/enums/InviteStatusEnum';
 import { UserRoleEnum } from 'src/types/enums/UserRoleEnum';
-import {
-  createTestUserInDb,
-  createAuthHeaders
-} from 'src/tests/e2e/utils/e2e-helpers';
+import { createTestUserInDb, createAuthHeaders } from 'src/tests/e2e/utils/e2e-helpers';
 import { mockCognitoService } from 'src/tests/mocks/services/cognito.service.mock';
 
 describe('Me e2e', () => {
@@ -80,9 +73,7 @@ describe('Me e2e', () => {
 
       expect(res.statusCode).toBe(200);
 
-      const updated = await dataSource
-        .getRepository(UserEntity)
-        .findOneBy({ id: user.id });
+      const updated = await dataSource.getRepository(UserEntity).findOneBy({ id: user.id });
 
       expect(updated?.name).toBe('Updated Name');
       expect(updated?.companyName).toBe('Updated Company');
@@ -93,27 +84,21 @@ describe('Me e2e', () => {
 
   describe('GET /api/me/invites', () => {
     it('should retrieve current user invites', async () => {
-      const org = await dataSource
-        .getRepository(OrganizationEntity)
-        .save({ name: 'Test Org' });
+      const org = await dataSource.getRepository(OrganizationEntity).save({ name: 'Test Org' });
 
-      await dataSource
-        .getRepository(UserOrganizationEntity)
-        .save({
-          organizationId: org.id,
-          userId: user.id,
-          role: UserRoleEnum.ADMIN
-        });
+      await dataSource.getRepository(UserOrganizationEntity).save({
+        organizationId: org.id,
+        userId: user.id,
+        role: UserRoleEnum.ADMIN
+      });
 
-      await dataSource
-        .getRepository(OrganizationInviteEntity)
-        .save({
-          email: user.email,
-          organizationId: org.id,
-          expiresAt: new Date('2026-12-31'),
-          token: 'test-invite-token',
-          status: InviteStatus.PENDING
-        });
+      await dataSource.getRepository(OrganizationInviteEntity).save({
+        email: user.email,
+        organizationId: org.id,
+        expiresAt: new Date('2026-12-31'),
+        token: 'test-invite-token',
+        status: InviteStatus.PENDING
+      });
 
       const res = await app.inject({
         method: 'GET',
@@ -134,28 +119,22 @@ describe('Me e2e', () => {
 
   describe('GET /api/me/organizations', () => {
     it('should retrieve current user organizations', async () => {
-      const org1 = await dataSource
-        .getRepository(OrganizationEntity)
-        .save({ name: 'Org 1' });
+      const org1 = await dataSource.getRepository(OrganizationEntity).save({ name: 'Org 1' });
 
-      const org2 = await dataSource
-        .getRepository(OrganizationEntity)
-        .save({ name: 'Org 2' });
+      const org2 = await dataSource.getRepository(OrganizationEntity).save({ name: 'Org 2' });
 
-      await dataSource
-        .getRepository(UserOrganizationEntity)
-        .save([
-          {
-            organizationId: org1.id,
-            userId: user.id,
-            role: UserRoleEnum.USER
-          },
-          {
-            organizationId: org2.id,
-            userId: user.id,
-            role: UserRoleEnum.ADMIN
-          }
-        ]);
+      await dataSource.getRepository(UserOrganizationEntity).save([
+        {
+          organizationId: org1.id,
+          userId: user.id,
+          role: UserRoleEnum.USER
+        },
+        {
+          organizationId: org2.id,
+          userId: user.id,
+          role: UserRoleEnum.ADMIN
+        }
+      ]);
 
       const res = await app.inject({
         method: 'GET',
@@ -168,10 +147,7 @@ describe('Me e2e', () => {
       const orgs = res.json();
       expect(orgs).toHaveLength(2);
       expect(orgs).toEqual(
-        expect.arrayContaining([
-          expect.objectContaining({ id: org1.id }),
-          expect.objectContaining({ id: org2.id })
-        ])
+        expect.arrayContaining([expect.objectContaining({ id: org1.id }), expect.objectContaining({ id: org2.id })])
       );
     });
   });

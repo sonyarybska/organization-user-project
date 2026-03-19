@@ -5,11 +5,7 @@ import { ApplicationError } from 'src/types/errors/ApplicationError';
 
 const isProduction = process.env.NODE_ENV === 'production';
 
-export const errorHandler = function (
-  error: Error,
-  request: FastifyRequest,
-  reply: FastifyReply
-) {
+export const errorHandler = function (error: Error, request: FastifyRequest, reply: FastifyReply) {
   request.log.error(error);
 
   let errorCode = 0;

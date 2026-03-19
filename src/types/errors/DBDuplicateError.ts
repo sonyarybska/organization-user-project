@@ -1,5 +1,4 @@
-
-import {  ErrorCode } from 'src/types/enums/ErrorCodesEnum';
+import { ErrorCode } from 'src/types/enums/ErrorCodesEnum';
 import { ApplicationError } from './ApplicationError';
 
 export class DBDuplicateError extends ApplicationError {

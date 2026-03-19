@@ -2,10 +2,7 @@ import { getOrganizationRepo } from 'src/repos/organization.repo';
 import { getUserOrganizationRepo } from 'src/repos/user-organization.repo';
 import { getUserRepo } from 'src/repos/user.repo';
 import { OrganizationEntity } from 'src/services/typeorm/entities/OrganizationEntity';
-import {
-  setupTestDatabase,
-  teardownTestDatabase
-} from 'src/tests/utils/test-db-setup';
+import { setupTestDatabase, teardownTestDatabase } from 'src/tests/utils/test-db-setup';
 import { UserRoleEnum } from 'src/types/enums/UserRoleEnum';
 import { DataSource, QueryRunner } from 'typeorm';
 
@@ -40,9 +37,7 @@ describe('OrganizationRepo', () => {
     expect(result.id).toBeDefined();
     expect(result.name).toBe('Test Org');
 
-    const fromDb = await queryRunner.manager
-      .getRepository(OrganizationEntity)
-      .findOneBy({ id: result.id });
+    const fromDb = await queryRunner.manager.getRepository(OrganizationEntity).findOneBy({ id: result.id });
 
     expect(fromDb?.name).toBe('Test Org');
   });
@@ -98,7 +93,7 @@ describe('OrganizationRepo', () => {
     const orgs = await orgRepo.getByUserId(userId);
 
     expect(orgs).toHaveLength(2);
-    expect(orgs.map(o => o.id)).toEqual(expect.arrayContaining([org1.id, org2.id]));
+    expect(orgs.map((o) => o.id)).toEqual(expect.arrayContaining([org1.id, org2.id]));
   });
 
   it('should throw error on invalid create', async () => {
@@ -110,16 +105,12 @@ describe('OrganizationRepo', () => {
   it('should throw error on getByIdAndUserId with invalid ids', async () => {
     const repo = getOrganizationRepo(queryRunner.manager);
 
-    await expect(
-      repo.getByIdAndUserId('invalid', 'invalid')
-    ).rejects.toThrow('Organization with id invalid not found');
+    await expect(repo.getByIdAndUserId('invalid', 'invalid')).rejects.toThrow('Organization with id invalid not found');
   });
 
   it('should throw error on getByUserId with invalid userId', async () => {
     const repo = getOrganizationRepo(queryRunner.manager);
 
-    await expect(repo.getByUserId('invalid')).rejects.toThrow(
-      'Organizations for user with id invalid not found'
-    );
+    await expect(repo.getByUserId('invalid')).rejects.toThrow('Organizations for user with id invalid not found');
   });
 });

@@ -1,11 +1,5 @@
 import { createOrganizationInvite } from 'src/controllers/invites/create-organization-invite';
-import {
-  TEST_TOKENS,
-  TEST_USER_IDS,
-  TEST_EMAILS,
-  TEST_ORG_IDS,
-  TEST_ORG_NAMES
-} from 'src/tests/fixtures/test-constants';
+import { TEST_TOKENS, TEST_USER_IDS, TEST_EMAILS, TEST_ORG_IDS, TEST_ORG_NAMES } from 'src/tests/fixtures/test-constants';
 import { createTestInvite, createTestOrganization } from 'src/tests/fixtures/test-factories';
 import { mockOrganizationInviteRepo } from 'src/tests/mocks/repos/organization-invite.repo.mock';
 import { mockOrganizationRepo } from 'src/tests/mocks/repos/organization.repo.mock';
@@ -46,10 +40,7 @@ describe('createOrganizationInvite', () => {
         hmacService: mockHmacService
       });
 
-      expect(mockOrganizationRepo.getByIdAndUserId).toHaveBeenCalledWith(
-        TEST_ORG_IDS.FIRST,
-        TEST_USER_IDS.ADMIN
-      );
+      expect(mockOrganizationRepo.getByIdAndUserId).toHaveBeenCalledWith(TEST_ORG_IDS.FIRST, TEST_USER_IDS.ADMIN);
 
       expect(mockHmacService.getSignature).toHaveBeenCalledWith(
         expect.stringContaining(TEST_EMAILS.INVITED_USER),

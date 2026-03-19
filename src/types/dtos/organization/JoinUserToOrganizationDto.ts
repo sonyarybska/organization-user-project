@@ -7,11 +7,11 @@ import { TypeOrmConnection } from 'src/types/interfaces/TypeOrmConnection';
 import { TransactionService } from 'src/types/interfaces/TypeOrmTransactionService';
 
 export type JoinUserToOrganizationDto = {
-  token: string
-  userOrganizationRepo: IUserOrganizationRepo
-  organizationInviteRepo: IOrganizationInviteRepo
-  userRepo: IUserRepo
-  cognitoService: ICognitoService,
-  transactionService:TransactionService<TypeOrmConnection>,
-  hmacService: IHMACService
-}
+  token: string;
+  userOrganizationRepo: IUserOrganizationRepo;
+  organizationInviteRepo: IOrganizationInviteRepo;
+  userRepo: IUserRepo;
+  cognitoService: ICognitoService;
+  transactionService: TransactionService<TypeOrmConnection>;
+  hmacService: IHMACService;
+};

@@ -54,4 +54,4 @@ export const CreateProspectReqSchema = z.object({
   title: z.string().trim().min(1).nullish()
 });
 
-export type CreateProspectReq = z.infer<typeof CreateProspectReqSchema>
+export type CreateProspectReq = z.infer<typeof CreateProspectReqSchema>;

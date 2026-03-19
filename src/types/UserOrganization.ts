@@ -8,4 +8,4 @@ export const UserOrganizationSchema = z.object({
   role: z.enum(UserRoleEnum).default(UserRoleEnum.USER)
 });
 
-export type UserOrganization = z.infer<typeof UserOrganizationSchema>
+export type UserOrganization = z.infer<typeof UserOrganizationSchema>;

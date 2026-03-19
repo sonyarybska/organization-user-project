@@ -16,5 +16,4 @@ export class AttachmentEntity {
 
   @Column()
   userId: string;
-
 }

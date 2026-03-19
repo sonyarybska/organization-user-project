@@ -9,7 +9,7 @@ export async function declineOrganizationInviteByAdmin({
   organizationId
 }: DeclineOrganizationInviteByAdminDto) {
   const invite = await organizationInviteRepo.getByIdAndOrganizationId(inviteId, organizationId);
- 
+
   if (invite.expiresAt < new Date()) {
     throw new ApplicationError('Invite has expired');
   }
@@ -17,9 +17,6 @@ export async function declineOrganizationInviteByAdmin({
   if (invite.status !== InviteStatus.PENDING) {
     throw new ApplicationError('Invite is already accepted or declined');
   }
-  
-  await organizationInviteRepo.updateStatusById(
-    inviteId,
-    status
-  );
+
+  await organizationInviteRepo.updateStatusById(inviteId, status);
 }

@@ -55,19 +55,15 @@ export class ProspectEntity {
   @Column()
   userId: string;
 
-  @ManyToOne(
-    () => OrganizationEntity,
-    (organization) => organization.prospects,
-    {
-      onDelete: 'CASCADE'
-    }
-  )
+  @ManyToOne(() => OrganizationEntity, (organization) => organization.prospects, {
+    onDelete: 'CASCADE'
+  })
   @JoinColumn({ name: 'organizationId' })
   organization: OrganizationEntity;
 
   @Column({ nullable: true })
   companyId: string;
-  
+
   @ManyToOne(() => CompanyEntity)
   @JoinColumn({ name: 'companyId' })
   company: CompanyEntity;
@@ -81,6 +77,6 @@ export class ProspectEntity {
   @UpdateDateColumn()
   updatedAt: Date;
 
-  @Column({ type:'varchar' })
+  @Column({ type: 'varchar' })
   source: SourceTypeEnum;
 }

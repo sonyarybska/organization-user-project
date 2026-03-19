@@ -17,10 +17,7 @@ describe('updateUserById', () => {
         userRepo: mockUserRepo
       });
 
-      expect(mockUserRepo.updateUser).toHaveBeenCalledWith(
-        TEST_USER_IDS.FIRST,
-        updatedData
-      );
+      expect(mockUserRepo.updateUser).toHaveBeenCalledWith(TEST_USER_IDS.FIRST, updatedData);
     });
   });
 
@@ -37,10 +34,7 @@ describe('updateUserById', () => {
         })
       ).rejects.toThrow('Connection timeout');
 
-      expect(mockUserRepo.updateUser).toHaveBeenCalledWith(
-        TEST_USER_IDS.FIRST,
-        updatedData
-      );
+      expect(mockUserRepo.updateUser).toHaveBeenCalledWith(TEST_USER_IDS.FIRST, updatedData);
     });
   });
 });

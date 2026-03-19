@@ -6,37 +6,24 @@ import { TypeOrmConnection } from 'src/types/interfaces/TypeOrmConnection';
 import { DataSource, EntityManager, MoreThan } from 'typeorm';
 import { InviteStatus } from 'src/types/enums/InviteStatusEnum';
 
-export interface IOrganizationInviteRepo
-  extends Reconnector<IOrganizationInviteRepo, TypeOrmConnection> {
-  createInvite(data: Partial<OrganizationInvite>): Promise<OrganizationInvite>
-  updateStatusById(
-    id: string,
-    status: InviteStatus,
-  ): Promise<OrganizationInvite>
-  getValidPendingByToken(id: string): Promise<OrganizationInvite>
-  getByIdAndOrganizationId(
-    id: string,
-    organizationId: string,
-  ): Promise<OrganizationInvite>
-  getByOrganizationId(organizationId: string): Promise<OrganizationInvite[]>
-  getByEmail(email: string): Promise<OrganizationInvite[]>
+export interface IOrganizationInviteRepo extends Reconnector<IOrganizationInviteRepo, TypeOrmConnection> {
+  createInvite(data: Partial<OrganizationInvite>): Promise<OrganizationInvite>;
+  updateStatusById(id: string, status: InviteStatus): Promise<OrganizationInvite>;
+  getValidPendingByToken(id: string): Promise<OrganizationInvite>;
+  getByIdAndOrganizationId(id: string, organizationId: string): Promise<OrganizationInvite>;
+  getByOrganizationId(organizationId: string): Promise<OrganizationInvite[]>;
+  getByEmail(email: string): Promise<OrganizationInvite[]>;
 }
 
-export function getOrganizationInviteRepo(
-  db: DataSource | EntityManager
-): IOrganizationInviteRepo {
-  const organizationInviteRepo = db.getRepository<OrganizationInviteEntity>(
-    OrganizationInviteEntity
-  );
+export function getOrganizationInviteRepo(db: DataSource | EntityManager): IOrganizationInviteRepo {
+  const organizationInviteRepo = db.getRepository<OrganizationInviteEntity>(OrganizationInviteEntity);
 
   return {
     reconnect(connection: TypeOrmConnection): IOrganizationInviteRepo {
       return getOrganizationInviteRepo(connection.entityManager);
     },
 
-    async createInvite(
-      data: Partial<OrganizationInvite>
-    ): Promise<OrganizationInvite> {
+    async createInvite(data: Partial<OrganizationInvite>): Promise<OrganizationInvite> {
       try {
         const result = await organizationInviteRepo
           .createQueryBuilder('invite')
@@ -55,10 +42,7 @@ export function getOrganizationInviteRepo(
       }
     },
 
-    async updateStatusById(
-      id: string,
-      status: InviteStatus
-    ): Promise<OrganizationInvite> {
+    async updateStatusById(id: string, status: InviteStatus): Promise<OrganizationInvite> {
       try {
         const result = await organizationInviteRepo
           .createQueryBuilder('invite')
@@ -72,17 +56,12 @@ export function getOrganizationInviteRepo(
           .execute();
 
         if (!result.raw[0]) {
-          throw new DBError(
-            `Failed to update organization invite with id ${id}`
-          );
+          throw new DBError(`Failed to update organization invite with id ${id}`);
         }
 
         return result.raw[0];
       } catch (error) {
-        throw new DBError(
-          `Failed to update organization invite with id ${id}`,
-          error
-        );
+        throw new DBError(`Failed to update organization invite with id ${id}`, error);
       }
     },
 
@@ -98,25 +77,17 @@ export function getOrganizationInviteRepo(
       return invite;
     },
 
-    async getByIdAndOrganizationId(
-      id: string,
-      organizationId: string
-    ): Promise<OrganizationInvite> {
+    async getByIdAndOrganizationId(id: string, organizationId: string): Promise<OrganizationInvite> {
       try {
         return await organizationInviteRepo.findOneOrFail({
           where: { id, organizationId }
         });
       } catch (error) {
-        throw new DBError(
-          `Invite with id ${id} and organizationId ${organizationId} not found`,
-          error
-        );
+        throw new DBError(`Invite with id ${id} and organizationId ${organizationId} not found`, error);
       }
     },
 
-    async getByOrganizationId(
-      organizationId: string
-    ): Promise<OrganizationInvite[]> {
+    async getByOrganizationId(organizationId: string): Promise<OrganizationInvite[]> {
       try {
         return await organizationInviteRepo.find({
           where: {

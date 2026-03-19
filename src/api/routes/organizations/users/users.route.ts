@@ -11,17 +11,13 @@ const routes: FastifyPluginAsync = async (f) => {
   const { userRepo } = fastify.repos;
   const s3Service = fastify.s3Service;
 
-  fastify.get(
-    '/',
-    { schema: { tags: SCHEMA_TAGS, response: { 200: UserResSchema.array() } } },
-    async (req) => {
-      return await getUsersByOrganizationId({
-        organizationId: req.userOrganization.organizationId,
-        userRepo,
-        s3Service
-      });
-    }
-  );
+  fastify.get('/', { schema: { tags: SCHEMA_TAGS, response: { 200: UserResSchema.array() } } }, async (req) => {
+    return await getUsersByOrganizationId({
+      organizationId: req.userOrganization.organizationId,
+      userRepo,
+      s3Service
+    });
+  });
 };
 
 export default routes;

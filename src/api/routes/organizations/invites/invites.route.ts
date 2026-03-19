@@ -13,10 +13,7 @@ const SCHEMA_TAGS = ['Invite'];
 
 const routes: FastifyPluginAsync = async (f) => {
   const fastify = f.withTypeProvider<ZodTypeProvider>();
-  const {
-    organizationInviteRepo,
-    organizationRepo
-  } = fastify.repos;
+  const { organizationInviteRepo, organizationRepo } = fastify.repos;
   const sendGridService = fastify.sendGridService;
   const hmacService = fastify.hmacService;
 
@@ -36,14 +33,14 @@ const routes: FastifyPluginAsync = async (f) => {
     }
   );
 
-    fastify.post(
+  fastify.post(
     '/',
     {
       schema: {
         tags: SCHEMA_TAGS,
         body: CreateOrganizationInviteReqSchema
       },
-      preHandler:checkAdminHook
+      preHandler: checkAdminHook
     },
     async (req) => {
       await createOrganizationInvite({
@@ -65,7 +62,7 @@ const routes: FastifyPluginAsync = async (f) => {
         tags: SCHEMA_TAGS,
         params: IdUUIDSchema
       },
-      preHandler:checkAdminHook
+      preHandler: checkAdminHook
     },
     async (req) => {
       await declineOrganizationInviteByAdmin({

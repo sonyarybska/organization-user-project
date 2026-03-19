@@ -10,8 +10,7 @@ const SCHEMA_TAGS = ['Invite'];
 const routes: FastifyPluginAsync = async (f) => {
   const fastify = f.withTypeProvider<ZodTypeProvider>();
 
-  const { userOrganizationRepo, organizationInviteRepo, userRepo } =
-    fastify.repos;
+  const { userOrganizationRepo, organizationInviteRepo, userRepo } = fastify.repos;
   const cognitoService = fastify.cognitoService;
   const transactionService = fastify.transactionService;
   const hmacService = fastify.hmacService;

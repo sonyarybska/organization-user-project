@@ -20,10 +20,7 @@ describe('getProspectByIdAndOrgId', () => {
         prospectRepo: mockProspectRepo
       });
 
-      expect(mockProspectRepo.getByIdAndOrganizationId).toHaveBeenCalledWith(
-        testProspect.id,
-        testProspect.organizationId
-      );
+      expect(mockProspectRepo.getByIdAndOrganizationId).toHaveBeenCalledWith(testProspect.id, testProspect.organizationId);
       expect(result).toBe(testProspect);
     });
   });

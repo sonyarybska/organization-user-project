@@ -9,16 +9,16 @@ import { CsvImportRecordEntity } from './entities/CsvImportRecordEntity';
 import { CompanyEntity } from './entities/CompanyEntity';
 
 export function getDataSource(opts: {
-  host: string
-  port: number
-  dbName: string
-  user: string
-  password: string
-  migrations?: string[],
-  dropSchema?: boolean
+  host: string;
+  port: number;
+  dbName: string;
+  user: string;
+  password: string;
+  migrations?: string[];
+  dropSchema?: boolean;
 }) {
   const isTest = process.env.NODE_ENV === 'test';
-  
+
   return new DataSource({
     type: 'postgres',
     host: opts.host,
@@ -40,18 +40,14 @@ export function getDataSource(opts: {
       CompanyEntity
     ],
     dropSchema: opts.dropSchema || false,
-    ssl: isTest ? false : {
-      rejectUnauthorized: false
-    }
+    ssl: isTest
+      ? false
+      : {
+          rejectUnauthorized: false
+        }
   });
 }
 
-export function getDb(opts: {
-  host: string
-  port: number
-  dbName: string
-  user: string
-  password: string
-}) {
+export function getDb(opts: { host: string; port: number; dbName: string; user: string; password: string }) {
   return getDataSource(opts).initialize();
 }

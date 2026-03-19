@@ -1,5 +1,7 @@
 const tsPlugin = require('@typescript-eslint/eslint-plugin');
 const tsParser = require('@typescript-eslint/parser');
+const prettierConfig = require('eslint-config-prettier');
+const prettierPlugin = require('eslint-plugin-prettier');
 
 module.exports = [
   {
@@ -13,9 +15,11 @@ module.exports = [
       }
     },
     plugins: {
-      '@typescript-eslint': tsPlugin
+      '@typescript-eslint': tsPlugin,
+      prettier: prettierPlugin
     },
     rules: {
+      'prettier/prettier': 'error',
       'max-len': [
         'error',
         {
@@ -39,13 +43,9 @@ module.exports = [
       'constructor-super': 'error',
       'no-param-reassign': ['error', { props: true }],
       'no-multiple-empty-lines': ['error', { max: 1 }],
-      quotes: ['error', 'single', { avoidEscape: false }],
-      'object-curly-spacing': ['error', 'always'],
       curly: 'error',
       'no-async-promise-executor': ['error'],
       'no-console': 'error',
-      semi: 'error',
-      'comma-dangle': 'error',
       'object-shorthand': ['error', 'always'],
 
       '@typescript-eslint/no-var-requires': 'off',
@@ -61,7 +61,8 @@ module.exports = [
           args: 'all',
           argsIgnorePattern: '^_'
         }
-      ]
+      ],
+      ...prettierConfig.rules
     }
   }
 ];

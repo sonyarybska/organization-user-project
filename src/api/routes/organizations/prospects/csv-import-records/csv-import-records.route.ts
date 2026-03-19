@@ -31,7 +31,7 @@ const routes: FastifyPluginAsync = async (f) => {
         if (part.type === 'file') {
           buffer = await part.toBuffer();
         }
-  
+
         if (part.type === 'field' && part.fieldname === 'mapping') {
           mapping = JSON.parse(part.value as string);
         }

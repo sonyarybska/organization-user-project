@@ -1,3 +1,3 @@
 export interface Reconnector<T, C> {
-  reconnect(conn: C): T
+  reconnect(conn: C): T;
 }

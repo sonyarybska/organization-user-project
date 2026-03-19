@@ -46,7 +46,7 @@ const routes: FastifyPluginAsync = async (f) => {
     },
     async (req) => {
       const { id } = req.userProfile;
-       await updateUserById({
+      await updateUserById({
         userId: id,
         userData: req.body,
         userRepo

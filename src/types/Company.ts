@@ -13,4 +13,4 @@ export const CompanySchema = z.object({
   updatedAt: z.date()
 });
 
-export type Company = z.infer<typeof CompanySchema>
+export type Company = z.infer<typeof CompanySchema>;

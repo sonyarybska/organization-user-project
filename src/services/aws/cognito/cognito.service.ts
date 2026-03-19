@@ -4,15 +4,10 @@ import { ApplicationError } from 'src/types/errors/ApplicationError';
 import { AccessToken, JwtTokens } from 'src/types/JwtTokens';
 
 export interface ICognitoService {
-  getCognitoUserInfoByAccessToken(
-    accessToken: string,
-  ): Promise<{ subId: string }>
-  createCognitoUser(
-    email: string,
-    password?: string
-  ): Promise<string>
-  login(email: string, password: string): Promise<JwtTokens>
-  refreshAccessToken(refreshToken: string): Promise<AccessToken>
+  getCognitoUserInfoByAccessToken(accessToken: string): Promise<{ subId: string }>;
+  createCognitoUser(email: string, password?: string): Promise<string>;
+  login(email: string, password: string): Promise<JwtTokens>;
+  refreshAccessToken(refreshToken: string): Promise<AccessToken>;
 }
 
 export function getAwsCognitoService(region: string): ICognitoService {
@@ -21,24 +16,20 @@ export function getAwsCognitoService(region: string): ICognitoService {
   });
 
   return {
-    async getCognitoUserInfoByAccessToken(
-      accessToken: string
-    ): Promise<{ subId: string }> {
+    async getCognitoUserInfoByAccessToken(accessToken: string): Promise<{ subId: string }> {
       try {
         const user = await client.getUser({
           AccessToken: accessToken
         });
 
-        const subId = user.UserAttributes?.find(
-          (attr) => attr.Name === 'sub'
-        )!.Value!;
+        const subId = user.UserAttributes?.find((attr) => attr.Name === 'sub')!.Value!;
 
         return { subId };
       } catch (err) {
         throw new ApplicationError('Cognito error', err);
       }
     },
-    async createCognitoUser(email: string, password?:string): Promise<string> {
+    async createCognitoUser(email: string, password?: string): Promise<string> {
       try {
         const result = await client.adminCreateUser({
           UserPoolId: process.env.COGNITO_USER_POOL_ID,
@@ -60,16 +51,14 @@ export function getAwsCognitoService(region: string): ICognitoService {
           });
         }
 
-        const rawUserData = result.User?.Attributes?.reduce<
-          Record<string, string | null>
-        >((acc, attribute) => {
+        const rawUserData = result.User?.Attributes?.reduce<Record<string, string | null>>((acc, attribute) => {
           if (attribute.Name) {
             acc[attribute.Name] = attribute.Value || null;
           }
 
           return acc;
         }, {});
-        
+
         return rawUserData!.sub!;
       } catch (err) {
         throw new ApplicationError('Cognito sign up error', err);

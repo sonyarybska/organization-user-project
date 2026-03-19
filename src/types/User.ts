@@ -14,4 +14,4 @@ export const UserSchema = z.object({
   avatarId: z.uuid().nullable(),
   avatar: AttachmentSchema.optional()
 });
-export type User = z.infer<typeof UserSchema>
+export type User = z.infer<typeof UserSchema>;

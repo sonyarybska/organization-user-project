@@ -8,10 +8,7 @@ const SCHEMA_TAGS = ['Organization'];
 const routes: FastifyPluginAsync = async (f) => {
   const fastify = f.withTypeProvider<ZodTypeProvider>();
   const transactionService = fastify.transactionService;
-  const {
-    organizationRepo,
-    userOrganizationRepo
-  } = fastify.repos;
+  const { organizationRepo, userOrganizationRepo } = fastify.repos;
 
   fastify.post(
     '/',
@@ -25,7 +22,7 @@ const routes: FastifyPluginAsync = async (f) => {
     async (req) => {
       const { id } = req.userProfile;
 
-     await createOrganization({
+      await createOrganization({
         organizationRepo,
         userOrganizationRepo,
         organizationData: req.body,

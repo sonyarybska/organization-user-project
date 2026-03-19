@@ -1,4 +1,4 @@
 export enum SourceTypeEnum {
   MANUAL = 'manual',
-  CSV_IMPORT = 'csvImport',
+  CSV_IMPORT = 'csvImport'
 }

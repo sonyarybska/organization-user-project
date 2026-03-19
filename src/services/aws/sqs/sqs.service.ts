@@ -1,7 +1,7 @@
 import { SQS } from '@aws-sdk/client-sqs';
 
 export interface ISqsService {
-  sendMessageToQueue: (queueUrl: string, message: any) => Promise<void>
+  sendMessageToQueue: (queueUrl: string, message: any) => Promise<void>;
 }
 
 export function getAwsSqsService(region: string): ISqsService {

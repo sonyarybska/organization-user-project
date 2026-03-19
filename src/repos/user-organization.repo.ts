@@ -4,17 +4,12 @@ import { TypeOrmConnection } from 'src/types/interfaces/TypeOrmConnection';
 import { DataSource, EntityManager } from 'typeorm';
 import { DBError } from 'src/types/errors/DBError';
 
-export interface IUserOrganizationRepo
-  extends Reconnector<IUserOrganizationRepo, TypeOrmConnection> {
-  create(data: Partial<UserOrganizationEntity>): Promise<void>
+export interface IUserOrganizationRepo extends Reconnector<IUserOrganizationRepo, TypeOrmConnection> {
+  create(data: Partial<UserOrganizationEntity>): Promise<void>;
 }
 
-export function getUserOrganizationRepo(
-  db: DataSource | EntityManager
-): IUserOrganizationRepo {
-  const userOrganizationRepo = db.getRepository<UserOrganizationEntity>(
-    UserOrganizationEntity
-  );
+export function getUserOrganizationRepo(db: DataSource | EntityManager): IUserOrganizationRepo {
+  const userOrganizationRepo = db.getRepository<UserOrganizationEntity>(UserOrganizationEntity);
 
   return {
     reconnect(conn: TypeOrmConnection): IUserOrganizationRepo {

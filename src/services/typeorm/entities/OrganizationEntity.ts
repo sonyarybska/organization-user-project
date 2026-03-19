@@ -1,11 +1,4 @@
-import {
-  Column,
-  CreateDateColumn,
-  Entity,
-  OneToMany,
-  PrimaryGeneratedColumn,
-  UpdateDateColumn
-} from 'typeorm';
+import { Column, CreateDateColumn, Entity, OneToMany, PrimaryGeneratedColumn, UpdateDateColumn } from 'typeorm';
 import { UserOrganizationEntity } from './UserOrganizationEntity';
 import { ProspectEntity } from './ProspectEntity';
 import { CsvImportRecordEntity } from './CsvImportRecordEntity';
@@ -17,7 +10,7 @@ export class OrganizationEntity {
 
   @Column({ unique: true })
   name: string;
-  
+
   @OneToMany(() => UserOrganizationEntity, (user) => user.organization)
   userOrganizations: UserOrganizationEntity[];
 

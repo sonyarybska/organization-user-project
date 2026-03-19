@@ -2,9 +2,7 @@ import { TypeOrmConnection } from 'src/types/interfaces/TypeOrmConnection';
 import { TransactionService } from 'src/types/interfaces/TypeOrmTransactionService';
 import { DataSource } from 'typeorm';
 
-export function getTypeOrmTransactionService(
-  db: DataSource
-): TransactionService<TypeOrmConnection> {
+export function getTypeOrmTransactionService(db: DataSource): TransactionService<TypeOrmConnection> {
   return {
     async run<T>(cb: (conn: TypeOrmConnection) => Promise<T>) {
       return await db.transaction((entityManager) => {

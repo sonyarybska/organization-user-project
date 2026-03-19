@@ -5,10 +5,7 @@ import { mockUserOrganizationRepo } from 'src/tests/mocks/repos/user-organizatio
 import { mockCognitoService } from 'src/tests/mocks/services/cognito.service.mock';
 import { mockSendGridService } from 'src/tests/mocks/services/send-grid.service.mock';
 import { UserRoleEnum } from 'src/types/enums/UserRoleEnum';
-import {
-  createTestOrganization,
-  createTestUser
-} from 'src/tests/fixtures/test-factories';
+import { createTestOrganization, createTestUser } from 'src/tests/fixtures/test-factories';
 import {
   TEST_EMAILS,
   TEST_PASSWORDS,
@@ -62,10 +59,7 @@ describe('registerUser', () => {
         createData: registrationData
       });
 
-      expect(mockCognitoService.createCognitoUser).toHaveBeenCalledWith(
-        TEST_EMAILS.VALID_USER,
-        TEST_PASSWORDS.VALID
-      );
+      expect(mockCognitoService.createCognitoUser).toHaveBeenCalledWith(TEST_EMAILS.VALID_USER, TEST_PASSWORDS.VALID);
 
       expect(mockTransactionService.run).toHaveBeenCalledTimes(1);
 

@@ -4,7 +4,7 @@ export const ImportCsvProspectSchema = z.object({
   firstName: z.string(),
   lastName: z.string(),
   email: z.email(),
-  organizationId:z.uuid(),
+  organizationId: z.uuid(),
   domain: z.string().nullish(),
   phone: z.string().nullish(),
   salary: z.number().nullish(),

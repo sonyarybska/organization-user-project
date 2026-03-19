@@ -1,10 +1,7 @@
 import { getCompanyRepo } from 'src/repos/company.repo';
 import { CompanyEntity } from 'src/services/typeorm/entities/CompanyEntity';
 import { OrganizationEntity } from 'src/services/typeorm/entities/OrganizationEntity';
-import {
-  setupTestDatabase,
-  teardownTestDatabase
-} from 'src/tests/utils/test-db-setup';
+import { setupTestDatabase, teardownTestDatabase } from 'src/tests/utils/test-db-setup';
 import { SourceTypeEnum } from 'src/types/enums/SourceTypeEnum';
 import { DataSource, QueryRunner } from 'typeorm';
 
@@ -89,6 +86,5 @@ describe('CompanyRepo', () => {
       expect(result.name).toBe('New Company');
       expect(result.address).toBe('123 Main St');
     });
-   
   });
 });

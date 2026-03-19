@@ -16,26 +16,25 @@ export function normalizeDomain(url: string): string {
   }
 
   // Manual extraction if parsing failed
-  return trimmed.replace(/^https?:\/\//, '').replace(/^www\./, '').split(/[/?#]/)[0];
+  return trimmed
+    .replace(/^https?:\/\//, '')
+    .replace(/^www\./, '')
+    .split(/[/?#]/)[0];
 }
 
-export function normalizeLinkedinUrl(
-  url: string | null | undefined
-): string | null {
+export function normalizeLinkedinUrl(url: string | null | undefined): string | null {
   if (!url) {
     return null;
   }
 
   const trimmed = url.trim().toLowerCase();
-  
+
   if (!trimmed) {
     return null;
   }
 
   // Remove protocol and www prefix
-  let normalized = trimmed
-    .replace(/^https?:\/\//, '')
-    .replace(/^www\./, '');
+  let normalized = trimmed.replace(/^https?:\/\//, '').replace(/^www\./, '');
 
   // Check if the normalized URL still contains 'linkedin.com'
   if (!normalized.includes('linkedin.com')) {
@@ -48,9 +47,7 @@ export function normalizeLinkedinUrl(
   return normalized;
 }
 
-export function normalizePhoneNumber(
-  phone: string | null | undefined
-): string | null {
+export function normalizePhoneNumber(phone: string | null | undefined): string | null {
   if (!phone) {
     return null;
   }

@@ -22,10 +22,7 @@ describe('loginUser', () => {
         cognitoService: mockCognitoService
       });
 
-      expect(mockCognitoService.login).toHaveBeenCalledWith(
-        TEST_EMAILS.VALID_USER,
-        TEST_PASSWORDS.VALID
-      );
+      expect(mockCognitoService.login).toHaveBeenCalledWith(TEST_EMAILS.VALID_USER, TEST_PASSWORDS.VALID);
       expect(result).toEqual({
         accessToken: TEST_TOKENS.ACCESS,
         refreshToken: TEST_TOKENS.REFRESH

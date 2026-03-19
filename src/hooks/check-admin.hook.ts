@@ -1,4 +1,3 @@
- 
 import { preHandlerAsyncHookHandler } from 'fastify';
 import { HttpError } from 'src/api/errors/HttpError';
 import { UserRoleEnum } from 'src/types/enums/UserRoleEnum';

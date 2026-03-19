@@ -5,14 +5,11 @@ import { Reconnector } from 'src/types/interfaces/Reconnector';
 import { TypeOrmConnection } from 'src/types/interfaces/TypeOrmConnection';
 import { DataSource, EntityManager } from 'typeorm';
 
-export interface IAttachmentRepo
-  extends Reconnector<IAttachmentRepo, TypeOrmConnection> {
-  create(data: Partial<AttachmentEntity>): Promise<Attachment>
+export interface IAttachmentRepo extends Reconnector<IAttachmentRepo, TypeOrmConnection> {
+  create(data: Partial<AttachmentEntity>): Promise<Attachment>;
 }
 
-export function getAttachmentRepo(
-  db: DataSource | EntityManager
-): IAttachmentRepo {
+export function getAttachmentRepo(db: DataSource | EntityManager): IAttachmentRepo {
   const attachmentRepo = db.getRepository<AttachmentEntity>(AttachmentEntity);
 
   return {

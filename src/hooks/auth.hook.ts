@@ -20,9 +20,7 @@ export const authHook: preHandlerAsyncHookHandler = async function (request) {
       throw new Error('Token in wrong format');
     }
 
-    const { subId } = await this.cognitoService.getCognitoUserInfoByAccessToken(
-      bearerTokenMatch[1]
-    );
+    const { subId } = await this.cognitoService.getCognitoUserInfoByAccessToken(bearerTokenMatch[1]);
 
     const userProfile = await this.repos.userRepo.getUserByCognitoUserId(subId);
 

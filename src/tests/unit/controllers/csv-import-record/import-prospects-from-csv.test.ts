@@ -9,12 +9,8 @@ import { TEST_USER_IDS, TEST_ORG_IDS } from 'src/tests/fixtures/test-constants';
 describe('importProspectsFromCsv', () => {
   const MOCK_TIMESTAMP = 1700000000000;
   const csvMapping = { email: 'email', firstName: 'firstName' };
-  
-  const sampleCsvBuffer = Buffer.from(
-    'email,firstName\n' +
-    'john@test.com,John\n' +
-    'jane@test.com,Jane\n'
-  );
+
+  const sampleCsvBuffer = Buffer.from('email,firstName\n' + 'john@test.com,John\n' + 'jane@test.com,Jane\n');
 
   beforeEach(() => {
     jest.clearAllMocks();
@@ -41,11 +37,7 @@ describe('importProspectsFromCsv', () => {
         userId: TEST_USER_IDS.FIRST
       });
 
-      expect(mockS3Service.upload).toHaveBeenCalledWith(
-        expectedKey,
-        sampleCsvBuffer,
-        process.env.AWS_S3_BUCKET_NAME
-      );
+      expect(mockS3Service.upload).toHaveBeenCalledWith(expectedKey, sampleCsvBuffer, process.env.AWS_S3_BUCKET_NAME);
 
       expect(mockCsvImportRecordRepo.create).toHaveBeenCalledWith({
         key: expectedKey,
@@ -55,16 +47,13 @@ describe('importProspectsFromCsv', () => {
         status: CsvImportStatusEnum.NEW
       });
 
-      expect(mockSqsService.sendMessageToQueue).toHaveBeenCalledWith(
-        process.env.AWS_SQS_START_CSV_IMPORT_QUEUE_URL,
-        {
-          importRecordId: testCsvImportRecord.id,
-          mapping: csvMapping,
-          userId: TEST_USER_IDS.FIRST,
-          organizationId: TEST_ORG_IDS.FIRST,
-          key: expectedKey
-        }
-      );
+      expect(mockSqsService.sendMessageToQueue).toHaveBeenCalledWith(process.env.AWS_SQS_START_CSV_IMPORT_QUEUE_URL, {
+        importRecordId: testCsvImportRecord.id,
+        mapping: csvMapping,
+        userId: TEST_USER_IDS.FIRST,
+        organizationId: TEST_ORG_IDS.FIRST,
+        key: expectedKey
+      });
 
       expect(result).toEqual({ csvImportRecordId: testCsvImportRecord.id });
     });

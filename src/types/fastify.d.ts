@@ -11,24 +11,24 @@ import { ISqsService } from 'src/services/aws/sqs/sqs.service';
 
 declare module 'fastify' {
   interface FastifyInstance {
-    db: DataSource
-    repos: IRepos
-    sendGridService: ISendGridService
-    transactionService: TransactionService<TypeOrmConnection>
-    s3Service: IS3Service
-    cognitoService: ICognitoService
-    sqsService: ISqsService
-    hmacService: IHMACService
+    db: DataSource;
+    repos: IRepos;
+    sendGridService: ISendGridService;
+    transactionService: TransactionService<TypeOrmConnection>;
+    s3Service: IS3Service;
+    cognitoService: ICognitoService;
+    sqsService: ISqsService;
+    hmacService: IHMACService;
   }
 
   interface FastifyContextConfig {
-    skipAuth?: boolean
-    skipConfirmEmail?: boolean
-    skipUserOrganization?: boolean
+    skipAuth?: boolean;
+    skipConfirmEmail?: boolean;
+    skipUserOrganization?: boolean;
   }
 
   interface FastifyRequest {
-    userProfile: User
-    userOrganization: UserOrganization
+    userProfile: User;
+    userOrganization: UserOrganization;
   }
 }

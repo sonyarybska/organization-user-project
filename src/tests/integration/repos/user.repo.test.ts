@@ -38,9 +38,7 @@ describe('User repo', () => {
     expect(result.id).toBeDefined();
     expect(result.email).toBe('user@test.com');
 
-    const fromDb = await queryRunner.manager
-      .getRepository(UserEntity)
-      .findOneBy({ id: result.id });
+    const fromDb = await queryRunner.manager.getRepository(UserEntity).findOneBy({ id: result.id });
 
     expect(fromDb?.email).toBe('user@test.com');
   });
@@ -48,8 +46,6 @@ describe('User repo', () => {
   it('should throw error on invalid data', async () => {
     const repo = getUserRepo(queryRunner.manager);
 
-    await expect(
-      repo.create({ cognitoUserId: undefined, email: 'invalid' } as any)
-    ).rejects.toThrow('Failed to create user');
+    await expect(repo.create({ cognitoUserId: undefined, email: 'invalid' } as any)).rejects.toThrow('Failed to create user');
   });
 });

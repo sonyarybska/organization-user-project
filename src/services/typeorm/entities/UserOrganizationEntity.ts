@@ -1,23 +1,11 @@
-import {
-  Column,
-  CreateDateColumn,
-  Entity,
-  Index,
-  JoinColumn,
-  ManyToOne,
-  PrimaryGeneratedColumn
-} from 'typeorm';
+import { Column, CreateDateColumn, Entity, Index, JoinColumn, ManyToOne, PrimaryGeneratedColumn } from 'typeorm';
 import { UserEntity } from './UserEntity';
 import { OrganizationEntity } from './OrganizationEntity';
 import { UserRoleEnum } from 'src/types/enums/UserRoleEnum';
 
-@Index(
-  'userOrganizationUserIdPerOrganizationId',
-  ['userId', 'organizationId'],
-  {
-    unique: true
-  }
-)
+@Index('userOrganizationUserIdPerOrganizationId', ['userId', 'organizationId'], {
+  unique: true
+})
 @Entity('UserOrganization')
 export class UserOrganizationEntity {
   @PrimaryGeneratedColumn('uuid')
