@@ -27,4 +27,4 @@ terraform.rc
 *.secrets
 .DS_Store
 
-lambdas/
+/lambdas/
