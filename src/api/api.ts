@@ -16,6 +16,7 @@ import fastifyMultipart from '@fastify/multipart';
 import { getAwsCognitoService } from 'src/services/aws/cognito/cognito.service';
 import { getAwsSqsService } from 'src/services/aws/sqs/sqs.service';
 import { getHMACService } from 'src/services/hmac/hmac.service';
+import { getAIService } from 'src/services/ai/ai.service';
 
 const server = fastify({
   logger: {
@@ -87,6 +88,8 @@ const start = async () => {
     server.decorate('hmacService', getHMACService());
 
     server.decorate('cognitoService', getAwsCognitoService(process.env.AWS_REGION));
+
+    server.decorate('aiService', getAIService(process.env.GROQ_API_KEY));
 
     server.decorate('repos', getRepos(server.db));
 
