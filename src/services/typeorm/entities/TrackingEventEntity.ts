@@ -1,8 +1,8 @@
 import { Entity, PrimaryGeneratedColumn, Column, CreateDateColumn, ManyToOne, JoinColumn } from 'typeorm';
-import { UserEntity } from './UserEntity';
 import { OrganizationEntity } from './OrganizationEntity';
 import { EventTypeEnum } from 'src/types/enums/EventTypeEnum';
 import { EventResourceTypeEnum } from 'src/types/enums/EventResourceTypeEnum';
+import { EventSourceEnum } from 'src/types/enums/EventSourceEnum';
 
 @Entity('TrackingEvent')
 export class TrackingEventEntity {
@@ -12,12 +12,8 @@ export class TrackingEventEntity {
   @Column({ type: 'varchar' })
   eventType: EventTypeEnum;
 
-  @ManyToOne(() => UserEntity, { nullable: true, onDelete: 'SET NULL' })
-  @JoinColumn({ name: 'userId' })
-  user: UserEntity;
-
-  @Column({ nullable: true })
-  userId: string;
+  @Column({ type: 'varchar' })
+  userEmail: string;
 
   @ManyToOne(() => OrganizationEntity, { nullable: true, onDelete: 'SET NULL' })
   @JoinColumn({ name: 'organizationId' })
@@ -32,11 +28,17 @@ export class TrackingEventEntity {
   @Column({ type: 'uuid', nullable: true })
   resourceId: string;
 
-  @Column({ type: 'varchar', length: 45, nullable: true })
+  @Column({ type: 'varchar', nullable: true })
   ipAddress: string;
 
-  @Column({ type: 'varchar', length: 512, nullable: true })
+  @Column({ type: 'varchar', nullable: true })
   userAgent: string;
+
+  @Column({ type: 'varchar', nullable: true })
+  source: EventSourceEnum;
+
+  @Column({ type: 'varchar', nullable: true })
+  sourceName: string;
 
   @CreateDateColumn()
   createdAt: Date;

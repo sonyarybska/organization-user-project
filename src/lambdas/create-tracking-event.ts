@@ -2,7 +2,7 @@
 import { SQSEvent, SQSHandler } from 'aws-lambda';
 import { getDb } from 'src/services/typeorm/typeorm.service';
 import { getTrackingEventRepo } from 'src/repos/tracking-event.repo';
-import { CreateTrackingEventSchema } from 'src/types/dtos/tracking/CreateTrackingEventDto';
+import { CreateTrackingEventSchema } from 'src/types/schemas/CreateTrackingEventSchema';
 
 export const handler: SQSHandler = async (event: SQSEvent) => {
   if (!event.Records.length) {

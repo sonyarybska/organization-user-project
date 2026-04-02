@@ -13,6 +13,7 @@ export interface ITrackingService {
     userId: string;
     organizationId: string | null;
     trackingContext: TrackingContext;
+    sourceName?: string | null;
   }): void;
 }
 
@@ -29,10 +30,12 @@ export function getTrackingService(sqsService: ISqsService, logger: FastifyBaseL
           userId: params.userId,
           organizationId: params.organizationId,
           ipAddress: params.trackingContext.ipAddress,
-          userAgent: params.trackingContext.userAgent
+          userAgent: params.trackingContext.userAgent,
+          source: params.trackingContext.source,
+          sourceName: params.sourceName ?? null
         })
         .catch((err) => {
-          logger.error({ err }, 'Failed to track event');
+          logger.error(err, 'Failed to track event');
         });
     }
   };

@@ -34,6 +34,7 @@ declare module 'fastify' {
     trackingContext: {
       ipAddress: string | null;
       userAgent: string | null;
+      source: EventSourceEnum;
     };
   }
 }

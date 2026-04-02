@@ -13,6 +13,7 @@ import {
 } from 'src/api/routes/organizations/prospects/csv-import-records/schemas/ImportCsvProspectSchema';
 import { EventTypeEnum } from 'src/types/enums/EventTypeEnum';
 import { EventResourceTypeEnum } from 'src/types/enums/EventResourceTypeEnum';
+import { EventSourceEnum } from 'src/types/enums/EventSourceEnum';
 import { CreateTrackingEventDto } from 'src/types/dtos/tracking/CreateTrackingEventDto';
 import { ProcessProspectCsvRowMessageDto } from 'src/types/dtos/prospect/ProcessProspectCsvRowMessageDto';
 
@@ -133,10 +134,12 @@ export const handler: SQSHandler = async (event: SQSEvent) => {
         eventType: EventTypeEnum.CsvImportFailed,
         ipAddress: null,
         userAgent: null,
+        source: EventSourceEnum.Lambda,
         organizationId,
         userId,
         resourceType: EventResourceTypeEnum.CsvImport,
-        resourceId: importRecordId
+        resourceId: importRecordId,
+        sourceName: 'start-process-csv'
       });
 
       console.error('Error processing CSV import:', errorMessage);

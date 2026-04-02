@@ -11,6 +11,7 @@ import { normalizeDomain, normalizeLinkedinUrl, normalizePhoneNumber } from 'src
 import { getAwsSqsService } from 'src/services/aws/sqs/sqs.service';
 import { EventTypeEnum } from 'src/types/enums/EventTypeEnum';
 import { EventResourceTypeEnum } from 'src/types/enums/EventResourceTypeEnum';
+import { EventSourceEnum } from 'src/types/enums/EventSourceEnum';
 import { CreateTrackingEventDto } from 'src/types/dtos/tracking/CreateTrackingEventDto';
 import { ProcessProspectCsvRowMessageDto } from 'src/types/dtos/prospect/ProcessProspectCsvRowMessageDto';
 
@@ -113,10 +114,12 @@ export const handler: SQSHandler = async (event: SQSEvent) => {
           eventType: EventTypeEnum.CsvImportCompleted,
           ipAddress: null,
           userAgent: null,
+          source: EventSourceEnum.Lambda,
           organizationId: importRecord.organizationId,
           userId: importRecord.userId,
           resourceType: EventResourceTypeEnum.CsvImport,
-          resourceId: importRecordId
+          resourceId: importRecordId,
+          sourceName: 'split-process-csv'
         });
       }
     }

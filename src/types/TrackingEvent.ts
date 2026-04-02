@@ -1,6 +1,7 @@
 import z from 'zod';
 import { EventTypeEnum } from './enums/EventTypeEnum';
 import { EventResourceTypeEnum } from './enums/EventResourceTypeEnum';
+import { EventSourceEnum } from './enums/EventSourceEnum';
 
 export const TrackingEventSchema = z.object({
   id: z.uuid(),
@@ -11,7 +12,9 @@ export const TrackingEventSchema = z.object({
   resourceId: z.uuid().nullable(),
   ipAddress: z.string().nullable(),
   userAgent: z.string().nullable(),
+  source: z.enum(EventSourceEnum).nullable(),
+  sourceName: z.string().nullable(),
   createdAt: z.date()
 });
 
-export type TrackingEvent = z.infer<typeof TrackingEventSchema>
+export type TrackingEvent = z.infer<typeof TrackingEventSchema>;
