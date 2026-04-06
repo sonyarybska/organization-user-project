@@ -77,6 +77,9 @@ export class ProspectEntity {
   @UpdateDateColumn()
   updatedAt: Date;
 
+  @Column({ type: 'integer', default: 0 })
+  score: number;
+
   @Column({ type: 'varchar' })
   source: SourceTypeEnum;
 }

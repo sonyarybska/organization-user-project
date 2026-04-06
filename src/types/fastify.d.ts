@@ -8,6 +8,8 @@ import { UserOrganization } from './UserOrganization';
 import { IS3Service } from 'src/services/aws/s3/s3.service';
 import { ICognitoService } from 'src/services/aws/cognito/cognito.service';
 import { ISqsService } from 'src/services/aws/sqs/sqs.service';
+import { IHMACService } from 'src/services/hmac/hmac.service';
+import { IAIService } from 'src/types/interfaces/AIService';
 
 declare module 'fastify' {
   interface FastifyInstance {
@@ -19,6 +21,7 @@ declare module 'fastify' {
     cognitoService: ICognitoService;
     sqsService: ISqsService;
     hmacService: IHMACService;
+    aiService: IAIService;
   }
 
   interface FastifyContextConfig {

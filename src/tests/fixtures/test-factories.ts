@@ -54,6 +54,7 @@ export function createTestProspect(overrides: Partial<Prospect> = {}): Prospect 
     updatedAt: new Date('2025-06-01'),
     companyId: null,
     source: SourceTypeEnum.MANUAL,
+    score: 0,
     ...overrides
   };
 }

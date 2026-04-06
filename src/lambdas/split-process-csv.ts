@@ -9,11 +9,46 @@ import { getTypeOrmTransactionService } from 'src/services/typeorm/typeorm-trans
 import { SourceTypeEnum } from 'src/types/enums/SourceTypeEnum';
 import { normalizeDomain, normalizeLinkedinUrl, normalizePhoneNumber } from 'src/api/helpers/normalization';
 import { ImportCsvProspect } from 'src/api/routes/organizations/prospects/csv-import-records/schemas/ImportCsvProspectSchema';
+import { getAIService } from 'src/services/ai/ai.service';
+import { IAIService } from 'src/types/interfaces/AIService';
 
 interface ProcessCsvRowMessage {
   importRecordId: string;
   row: Partial<ImportCsvProspect>;
   isDuplicate: boolean;
+}
+
+async function calculateProspectScore(aiService: IAIService, prospect: Record<string, any>): Promise<number> {
+  const prompt = `
+You are a sales intelligence AI. Analyze this prospect and calculate a SALES READINESS SCORE (0-10).
+
+PROSPECT DATA:
+- Name: ${prospect.firstName || 'unknown'} ${prospect.lastName || 'unknown'}
+- Email: ${prospect.email || 'none'}
+- Phone: ${prospect.phone || 'none'}
+- Job Title: ${prospect.title || 'unknown'}
+- Department: ${prospect.department || 'unknown'}
+- Company: ${prospect.companyId ? 'linked' : 'not linked'}
+- LinkedIn: ${prospect.linkedinUrl || 'none'}
+- Salary: ${prospect.salary != null ? '$' + prospect.salary : 'unknown'}
+- Domain: ${prospect.domain || 'unknown'}
+
+SCORING CRITERIA:
+- Contact quality (email + phone = high value)
+- Decision maker potential (title, department)
+- Research ability (LinkedIn, company link)
+- Budget indicator (salary info)
+
+Return JSON: { "score": number }
+`;
+
+  const response = await aiService.callAI<{ score: number }>(prompt, {
+    model: 'llama-3.3-70b-versatile',
+    maxTokens: 100,
+    temperature: 0.3
+  });
+
+  return Math.max(0, Math.min(10, Math.round(response.score)));
 }
 
 export const handler: SQSHandler = async (event: SQSEvent) => {
@@ -34,6 +69,10 @@ export const handler: SQSHandler = async (event: SQSEvent) => {
   const prospectRepo = getProspectRepo(db);
   const companyRepo = getCompanyRepo(db);
   const importRepo = getCsvImportRecordRepo(db);
+  const aiService = getAIService({
+    apiKey: process.env.GROQ_API_KEY,
+    baseURL: 'https://api.groq.com/openai/v1'
+  });
 
   for (const record of event.Records) {
     const { importRecordId, row, isDuplicate } = JSON.parse(record.body) as ProcessCsvRowMessage;
@@ -84,13 +123,22 @@ export const handler: SQSHandler = async (event: SQSEvent) => {
         const normalizedProspectLinkedinUrl = normalizeLinkedinUrl(prospectData.linkedinUrl);
         const normalizedPhone = normalizePhoneNumber(prospectData.phone);
 
-        await prospectRepoTx.create({
+        const prospectToCreate = {
           ...prospectData,
           linkedinUrl: normalizedProspectLinkedinUrl,
           phone: normalizedPhone,
           companyId: company.id,
           source: SourceTypeEnum.CSV_IMPORT
-        });
+        };
+
+        let score = 0;
+        try {
+          score = await calculateProspectScore(aiService, prospectToCreate);
+        } catch (err) {
+          console.log('Failed to get AI score, defaulting to 0:', err);
+        }
+
+        await prospectRepoTx.create({ ...prospectToCreate, score });
 
         await importRepoTx.incrementProcessedRows(importRecordId);
       });
