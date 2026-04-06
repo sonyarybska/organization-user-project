@@ -17,8 +17,6 @@ export function getDataSource(opts: {
   migrations?: string[];
   dropSchema?: boolean;
 }) {
-  const isTest = process.env.NODE_ENV === 'test';
-
   return new DataSource({
     type: 'postgres',
     host: opts.host,
@@ -39,12 +37,7 @@ export function getDataSource(opts: {
       CsvImportRecordEntity,
       CompanyEntity
     ],
-    dropSchema: opts.dropSchema || false,
-    ssl: isTest
-      ? false
-      : {
-          rejectUnauthorized: false
-        }
+    dropSchema: opts.dropSchema || false
   });
 }
 
