@@ -1,29 +1,35 @@
-import OpenAI from 'openai';
+import axios from 'axios';
+import { AICallOptions, IAIService } from 'src/types/interfaces/AIService';
 
-export interface IAIService {
-  callAI: <T>(prompt: string) => Promise<T>;
-}
-
-export function getAIService(apiKey: string): IAIService {
-  const client = new OpenAI({
-    apiKey,
-    baseURL: 'https://api.groq.com/openai/v1'
-  });
+export function getAIService(config: { apiKey: string; baseURL: string }): IAIService {
+  const { apiKey, baseURL } = config;
 
   return {
-    async callAI<T>(prompt: string): Promise<T> {
-      const response = await client.chat.completions.create({
-        model: 'llama-3.3-70b-versatile',
-        max_tokens: 500,
-        temperature: 0.3,
-        response_format: { type: 'json_object' },
-        messages: [
-          { role: 'system', content: 'Return only valid JSON without markdown formatting.' },
-          { role: 'user', content: prompt }
-        ]
-      });
+    async callAI<T>(prompt: string, options: AICallOptions): Promise<T> {
+      const { model, maxTokens = 500, temperature = 0.3 } = options;
 
-      const content = response.choices[0]?.message?.content;
+      const response = await axios.post(
+        `${baseURL}/chat/completions`,
+        {
+          model,
+          max_tokens: maxTokens,
+          temperature,
+          response_format: { type: 'json_object' },
+          messages: [
+            { role: 'system', content: 'Return only valid JSON without markdown formatting.' },
+            { role: 'user', content: prompt }
+          ]
+        },
+        {
+          headers: {
+            'Content-Type': 'application/json',
+            Authorization: `Bearer ${apiKey}`
+          }
+        }
+      );
+
+      const content = response.data?.choices?.[0]?.message?.content;
+
       if (!content) throw new Error('No response from AI');
 
       return JSON.parse(content) as T;

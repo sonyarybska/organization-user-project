@@ -89,7 +89,13 @@ const start = async () => {
 
     server.decorate('cognitoService', getAwsCognitoService(process.env.AWS_REGION));
 
-    server.decorate('aiService', getAIService(process.env.GROQ_API_KEY));
+    server.decorate(
+      'aiService',
+      getAIService({
+        apiKey: process.env.GROQ_API_KEY,
+        baseURL: 'https://api.groq.com/openai/v1'
+      })
+    );
 
     server.decorate('repos', getRepos(server.db));
 

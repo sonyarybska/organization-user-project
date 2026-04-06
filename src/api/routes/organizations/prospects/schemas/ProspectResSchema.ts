@@ -17,5 +17,6 @@ export const ProspectResSchema = z.object({
   organizationId: z.uuid(),
   createdAt: z.date(),
   updatedAt: z.date(),
-  source: z.enum(SourceTypeEnum)
+  source: z.enum(SourceTypeEnum),
+  score: z.number()
 });

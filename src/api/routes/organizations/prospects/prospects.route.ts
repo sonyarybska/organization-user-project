@@ -3,11 +3,9 @@ import { ZodTypeProvider } from 'fastify-type-provider-zod';
 import { createProspect } from 'src/controllers/prospect/create-prospect';
 import { getProspectsByOrganizationId } from 'src/controllers/prospect/get-prospects-by-organization-id';
 import { getProspectByIdAndOrgId } from 'src/controllers/prospect/get-prospect-by-id-and-org-id';
-import { getProspectScoreByIdAndOrganizationId } from 'src/controllers/prospect/get-prospect-score-by-id';
 import { CreateProspectReqSchema } from './schemas/CreateProspectReqSchema';
 import { IdUUIDSchema } from '../../schemas/IdUUIDSchema';
 import { ProspectResSchema } from './schemas/ProspectResSchema';
-import { ProspectScoreResSchema } from './schemas/ProspectScoreResSchema';
 import { PaginatedProspectsResSchema } from './schemas/PaginatedProspectsResSchema';
 import { deleteProspectsByIdAndOrganizationId } from 'src/controllers/prospect/delete-prospects-by-id-and-organization-id';
 import { SourceTypeEnum } from 'src/types/enums/SourceTypeEnum';
@@ -17,7 +15,6 @@ const SCHEMA_TAGS = ['Prospect'];
 const routes: FastifyPluginAsync = async (f) => {
   const fastify = f.withTypeProvider<ZodTypeProvider>();
   const { prospectRepo } = fastify.repos;
-  const aiService = fastify.aiService;
 
   fastify.post(
     '/',
@@ -68,25 +65,6 @@ const routes: FastifyPluginAsync = async (f) => {
         id: req.params.id,
         organizationId: req.userOrganization.organizationId,
         prospectRepo
-      });
-    }
-  );
-
-  fastify.get(
-    '/:id/score',
-    {
-      schema: {
-        tags: SCHEMA_TAGS,
-        params: IdUUIDSchema,
-        response: { 200: ProspectScoreResSchema }
-      }
-    },
-    async (req) => {
-      return await getProspectScoreByIdAndOrganizationId({
-        prospectId: req.params.id,
-        organizationId: req.userOrganization.organizationId,
-        prospectRepo,
-        aiService
       });
     }
   );
