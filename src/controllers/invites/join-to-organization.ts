@@ -57,7 +57,7 @@ export async function joinUserToOrganization(data: JoinUserToOrganizationDto) {
     eventType: EventTypeEnum.InviteAccepted,
     resourceType: EventResourceTypeEnum.Invite,
     resourceId: invite.id,
-    userId: user!.id,
+    userEmail: user!.email,
     organizationId: invite.organizationId,
     trackingContext
   });

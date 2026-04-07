@@ -30,7 +30,8 @@ const routes: FastifyPluginAsync = async (f) => {
         transactionService,
         userId: id,
         trackingContext: req.trackingContext,
-        trackingService
+        trackingService,
+        userEmail: req.userProfile.email
       });
     }
   );

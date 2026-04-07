@@ -7,7 +7,7 @@ export async function updateCompanyByIdAndOrgId({
   organizationId,
   companyData,
   companyRepo,
-  userId,
+  userEmail,
   trackingContext,
   trackingService
 }: UpdateCompanyByIdAndOrgIdDto) {
@@ -17,7 +17,7 @@ export async function updateCompanyByIdAndOrgId({
     eventType: EventTypeEnum.CompanyUpdated,
     resourceType: EventResourceTypeEnum.Company,
     resourceId: id,
-    userId,
+    userEmail,
     organizationId,
     trackingContext
   });

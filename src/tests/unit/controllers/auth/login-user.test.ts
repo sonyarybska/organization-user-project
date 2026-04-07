@@ -32,7 +32,8 @@ describe('loginUser', () => {
         password: TEST_PASSWORDS.VALID,
         cognitoService: mockCognitoService,
         trackingService: trackingServiceMock,
-        trackingContext: TEST_TRACKING_CONTEXT
+        trackingContext: TEST_TRACKING_CONTEXT,
+        userEmail: TEST_EMAILS.VALID_USER
       });
 
       expect(mockCognitoService.login).toHaveBeenCalledWith(TEST_EMAILS.VALID_USER, TEST_PASSWORDS.VALID);
@@ -56,7 +57,8 @@ describe('loginUser', () => {
           password: TEST_PASSWORDS.WEAK,
           cognitoService: mockCognitoService,
           trackingService: trackingServiceMock,
-          trackingContext: TEST_TRACKING_CONTEXT
+          trackingContext: TEST_TRACKING_CONTEXT,
+          userEmail: TEST_EMAILS.VALID_USER
         })
       ).rejects.toThrow('Invalid credentials');
     });

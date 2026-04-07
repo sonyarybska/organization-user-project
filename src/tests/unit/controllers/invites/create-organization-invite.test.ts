@@ -47,7 +47,8 @@ describe('createOrganizationInvite', () => {
         organizationRepo: mockOrganizationRepo,
         hmacService: mockHmacService,
         trackingContext: TEST_TRACKING_CONTEXT,
-        trackingService: trackingServiceMock
+        trackingService: trackingServiceMock,
+        userEmail: TEST_EMAILS.ADMIN
       });
 
       expect(mockOrganizationRepo.getByIdAndUserId).toHaveBeenCalledWith(TEST_ORG_IDS.FIRST, TEST_USER_IDS.ADMIN);

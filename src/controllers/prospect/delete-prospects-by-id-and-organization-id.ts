@@ -6,7 +6,7 @@ export async function deleteProspectsByIdAndOrganizationId({
   id,
   organizationId,
   prospectRepo,
-  userId,
+  userEmail,
   trackingContext,
   trackingService
 }: DeleteProspectByIdAndOrganizationIdDto) {
@@ -16,7 +16,7 @@ export async function deleteProspectsByIdAndOrganizationId({
     eventType: EventTypeEnum.ProspectDeleted,
     resourceType: EventResourceTypeEnum.Prospect,
     resourceId: id,
-    userId,
+    userEmail,
     organizationId,
     trackingContext
   });

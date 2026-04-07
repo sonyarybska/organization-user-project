@@ -8,7 +8,7 @@ export type UpdateCompanyByIdAndOrgIdDto = {
   organizationId: string;
   companyData: Partial<Company>;
   companyRepo: ICompanyRepo;
-  userId: string;
   trackingContext: TrackingContext;
   trackingService: ITrackingService;
+  userEmail: string;
 };

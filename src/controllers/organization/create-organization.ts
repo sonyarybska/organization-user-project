@@ -4,7 +4,8 @@ import { EventResourceTypeEnum } from 'src/types/enums/EventResourceTypeEnum';
 import { EventTypeEnum } from 'src/types/enums/EventTypeEnum';
 
 export async function createOrganization(data: CreateOrganizationDto) {
-  const { organizationRepo, userOrganizationRepo, transactionService, userId, trackingContext, trackingService } = data;
+  const { organizationRepo, userOrganizationRepo, transactionService, userId, trackingContext, trackingService, userEmail } =
+    data;
 
   const organization = await transactionService.run(async (connection) => {
     const organization = await organizationRepo.reconnect(connection).create(data.organizationData);
@@ -22,7 +23,7 @@ export async function createOrganization(data: CreateOrganizationDto) {
     eventType: EventTypeEnum.OrganizationCreated,
     resourceType: EventResourceTypeEnum.Organization,
     resourceId: organization.id,
-    userId,
+    userEmail,
     organizationId: organization.id,
     trackingContext
   });

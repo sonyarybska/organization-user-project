@@ -5,7 +5,7 @@ import { EventTypeEnum } from 'src/types/enums/EventTypeEnum';
 
 export async function registerUser(data: RegisterUserDto): Promise<void> {
   const { password, organizationName, ...userCreateData } = data.createData;
-  const { transactionService, cognitoService, trackingContext, trackingService } = data;
+  const { transactionService, cognitoService, trackingContext, trackingService, userEmail } = data;
 
   const cognitoUserId = await cognitoService.createCognitoUser(data.createData.email, password);
 
@@ -28,7 +28,7 @@ export async function registerUser(data: RegisterUserDto): Promise<void> {
     eventType: EventTypeEnum.UserRegistered,
     resourceType: EventResourceTypeEnum.User,
     resourceId: userId,
-    userId,
+    userEmail,
     organizationId,
     trackingContext
   });
@@ -37,7 +37,7 @@ export async function registerUser(data: RegisterUserDto): Promise<void> {
     eventType: EventTypeEnum.OrganizationCreated,
     resourceType: EventResourceTypeEnum.Organization,
     resourceId: organizationId,
-    userId,
+    userEmail,
     organizationId,
     trackingContext
   });

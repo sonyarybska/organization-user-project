@@ -15,4 +15,5 @@ export type CreateOrganizationInviteDto = {
   hmacService: IHMACService;
   trackingContext: TrackingContext;
   trackingService: ITrackingService;
+  userEmail: string;
 };

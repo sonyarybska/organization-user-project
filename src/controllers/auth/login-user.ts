@@ -9,7 +9,8 @@ export async function loginUser({
   email,
   password,
   trackingContext,
-  trackingService
+  trackingService,
+  userEmail
 }: LoginUserDto): Promise<JwtTokens> {
   const tokens = await cognitoService.login(email, password);
 
@@ -19,7 +20,7 @@ export async function loginUser({
     eventType: EventTypeEnum.UserLogin,
     resourceType: EventResourceTypeEnum.User,
     resourceId: user.id,
-    userId: user.id,
+    userEmail,
     organizationId: null,
     trackingContext
   });

@@ -10,7 +10,7 @@ export interface ITrackingService {
     eventType: EventTypeEnum;
     resourceType: EventResourceTypeEnum;
     resourceId: string;
-    userId: string;
+    userEmail: string;
     organizationId: string | null;
     trackingContext: TrackingContext;
     sourceName?: string | null;
@@ -27,7 +27,7 @@ export function getTrackingService(sqsService: ISqsService, logger: FastifyBaseL
           eventType: params.eventType,
           resourceType: params.resourceType,
           resourceId: params.resourceId,
-          userId: params.userId,
+          userEmail: params.userEmail,
           organizationId: params.organizationId,
           ipAddress: params.trackingContext.ipAddress,
           userAgent: params.trackingContext.userAgent,

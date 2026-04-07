@@ -3,14 +3,14 @@ import { EventTypeEnum } from 'src/types/enums/EventTypeEnum';
 import { EventResourceTypeEnum } from 'src/types/enums/EventResourceTypeEnum';
 
 export async function updateUserById(data: UpdateUserDto) {
-  const { userRepo, trackingService, trackingContext, userId } = data;
+  const { userRepo, trackingService, trackingContext, userId, userEmail } = data;
   await userRepo.updateUser(userId, data.userData);
 
   trackingService.track({
     eventType: EventTypeEnum.UserUpdated,
     trackingContext,
     organizationId: null,
-    userId,
+    userEmail,
     resourceType: EventResourceTypeEnum.User,
     resourceId: userId
   });

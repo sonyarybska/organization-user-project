@@ -2,7 +2,7 @@ import { createTestAttachment } from 'src/tests/fixtures/test-factories';
 import { mockAttachmentRepo } from 'src/tests/mocks/repos/attachment.repo.mock';
 import { mockS3Service } from 'src/tests/mocks/services/s3.service.mock';
 import { createAttachment } from 'src/controllers/attachment/create-attachment';
-import { TEST_ORG_IDS, TEST_TRACKING_CONTEXT, TEST_USER_IDS } from 'src/tests/fixtures/test-constants';
+import { TEST_EMAILS, TEST_ORG_IDS, TEST_TRACKING_CONTEXT, TEST_USER_IDS } from 'src/tests/fixtures/test-constants';
 import { trackingServiceMock } from 'src/tests/mocks/services/tracking.service.mock';
 
 describe('createAttachment', () => {
@@ -31,7 +31,8 @@ describe('createAttachment', () => {
         },
         trackingService: trackingServiceMock,
         trackingContext: TEST_TRACKING_CONTEXT,
-        organizationId: TEST_ORG_IDS.FIRST
+        organizationId: TEST_ORG_IDS.FIRST,
+        userEmail: TEST_EMAILS.VALID_USER
       });
 
       expect(mockS3Service.upload).toHaveBeenCalledTimes(1);
@@ -69,7 +70,8 @@ describe('createAttachment', () => {
           },
           trackingService: trackingServiceMock,
           trackingContext: TEST_TRACKING_CONTEXT,
-          organizationId: TEST_ORG_IDS.FIRST
+          organizationId: TEST_ORG_IDS.FIRST,
+          userEmail: TEST_EMAILS.VALID_USER
         })
       ).rejects.toThrow('Connection timeout');
 
@@ -94,7 +96,8 @@ describe('createAttachment', () => {
           },
           trackingService: trackingServiceMock,
           trackingContext: TEST_TRACKING_CONTEXT,
-          organizationId: TEST_ORG_IDS.FIRST
+          organizationId: TEST_ORG_IDS.FIRST,
+          userEmail: TEST_EMAILS.VALID_USER
         })
       ).rejects.toThrow('Unique constraint violation');
 

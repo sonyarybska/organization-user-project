@@ -59,8 +59,9 @@ describe('registerUser', () => {
         sendGridService: mockSendGridService,
         cognitoService: mockCognitoService,
         createData: registrationData,
-        trackingContext:TEST_TRACKING_CONTEXT,
-        trackingService: trackingServiceMock
+        trackingContext: TEST_TRACKING_CONTEXT,
+        trackingService: trackingServiceMock,
+        userEmail: registrationData.email
       });
 
       expect(mockCognitoService.createCognitoUser).toHaveBeenCalledWith(TEST_EMAILS.VALID_USER, TEST_PASSWORDS.VALID);
@@ -103,8 +104,9 @@ describe('registerUser', () => {
           sendGridService: mockSendGridService,
           cognitoService: mockCognitoService,
           createData: registrationData,
-          trackingContext:TEST_TRACKING_CONTEXT,
-          trackingService: trackingServiceMock
+          trackingContext: TEST_TRACKING_CONTEXT,
+          trackingService: trackingServiceMock,
+          userEmail: registrationData.email
         })
       ).rejects.toThrow('User already exists');
 
@@ -127,8 +129,9 @@ describe('registerUser', () => {
           sendGridService: mockSendGridService,
           cognitoService: mockCognitoService,
           createData: registrationData,
-          trackingContext:TEST_TRACKING_CONTEXT,
-          trackingService: trackingServiceMock
+          trackingContext: TEST_TRACKING_CONTEXT,
+          trackingService: trackingServiceMock,
+          userEmail: registrationData.email
         })
       ).rejects.toThrow('Database constraint violation');
 

@@ -11,7 +11,8 @@ export async function createAttachment({
   attachmentData: { userId, originalName, buffer },
   organizationId,
   trackingContext,
-  trackingService
+  trackingService,
+  userEmail
 }: CreateAttachmentDto) {
   const publicKey = `attachments/${userId}/${randomUUID()}-${originalName}`;
   const key = `public/${publicKey}`;
@@ -29,7 +30,7 @@ export async function createAttachment({
     eventType: EventTypeEnum.AttachmentUploaded,
     resourceType: EventResourceTypeEnum.Attachment,
     resourceId: id,
-    userId,
+    userEmail,
     organizationId,
     trackingContext
   });

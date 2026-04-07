@@ -19,4 +19,5 @@ export type RegisterUserDto = {
   createData: RegisterUserReq;
   trackingContext: TrackingContext;
   trackingService: ITrackingService;
+  userEmail: string;
 };

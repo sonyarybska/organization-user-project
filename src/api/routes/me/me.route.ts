@@ -52,7 +52,8 @@ const routes: FastifyPluginAsync = async (f) => {
         userData: req.body,
         userRepo,
         trackingService,
-        trackingContext: req.trackingContext
+        trackingContext: req.trackingContext,
+        userEmail: req.userProfile.email
       });
     }
   );

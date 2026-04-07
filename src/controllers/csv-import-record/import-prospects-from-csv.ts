@@ -40,7 +40,7 @@ export async function importProspectsFromCsv(data: ImportProspectsFromCsvDto) {
     eventType: EventTypeEnum.CsvImportStarted,
     resourceType: EventResourceTypeEnum.CsvImport,
     resourceId: csvImportRecord.id,
-    userId,
+    userEmail: data.userEmail,
     organizationId,
     trackingContext
   });

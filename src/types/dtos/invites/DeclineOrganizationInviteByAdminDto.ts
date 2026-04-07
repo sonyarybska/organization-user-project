@@ -8,7 +8,7 @@ export type DeclineOrganizationInviteByAdminDto = {
   organizationId: string;
   organizationInviteRepo: IOrganizationInviteRepo;
   status: InviteStatus;
-  userId: string;
   trackingService: ITrackingService;
   trackingContext: TrackingContext;
+  userEmail: string;
 };

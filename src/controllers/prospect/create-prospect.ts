@@ -5,7 +5,7 @@ import { EventTypeEnum } from 'src/types/enums/EventTypeEnum';
 export async function createProspect({
   data,
   prospectRepo,
-  userId,
+  userEmail,
   organizationId,
   trackingContext,
   trackingService
@@ -16,7 +16,7 @@ export async function createProspect({
     eventType: EventTypeEnum.ProspectCreated,
     resourceType: EventResourceTypeEnum.Prospect,
     resourceId: prospect.id,
-    userId,
+    userEmail,
     organizationId,
     trackingContext
   });

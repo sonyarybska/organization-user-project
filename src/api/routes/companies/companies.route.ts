@@ -34,10 +34,10 @@ const routes: FastifyPluginAsync = async (f) => {
           organizationId: req.userOrganization.organizationId
         },
         companyRepo,
-        userId: req.userProfile.id,
         organizationId: req.userOrganization.organizationId,
         trackingContext: req.trackingContext,
-        trackingService
+        trackingService,
+        userEmail: req.userProfile.email
       });
     }
   );
@@ -75,9 +75,9 @@ const routes: FastifyPluginAsync = async (f) => {
         organizationId: req.userOrganization.organizationId,
         companyData: req.body,
         companyRepo,
-        userId: req.userProfile.id,
         trackingContext: req.trackingContext,
-        trackingService
+        trackingService,
+        userEmail: req.userProfile.email
       });
     }
   );
@@ -95,9 +95,9 @@ const routes: FastifyPluginAsync = async (f) => {
         id: req.params.id,
         organizationId: req.userOrganization.organizationId,
         companyRepo,
-        userId: req.userProfile.id,
         trackingContext: req.trackingContext,
-        trackingService
+        trackingService,
+        userEmail: req.userProfile.email
       });
     }
   );

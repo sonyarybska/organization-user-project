@@ -3,7 +3,7 @@ import { createTestOrganization } from 'src/tests/fixtures/test-factories';
 import { mockOrganizationRepo } from 'src/tests/mocks/repos/organization.repo.mock';
 import { mockUserOrganizationRepo } from 'src/tests/mocks/repos/user-organization.repo.mock';
 import { UserRoleEnum } from 'src/types/enums/UserRoleEnum';
-import { TEST_USER_IDS, TEST_ORG_NAMES, TEST_TRACKING_CONTEXT } from 'src/tests/fixtures/test-constants';
+import { TEST_USER_IDS, TEST_ORG_NAMES, TEST_TRACKING_CONTEXT, TEST_EMAILS } from 'src/tests/fixtures/test-constants';
 import { trackingServiceMock } from 'src/tests/mocks/services/tracking.service.mock';
 
 describe('createOrganization', () => {
@@ -30,7 +30,8 @@ describe('createOrganization', () => {
         userOrganizationRepo: mockUserOrganizationRepo,
         transactionService: mockTransactionService,
         trackingService: trackingServiceMock,
-        trackingContext: TEST_TRACKING_CONTEXT
+        trackingContext: TEST_TRACKING_CONTEXT,
+        userEmail: TEST_EMAILS.VALID_USER
       });
 
       expect(mockTransactionService.run).toHaveBeenCalledTimes(1);
@@ -62,7 +63,8 @@ describe('createOrganization', () => {
           userOrganizationRepo: mockUserOrganizationRepo,
           transactionService: mockTransactionService,
           trackingService: trackingServiceMock,
-          trackingContext: TEST_TRACKING_CONTEXT
+          trackingContext: TEST_TRACKING_CONTEXT,
+          userEmail: TEST_EMAILS.VALID_USER
         })
       ).rejects.toThrow('Organization name already exists');
 

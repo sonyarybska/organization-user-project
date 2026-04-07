@@ -2,7 +2,7 @@ import { declineOrganizationInviteByAdmin } from 'src/controllers/invites/declin
 import { createTestInvite } from 'src/tests/fixtures/test-factories';
 import { mockOrganizationInviteRepo } from 'src/tests/mocks/repos/organization-invite.repo.mock';
 import { InviteStatus } from 'src/types/enums/InviteStatusEnum';
-import { TEST_DATES, TEST_ORG_IDS, TEST_TRACKING_CONTEXT, TEST_USER_IDS } from 'src/tests/fixtures/test-constants';
+import { TEST_DATES, TEST_EMAILS, TEST_ORG_IDS, TEST_TRACKING_CONTEXT } from 'src/tests/fixtures/test-constants';
 import { trackingServiceMock } from 'src/tests/mocks/services/tracking.service.mock';
 
 describe('declineOrganizationInviteByAdmin', () => {
@@ -26,7 +26,7 @@ describe('declineOrganizationInviteByAdmin', () => {
           status: InviteStatus.DECLINED_BY_ADMIN,
           trackingService: trackingServiceMock,
           trackingContext: TEST_TRACKING_CONTEXT,
-          userId: TEST_USER_IDS.FIRST
+          userEmail: TEST_EMAILS.VALID_USER
         })
       ).rejects.toThrow('Invite has expired');
 
@@ -51,7 +51,7 @@ describe('declineOrganizationInviteByAdmin', () => {
           status: InviteStatus.DECLINED_BY_ADMIN,
           trackingService: trackingServiceMock,
           trackingContext: TEST_TRACKING_CONTEXT,
-          userId: TEST_USER_IDS.FIRST
+          userEmail: TEST_EMAILS.VALID_USER
         })
       ).rejects.toThrow('Invite is already accepted or declined');
 
@@ -75,7 +75,7 @@ describe('declineOrganizationInviteByAdmin', () => {
         status: InviteStatus.DECLINED_BY_ADMIN,
         trackingService: trackingServiceMock,
         trackingContext: TEST_TRACKING_CONTEXT,
-        userId: TEST_USER_IDS.FIRST
+        userEmail: TEST_EMAILS.VALID_USER
       });
 
       expect(mockOrganizationInviteRepo.updateStatusById).toHaveBeenCalledWith(validInvite.id, InviteStatus.DECLINED_BY_ADMIN);

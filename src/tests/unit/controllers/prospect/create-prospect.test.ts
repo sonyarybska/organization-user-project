@@ -3,7 +3,7 @@ import { createTestProspect } from 'src/tests/fixtures/test-factories';
 import { mockProspectRepo } from 'src/tests/mocks/repos/prospect.repo.mock';
 import { mockSqsService } from 'src/tests/mocks/services/sqs.service.mock';
 import { DBError } from 'src/types/errors/DBError';
-import { TEST_USER_IDS, TEST_ORG_IDS, TEST_TRACKING_CONTEXT } from 'src/tests/fixtures/test-constants';
+import { TEST_ORG_IDS, TEST_TRACKING_CONTEXT, TEST_EMAILS } from 'src/tests/fixtures/test-constants';
 import { trackingServiceMock } from 'src/tests/mocks/services/tracking.service.mock';
 
 describe('createProspect', () => {
@@ -20,16 +20,16 @@ describe('createProspect', () => {
       const result = await createProspect({
         data: testProspect,
         prospectRepo: mockProspectRepo,
-        userId: TEST_USER_IDS.FIRST,
         organizationId: TEST_ORG_IDS.FIRST,
         trackingContext: TEST_TRACKING_CONTEXT,
-        trackingService: trackingServiceMock
+        trackingService: trackingServiceMock,
+        userEmail: TEST_EMAILS.VALID_USER
       });
 
       expect(mockProspectRepo.create).toHaveBeenCalledWith(testProspect);
       expect(trackingServiceMock.track).toHaveBeenCalledWith(
         expect.objectContaining({
-          userId: TEST_USER_IDS.FIRST,
+          userEmail: TEST_EMAILS.VALID_USER,
           organizationId: TEST_ORG_IDS.FIRST,
           resourceId: testProspect.id
         })
@@ -48,10 +48,10 @@ describe('createProspect', () => {
         createProspect({
           data: testProspect,
           prospectRepo: mockProspectRepo,
-          userId: TEST_USER_IDS.FIRST,
           organizationId: TEST_ORG_IDS.FIRST,
           trackingContext: TEST_TRACKING_CONTEXT,
-          trackingService: trackingServiceMock
+          trackingService: trackingServiceMock,
+          userEmail: TEST_EMAILS.VALID_USER
         })
       ).rejects.toThrow('Unique constraint violation');
     });

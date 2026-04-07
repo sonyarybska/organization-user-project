@@ -38,7 +38,8 @@ const routes: FastifyPluginAsync = async (f) => {
         transactionService: fastify.transactionService,
         sendGridService: fastify.sendGridService,
         trackingContext: req.trackingContext,
-        trackingService
+        trackingService,
+        userEmail: req.body.email
       });
     }
   );
@@ -64,7 +65,8 @@ const routes: FastifyPluginAsync = async (f) => {
         email: req.body.email,
         password: req.body.password,
         trackingContext: req.trackingContext,
-        trackingService
+        trackingService,
+        userEmail: req.body.email
       });
     }
   );

@@ -55,7 +55,8 @@ const routes: FastifyPluginAsync = async (f) => {
         sqsService,
         csvImportRecordRepo,
         trackingContext: req.trackingContext,
-        trackingService
+        trackingService,
+        userEmail: req.userProfile.email
       });
     }
   );

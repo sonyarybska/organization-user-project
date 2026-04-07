@@ -30,7 +30,7 @@ export async function createOrganizationInvite(data: CreateOrganizationInviteDto
     eventType: EventTypeEnum.InviteCreated,
     resourceType: EventResourceTypeEnum.Invite,
     resourceId: invite.id,
-    userId: data.userId,
+    userEmail: data.userEmail,
     organizationId: data.organizationId,
     trackingContext
   });

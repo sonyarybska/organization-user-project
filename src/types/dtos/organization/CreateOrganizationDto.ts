@@ -14,4 +14,5 @@ export type CreateOrganizationDto = {
   userId: string;
   trackingContext: TrackingContext;
   trackingService: ITrackingService;
+  userEmail: string;
 };

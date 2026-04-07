@@ -6,7 +6,7 @@ export async function deleteCompanyByIdAndOrgId({
   id,
   organizationId,
   companyRepo,
-  userId,
+  userEmail,
   trackingContext,
   trackingService
 }: DeleteCompanyByIdAndOrgIdDto) {
@@ -16,7 +16,7 @@ export async function deleteCompanyByIdAndOrgId({
     eventType: EventTypeEnum.CompanyDeleted,
     resourceType: EventResourceTypeEnum.Company,
     resourceId: id,
-    userId,
+    userEmail,
     organizationId,
     trackingContext
   });

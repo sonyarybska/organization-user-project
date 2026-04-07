@@ -35,10 +35,10 @@ const routes: FastifyPluginAsync = async (f) => {
           userId: req.userProfile.id,
           source: SourceTypeEnum.MANUAL
         },
-        userId: req.userProfile.id,
         organizationId: req.userOrganization.organizationId,
         trackingContext: req.trackingContext,
-        trackingService
+        trackingService,
+        userEmail: req.userProfile.email
       });
     }
   );
@@ -87,9 +87,9 @@ const routes: FastifyPluginAsync = async (f) => {
         id: req.params.id,
         organizationId: req.userOrganization.organizationId,
         prospectRepo,
-        userId: req.userProfile.id,
         trackingContext: req.trackingContext,
-        trackingService
+        trackingService,
+        userEmail: req.userProfile.email
       });
     }
   );

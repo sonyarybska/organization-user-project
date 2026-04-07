@@ -14,6 +14,7 @@ import { EventResourceTypeEnum } from 'src/types/enums/EventResourceTypeEnum';
 import { EventSourceEnum } from 'src/types/enums/EventSourceEnum';
 import { CreateTrackingEventDto } from 'src/types/dtos/tracking/CreateTrackingEventDto';
 import { ProcessProspectCsvRowMessageDto } from 'src/types/dtos/prospect/ProcessProspectCsvRowMessageDto';
+import { getUserRepo } from 'src/repos/user.repo';
 
 export const handler: SQSHandler = async (event: SQSEvent) => {
   if (!event.Records.length) {
@@ -33,6 +34,8 @@ export const handler: SQSHandler = async (event: SQSEvent) => {
   const prospectRepo = getProspectRepo(db);
   const companyRepo = getCompanyRepo(db);
   const importRepo = getCsvImportRecordRepo(db);
+  const userRepo = getUserRepo(db);
+
   const sqs = getAwsSqsService(process.env.AWS_REGION);
 
   for (const record of event.Records) {
@@ -105,6 +108,7 @@ export const handler: SQSHandler = async (event: SQSEvent) => {
 
       if (isDone) {
         const importRecord = await importRepo.getById(importRecordId);
+        const { email } = await userRepo.getById(importRecord.userId);
 
         await importRepo.update(importRecordId, {
           status: CsvImportStatusEnum.DONE
@@ -116,7 +120,7 @@ export const handler: SQSHandler = async (event: SQSEvent) => {
           userAgent: null,
           source: EventSourceEnum.Lambda,
           organizationId: importRecord.organizationId,
-          userId: importRecord.userId,
+          userEmail: email,
           resourceType: EventResourceTypeEnum.CsvImport,
           resourceId: importRecordId,
           sourceName: 'split-process-csv'

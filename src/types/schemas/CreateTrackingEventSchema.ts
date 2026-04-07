@@ -5,7 +5,7 @@ import { EventSourceEnum } from 'src/types/enums/EventSourceEnum';
 
 export const CreateTrackingEventSchema = z.object({
   eventType: z.enum(EventTypeEnum),
-  userId: z.uuid(),
+  userEmail: z.email(),
   organizationId: z.uuid().nullable(),
   resourceType: z.enum(EventResourceTypeEnum),
   resourceId: z.string().uuid(),

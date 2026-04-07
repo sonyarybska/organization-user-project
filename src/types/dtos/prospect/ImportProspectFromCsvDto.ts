@@ -14,4 +14,5 @@ export type ImportProspectsFromCsvDto = {
   sqsService: ISqsService;
   trackingService: ITrackingService;
   trackingContext: TrackingContext;
+  userEmail: string;
 };

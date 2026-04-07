@@ -6,8 +6,8 @@ import { ITrackingService } from 'src/services/tracking/tracking.service';
 export type CreateProspectDto = {
   data: Partial<Prospect>;
   prospectRepo: IProspectRepo;
-  userId: string;
   organizationId: string;
   trackingContext: TrackingContext;
   trackingService: ITrackingService;
+  userEmail: string;
 };

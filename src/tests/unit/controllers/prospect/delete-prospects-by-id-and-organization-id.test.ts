@@ -1,5 +1,5 @@
 import { deleteProspectsByIdAndOrganizationId } from 'src/controllers/prospect/delete-prospects-by-id-and-organization-id';
-import { TEST_TRACKING_CONTEXT, TEST_USER_IDS } from 'src/tests/fixtures/test-constants';
+import { TEST_EMAILS, TEST_TRACKING_CONTEXT } from 'src/tests/fixtures/test-constants';
 import { createTestProspect } from 'src/tests/fixtures/test-factories';
 import { mockProspectRepo } from 'src/tests/mocks/repos/prospect.repo.mock';
 import { trackingServiceMock } from 'src/tests/mocks/services/tracking.service.mock';
@@ -20,7 +20,7 @@ describe('deleteProspectsByIdAndOrganizationId', () => {
         prospectRepo: mockProspectRepo,
         trackingService: trackingServiceMock,
         trackingContext: TEST_TRACKING_CONTEXT,
-        userId: TEST_USER_IDS.FIRST
+        userEmail: TEST_EMAILS.VALID_USER
       });
 
       expect(mockProspectRepo.deleteByIdAndOrganizationId).toHaveBeenCalledWith(testProspect.id, testProspect.organizationId);
@@ -40,7 +40,7 @@ describe('deleteProspectsByIdAndOrganizationId', () => {
           prospectRepo: mockProspectRepo,
           trackingService: trackingServiceMock,
           trackingContext: TEST_TRACKING_CONTEXT,
-          userId: TEST_USER_IDS.FIRST
+          userEmail: TEST_EMAILS.VALID_USER
         })
       ).rejects.toThrow('Foreign key constraint');
     });

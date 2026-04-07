@@ -14,4 +14,5 @@ export type CreateAttachmentDto = {
   organizationId: string;
   trackingContext: TrackingContext;
   trackingService: ITrackingService;
+  userEmail: string;
 };

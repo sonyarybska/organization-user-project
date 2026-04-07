@@ -7,6 +7,7 @@ import { parse } from 'csv-parse';
 import { Readable } from 'stream';
 import { CsvImportStatusEnum } from 'src/types/enums/CsvImportStatusEnum';
 import { getCsvImportRecordRepo } from 'src/repos/csv-import-record.repo';
+import { getUserRepo } from 'src/repos/user.repo';
 import {
   ImportCsvProspect,
   ImportCsvProspectSchema
@@ -75,11 +76,13 @@ export const handler: SQSHandler = async (event: SQSEvent) => {
   });
 
   const repo = getCsvImportRecordRepo(db);
+  const userRepo = getUserRepo(db);
   const s3 = getAwsS3Service(process.env.AWS_REGION);
   const sqs = getAwsSqsService(process.env.AWS_REGION);
 
   for (const record of event.Records) {
     const { importRecordId, key, mapping, organizationId, userId } = JSON.parse(record.body) as StartCsvImportMessage;
+    const user = await userRepo.getById(userId);
 
     try {
       if (!importRecordId || !key || !mapping || !userId || !organizationId) {
@@ -136,7 +139,7 @@ export const handler: SQSHandler = async (event: SQSEvent) => {
         userAgent: null,
         source: EventSourceEnum.Lambda,
         organizationId,
-        userId,
+        userEmail: user.email,
         resourceType: EventResourceTypeEnum.CsvImport,
         resourceId: importRecordId,
         sourceName: 'start-process-csv'

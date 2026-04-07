@@ -10,4 +10,5 @@ export type LoginUserDto = {
   cognitoService: ICognitoService;
   trackingContext: TrackingContext;
   trackingService: ITrackingService;
+  userEmail: string;
 };

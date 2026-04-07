@@ -5,10 +5,10 @@ import { EventTypeEnum } from 'src/types/enums/EventTypeEnum';
 export async function createCompany({
   companyData,
   companyRepo,
-  userId,
   organizationId,
   trackingContext,
-  trackingService
+  trackingService,
+  userEmail
 }: CreateCompanyDto) {
   const company = await companyRepo.create(companyData);
 
@@ -16,7 +16,7 @@ export async function createCompany({
     eventType: EventTypeEnum.CompanyCreated,
     resourceType: EventResourceTypeEnum.Company,
     resourceId: company.id,
-    userId,
+    userEmail,
     organizationId,
     trackingContext
   });

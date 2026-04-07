@@ -9,7 +9,7 @@ export async function declineOrganizationInviteByAdmin({
   organizationInviteRepo,
   status,
   organizationId,
-  userId,
+  userEmail,
   trackingService,
   trackingContext
 }: DeclineOrganizationInviteByAdminDto) {
@@ -29,7 +29,7 @@ export async function declineOrganizationInviteByAdmin({
     eventType: EventTypeEnum.InviteDeclined,
     resourceType: EventResourceTypeEnum.Invite,
     resourceId: inviteId,
-    userId,
+    userEmail,
     organizationId,
     trackingContext
   });

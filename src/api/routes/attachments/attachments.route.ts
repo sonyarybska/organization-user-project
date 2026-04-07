@@ -35,7 +35,8 @@ const routes: FastifyPluginAsync = async (f) => {
         },
         organizationId: req.userOrganization?.organizationId || null!,
         trackingContext: req.trackingContext,
-        trackingService
+        trackingService,
+        userEmail: req.userProfile.email
       });
     }
   );

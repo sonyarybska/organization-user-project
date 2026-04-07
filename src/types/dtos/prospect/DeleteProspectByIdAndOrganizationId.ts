@@ -6,7 +6,7 @@ export interface DeleteProspectByIdAndOrganizationIdDto {
   id: string;
   organizationId: string;
   prospectRepo: IProspectRepo;
-  userId: string;
   trackingContext: TrackingContext;
   trackingService: ITrackingService;
+  userEmail: string;
 }

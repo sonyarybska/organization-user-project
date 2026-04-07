@@ -1,3 +1,5 @@
+import { EventSourceEnum } from 'src/types/enums/EventSourceEnum';
+
 export const TEST_IDS = {
   COGNITO_1: 'cognito-sub-1',
   COGNITO_2: 'cognito-sub-2'
@@ -50,5 +52,6 @@ export const TEST_DATES = {
 
 export const TEST_TRACKING_CONTEXT = {
   ipAddress: '127.0.0.1',
-  userAgent: 'Mozilla/5.0'
+  userAgent: 'Mozilla/5.0',
+  source: EventSourceEnum.WebApp
 } as const;

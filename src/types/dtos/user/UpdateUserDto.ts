@@ -9,4 +9,5 @@ export type UpdateUserDto = {
   userRepo: IUserRepo;
   trackingService: ITrackingService;
   trackingContext: TrackingContext;
+  userEmail: string;
 };

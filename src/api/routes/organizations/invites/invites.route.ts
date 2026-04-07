@@ -53,7 +53,8 @@ const routes: FastifyPluginAsync = async (f) => {
         userId: req.userProfile.id,
         hmacService,
         trackingContext: req.trackingContext,
-        trackingService
+        trackingService,
+        userEmail: req.body.email
       });
     }
   );
@@ -73,9 +74,9 @@ const routes: FastifyPluginAsync = async (f) => {
         organizationInviteRepo,
         status: InviteStatus.DECLINED_BY_ADMIN,
         organizationId: req.userOrganization.organizationId,
-        userId: req.userProfile.id,
         trackingService,
-        trackingContext: req.trackingContext
+        trackingContext: req.trackingContext,
+        userEmail: req.userProfile.email
       });
     }
   );
