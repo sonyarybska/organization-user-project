@@ -8,6 +8,10 @@ export const organizationGuardHook: preHandlerAsyncHookHandler = async function 
     return;
   }
 
+  if (!request.userProfile) {
+    return;
+  }
+
   try {
     const { organizationId } = OrganizationIdUUIDSchema.parse({
       organizationId: request.headers['organization-id']
