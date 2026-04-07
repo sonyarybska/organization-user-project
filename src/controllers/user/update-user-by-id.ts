@@ -1,6 +1,17 @@
 import { UpdateUserDto } from 'src/types/dtos/user/UpdateUserDto';
+import { EventTypeEnum } from 'src/types/enums/EventTypeEnum';
+import { EventResourceTypeEnum } from 'src/types/enums/EventResourceTypeEnum';
 
 export async function updateUserById(data: UpdateUserDto) {
-  const { userRepo } = data;
-  await userRepo.updateUser(data.userId, data.userData);
+  const { userRepo, trackingService, trackingContext, userId } = data;
+  await userRepo.updateUser(userId, data.userData);
+
+  trackingService.track({
+    eventType: EventTypeEnum.UserUpdated,
+    trackingContext,
+    organizationId: null,
+    userId,
+    resourceType: EventResourceTypeEnum.User,
+    resourceId: userId
+  });
 }

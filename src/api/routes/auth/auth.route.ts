@@ -13,6 +13,7 @@ const routes: FastifyPluginAsync = async (f) => {
   const fastify = f.withTypeProvider<ZodTypeProvider>();
   const { userRepo } = fastify.repos;
   const cognitoService = fastify.cognitoService;
+  const trackingService = fastify.trackingService;
 
   fastify.post(
     '/register',
@@ -35,7 +36,9 @@ const routes: FastifyPluginAsync = async (f) => {
         organizationRepo: fastify.repos.organizationRepo,
         userOrganizationRepo: fastify.repos.userOrganizationRepo,
         transactionService: fastify.transactionService,
-        sendGridService: fastify.sendGridService
+        sendGridService: fastify.sendGridService,
+        trackingContext: req.trackingContext,
+        trackingService
       });
     }
   );
@@ -59,7 +62,9 @@ const routes: FastifyPluginAsync = async (f) => {
         userRepo,
         cognitoService,
         email: req.body.email,
-        password: req.body.password
+        password: req.body.password,
+        trackingContext: req.trackingContext,
+        trackingService
       });
     }
   );

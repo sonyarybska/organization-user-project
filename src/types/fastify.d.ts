@@ -19,6 +19,7 @@ declare module 'fastify' {
     cognitoService: ICognitoService;
     sqsService: ISqsService;
     hmacService: IHMACService;
+    trackingService: ITrackingService;
   }
 
   interface FastifyContextConfig {
@@ -30,5 +31,10 @@ declare module 'fastify' {
   interface FastifyRequest {
     userProfile: User;
     userOrganization: UserOrganization;
+    trackingContext: {
+      ipAddress: string | null;
+      userAgent: string | null;
+      source: EventSourceEnum;
+    };
   }
 }

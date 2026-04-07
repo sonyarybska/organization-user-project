@@ -12,6 +12,7 @@ const routes: FastifyPluginAsync = async (f) => {
   const { csvImportRecordRepo } = fastify.repos;
   const s3Service = fastify.s3Service;
   const sqsService = fastify.sqsService;
+  const trackingService = fastify.trackingService;
 
   fastify.post(
     '/',
@@ -52,7 +53,9 @@ const routes: FastifyPluginAsync = async (f) => {
         userId: req.userProfile.id,
         s3Service,
         sqsService,
-        csvImportRecordRepo
+        csvImportRecordRepo,
+        trackingContext: req.trackingContext,
+        trackingService
       });
     }
   );

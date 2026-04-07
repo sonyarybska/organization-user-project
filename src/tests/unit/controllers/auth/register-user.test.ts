@@ -12,8 +12,10 @@ import {
   TEST_ORG_NAMES,
   TEST_COMPANY_DATA,
   TEST_DATES,
-  TEST_IDS
+  TEST_IDS,
+  TEST_TRACKING_CONTEXT
 } from 'src/tests/fixtures/test-constants';
+import { trackingServiceMock } from 'src/tests/mocks/services/tracking.service.mock';
 
 const COGNITO_USER_ID = TEST_IDS.COGNITO_1;
 
@@ -56,7 +58,9 @@ describe('registerUser', () => {
         transactionService: mockTransactionService,
         sendGridService: mockSendGridService,
         cognitoService: mockCognitoService,
-        createData: registrationData
+        createData: registrationData,
+        trackingContext:TEST_TRACKING_CONTEXT,
+        trackingService: trackingServiceMock
       });
 
       expect(mockCognitoService.createCognitoUser).toHaveBeenCalledWith(TEST_EMAILS.VALID_USER, TEST_PASSWORDS.VALID);
@@ -98,7 +102,9 @@ describe('registerUser', () => {
           transactionService: mockTransactionService,
           sendGridService: mockSendGridService,
           cognitoService: mockCognitoService,
-          createData: registrationData
+          createData: registrationData,
+          trackingContext:TEST_TRACKING_CONTEXT,
+          trackingService: trackingServiceMock
         })
       ).rejects.toThrow('User already exists');
 
@@ -120,7 +126,9 @@ describe('registerUser', () => {
           transactionService: mockTransactionService,
           sendGridService: mockSendGridService,
           cognitoService: mockCognitoService,
-          createData: registrationData
+          createData: registrationData,
+          trackingContext:TEST_TRACKING_CONTEXT,
+          trackingService: trackingServiceMock
         })
       ).rejects.toThrow('Database constraint violation');
 

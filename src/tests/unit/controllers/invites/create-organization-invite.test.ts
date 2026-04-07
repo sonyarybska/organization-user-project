@@ -1,10 +1,18 @@
 import { createOrganizationInvite } from 'src/controllers/invites/create-organization-invite';
-import { TEST_TOKENS, TEST_USER_IDS, TEST_EMAILS, TEST_ORG_IDS, TEST_ORG_NAMES } from 'src/tests/fixtures/test-constants';
+import {
+  TEST_TOKENS,
+  TEST_USER_IDS,
+  TEST_EMAILS,
+  TEST_ORG_IDS,
+  TEST_ORG_NAMES,
+  TEST_TRACKING_CONTEXT
+} from 'src/tests/fixtures/test-constants';
 import { createTestInvite, createTestOrganization } from 'src/tests/fixtures/test-factories';
 import { mockOrganizationInviteRepo } from 'src/tests/mocks/repos/organization-invite.repo.mock';
 import { mockOrganizationRepo } from 'src/tests/mocks/repos/organization.repo.mock';
 import { mockHmacService } from 'src/tests/mocks/services/hmac.service.mock';
 import { mockSendGridService } from 'src/tests/mocks/services/send-grid.service.mock';
+import { trackingServiceMock } from 'src/tests/mocks/services/tracking.service.mock';
 import { InviteStatus } from 'src/types/enums/InviteStatusEnum';
 
 describe('createOrganizationInvite', () => {
@@ -37,7 +45,9 @@ describe('createOrganizationInvite', () => {
         sendGridService: mockSendGridService,
         organizationInviteRepo: mockOrganizationInviteRepo,
         organizationRepo: mockOrganizationRepo,
-        hmacService: mockHmacService
+        hmacService: mockHmacService,
+        trackingContext: TEST_TRACKING_CONTEXT,
+        trackingService: trackingServiceMock
       });
 
       expect(mockOrganizationRepo.getByIdAndUserId).toHaveBeenCalledWith(TEST_ORG_IDS.FIRST, TEST_USER_IDS.ADMIN);

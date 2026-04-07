@@ -15,6 +15,7 @@ const SCHEMA_TAGS = ['Prospect'];
 const routes: FastifyPluginAsync = async (f) => {
   const fastify = f.withTypeProvider<ZodTypeProvider>();
   const { prospectRepo } = fastify.repos;
+  const trackingService = fastify.trackingService;
 
   fastify.post(
     '/',
@@ -33,7 +34,11 @@ const routes: FastifyPluginAsync = async (f) => {
           organizationId: req.userOrganization.organizationId,
           userId: req.userProfile.id,
           source: SourceTypeEnum.MANUAL
-        }
+        },
+        userId: req.userProfile.id,
+        organizationId: req.userOrganization.organizationId,
+        trackingContext: req.trackingContext,
+        trackingService
       });
     }
   );
@@ -81,7 +86,10 @@ const routes: FastifyPluginAsync = async (f) => {
       await deleteProspectsByIdAndOrganizationId({
         id: req.params.id,
         organizationId: req.userOrganization.organizationId,
-        prospectRepo
+        prospectRepo,
+        userId: req.userProfile.id,
+        trackingContext: req.trackingContext,
+        trackingService
       });
     }
   );

@@ -6,6 +6,8 @@ import { IOrganizationRepo } from 'src/repos/organization.repo';
 import { IUserOrganizationRepo } from 'src/repos/user-organization.repo';
 import { ICognitoService } from 'src/services/aws/cognito/cognito.service';
 import { RegisterUserReq } from 'src/api/routes/auth/schemas/RegisterUserReqSchema';
+import { TrackingContext } from 'src/types/interfaces/TrackingContext';
+import { ITrackingService } from 'src/services/tracking/tracking.service';
 
 export type RegisterUserDto = {
   userRepo: IUserRepo;
@@ -15,4 +17,6 @@ export type RegisterUserDto = {
   sendGridService: ISendGridService;
   cognitoService: ICognitoService;
   createData: RegisterUserReq;
+  trackingContext: TrackingContext;
+  trackingService: ITrackingService;
 };

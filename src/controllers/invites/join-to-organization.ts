@@ -2,11 +2,22 @@ import { JoinUserToOrganizationDto } from 'src/types/dtos/organization/JoinUserT
 import { InviteStatus } from 'src/types/enums/InviteStatusEnum';
 import { UserRoleEnum } from 'src/types/enums/UserRoleEnum';
 import { ApplicationError } from 'src/types/errors/ApplicationError';
+import { EventTypeEnum } from 'src/types/enums/EventTypeEnum';
+import { EventResourceTypeEnum } from 'src/types/enums/EventResourceTypeEnum';
 
 const inviteTokenSecret = process.env.INVITE_TOKEN_SECRET;
 
 export async function joinUserToOrganization(data: JoinUserToOrganizationDto) {
-  const { organizationInviteRepo, userRepo, userOrganizationRepo, cognitoService, hmacService, transactionService } = data;
+  const {
+    organizationInviteRepo,
+    userRepo,
+    userOrganizationRepo,
+    cognitoService,
+    hmacService,
+    transactionService,
+    trackingService,
+    trackingContext
+  } = data;
 
   const invite = await organizationInviteRepo.getValidPendingByToken(data.token);
 
@@ -40,5 +51,14 @@ export async function joinUserToOrganization(data: JoinUserToOrganizationDto) {
     });
 
     await organizationInviteRepo.reconnect(connection).updateStatusById(invite.id, InviteStatus.ACCEPTED);
+  });
+
+  trackingService.track({
+    eventType: EventTypeEnum.InviteAccepted,
+    resourceType: EventResourceTypeEnum.Invite,
+    resourceId: invite.id,
+    userId: user!.id,
+    organizationId: invite.organizationId,
+    trackingContext
   });
 }

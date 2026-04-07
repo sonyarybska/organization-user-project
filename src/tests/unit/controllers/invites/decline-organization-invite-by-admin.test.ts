@@ -2,7 +2,8 @@ import { declineOrganizationInviteByAdmin } from 'src/controllers/invites/declin
 import { createTestInvite } from 'src/tests/fixtures/test-factories';
 import { mockOrganizationInviteRepo } from 'src/tests/mocks/repos/organization-invite.repo.mock';
 import { InviteStatus } from 'src/types/enums/InviteStatusEnum';
-import { TEST_DATES, TEST_ORG_IDS } from 'src/tests/fixtures/test-constants';
+import { TEST_DATES, TEST_ORG_IDS, TEST_TRACKING_CONTEXT, TEST_USER_IDS } from 'src/tests/fixtures/test-constants';
+import { trackingServiceMock } from 'src/tests/mocks/services/tracking.service.mock';
 
 describe('declineOrganizationInviteByAdmin', () => {
   beforeEach(() => {
@@ -22,7 +23,10 @@ describe('declineOrganizationInviteByAdmin', () => {
           inviteId: expiredInvite.id,
           organizationId: TEST_ORG_IDS.FIRST,
           organizationInviteRepo: mockOrganizationInviteRepo,
-          status: InviteStatus.DECLINED_BY_ADMIN
+          status: InviteStatus.DECLINED_BY_ADMIN,
+          trackingService: trackingServiceMock,
+          trackingContext: TEST_TRACKING_CONTEXT,
+          userId: TEST_USER_IDS.FIRST
         })
       ).rejects.toThrow('Invite has expired');
 
@@ -44,7 +48,10 @@ describe('declineOrganizationInviteByAdmin', () => {
           inviteId: acceptedInvite.id,
           organizationId: TEST_ORG_IDS.FIRST,
           organizationInviteRepo: mockOrganizationInviteRepo,
-          status: InviteStatus.DECLINED_BY_ADMIN
+          status: InviteStatus.DECLINED_BY_ADMIN,
+          trackingService: trackingServiceMock,
+          trackingContext: TEST_TRACKING_CONTEXT,
+          userId: TEST_USER_IDS.FIRST
         })
       ).rejects.toThrow('Invite is already accepted or declined');
 
@@ -65,7 +72,10 @@ describe('declineOrganizationInviteByAdmin', () => {
         inviteId: validInvite.id,
         organizationId: TEST_ORG_IDS.FIRST,
         organizationInviteRepo: mockOrganizationInviteRepo,
-        status: InviteStatus.DECLINED_BY_ADMIN
+        status: InviteStatus.DECLINED_BY_ADMIN,
+        trackingService: trackingServiceMock,
+        trackingContext: TEST_TRACKING_CONTEXT,
+        userId: TEST_USER_IDS.FIRST
       });
 
       expect(mockOrganizationInviteRepo.updateStatusById).toHaveBeenCalledWith(validInvite.id, InviteStatus.DECLINED_BY_ADMIN);

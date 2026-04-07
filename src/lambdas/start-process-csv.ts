@@ -11,6 +11,11 @@ import {
   ImportCsvProspect,
   ImportCsvProspectSchema
 } from 'src/api/routes/organizations/prospects/csv-import-records/schemas/ImportCsvProspectSchema';
+import { EventTypeEnum } from 'src/types/enums/EventTypeEnum';
+import { EventResourceTypeEnum } from 'src/types/enums/EventResourceTypeEnum';
+import { EventSourceEnum } from 'src/types/enums/EventSourceEnum';
+import { CreateTrackingEventDto } from 'src/types/dtos/tracking/CreateTrackingEventDto';
+import { ProcessProspectCsvRowMessageDto } from 'src/types/dtos/prospect/ProcessProspectCsvRowMessageDto';
 
 interface StartCsvImportMessage {
   importRecordId: string;
@@ -101,7 +106,7 @@ export const handler: SQSHandler = async (event: SQSEvent) => {
         const email = prospect.email.toLowerCase();
 
         if (seenEmails.has(email)) {
-          await sqs.sendMessageToQueue(process.env.AWS_SQS_PROCESS_CSV_ROW_QUEUE_URL, {
+          await sqs.sendMessageToQueue<ProcessProspectCsvRowMessageDto>(process.env.AWS_SQS_PROCESS_CSV_ROW_QUEUE_URL, {
             importRecordId,
             row: prospect,
             isDuplicate: true
@@ -111,7 +116,7 @@ export const handler: SQSHandler = async (event: SQSEvent) => {
 
         seenEmails.add(email);
 
-        await sqs.sendMessageToQueue(process.env.AWS_SQS_PROCESS_CSV_ROW_QUEUE_URL, {
+        await sqs.sendMessageToQueue<ProcessProspectCsvRowMessageDto>(process.env.AWS_SQS_PROCESS_CSV_ROW_QUEUE_URL, {
           importRecordId,
           row: prospect,
           isDuplicate: false
@@ -123,6 +128,18 @@ export const handler: SQSHandler = async (event: SQSEvent) => {
       await repo.update(importRecordId, {
         status: CsvImportStatusEnum.ERROR,
         lastError: errorMessage
+      });
+
+      await sqs.sendMessageToQueue<CreateTrackingEventDto>(process.env.AWS_SQS_TRACKING_QUEUE_URL, {
+        eventType: EventTypeEnum.CsvImportFailed,
+        ipAddress: null,
+        userAgent: null,
+        source: EventSourceEnum.Lambda,
+        organizationId,
+        userId,
+        resourceType: EventResourceTypeEnum.CsvImport,
+        resourceId: importRecordId,
+        sourceName: 'start-process-csv'
       });
 
       console.error('Error processing CSV import:', errorMessage);

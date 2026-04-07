@@ -3,7 +3,8 @@ import { createTestOrganization } from 'src/tests/fixtures/test-factories';
 import { mockOrganizationRepo } from 'src/tests/mocks/repos/organization.repo.mock';
 import { mockUserOrganizationRepo } from 'src/tests/mocks/repos/user-organization.repo.mock';
 import { UserRoleEnum } from 'src/types/enums/UserRoleEnum';
-import { TEST_USER_IDS, TEST_ORG_NAMES } from 'src/tests/fixtures/test-constants';
+import { TEST_USER_IDS, TEST_ORG_NAMES, TEST_TRACKING_CONTEXT } from 'src/tests/fixtures/test-constants';
+import { trackingServiceMock } from 'src/tests/mocks/services/tracking.service.mock';
 
 describe('createOrganization', () => {
   const mockConnection = { entityManager: {} as any };
@@ -27,7 +28,9 @@ describe('createOrganization', () => {
         organizationData,
         organizationRepo: mockOrganizationRepo,
         userOrganizationRepo: mockUserOrganizationRepo,
-        transactionService: mockTransactionService
+        transactionService: mockTransactionService,
+        trackingService: trackingServiceMock,
+        trackingContext: TEST_TRACKING_CONTEXT
       });
 
       expect(mockTransactionService.run).toHaveBeenCalledTimes(1);
@@ -57,7 +60,9 @@ describe('createOrganization', () => {
           organizationData,
           organizationRepo: mockOrganizationRepo,
           userOrganizationRepo: mockUserOrganizationRepo,
-          transactionService: mockTransactionService
+          transactionService: mockTransactionService,
+          trackingService: trackingServiceMock,
+          trackingContext: TEST_TRACKING_CONTEXT
         })
       ).rejects.toThrow('Organization name already exists');
 

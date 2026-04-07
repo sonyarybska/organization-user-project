@@ -4,7 +4,8 @@ import { mockCsvImportRecordRepo } from 'src/tests/mocks/repos/csv-import-record
 import { mockS3Service } from 'src/tests/mocks/services/s3.service.mock';
 import { mockSqsService } from 'src/tests/mocks/services/sqs.service.mock';
 import { CsvImportStatusEnum } from 'src/types/enums/CsvImportStatusEnum';
-import { TEST_USER_IDS, TEST_ORG_IDS } from 'src/tests/fixtures/test-constants';
+import { TEST_USER_IDS, TEST_ORG_IDS, TEST_TRACKING_CONTEXT } from 'src/tests/fixtures/test-constants';
+import { trackingServiceMock } from 'src/tests/mocks/services/tracking.service.mock';
 
 describe('importProspectsFromCsv', () => {
   const MOCK_TIMESTAMP = 1700000000000;
@@ -34,7 +35,9 @@ describe('importProspectsFromCsv', () => {
         buffer: sampleCsvBuffer,
         mapping: csvMapping,
         organizationId: TEST_ORG_IDS.FIRST,
-        userId: TEST_USER_IDS.FIRST
+        userId: TEST_USER_IDS.FIRST,
+        trackingContext: TEST_TRACKING_CONTEXT,
+        trackingService:trackingServiceMock
       });
 
       expect(mockS3Service.upload).toHaveBeenCalledWith(expectedKey, sampleCsvBuffer, process.env.AWS_S3_BUCKET_NAME);
@@ -73,7 +76,9 @@ describe('importProspectsFromCsv', () => {
           buffer: singleRowCsv,
           mapping: { email: 'email' },
           organizationId: TEST_ORG_IDS.FIRST,
-          userId: TEST_USER_IDS.FIRST
+          userId: TEST_USER_IDS.FIRST,
+          trackingContext: TEST_TRACKING_CONTEXT,
+          trackingService:trackingServiceMock
         })
       ).rejects.toThrow('Connection timeout');
 
@@ -103,7 +108,9 @@ describe('importProspectsFromCsv', () => {
           buffer: singleRowCsv,
           mapping: { email: 'email' },
           organizationId: TEST_ORG_IDS.FIRST,
-          userId: TEST_USER_IDS.FIRST
+          userId: TEST_USER_IDS.FIRST,
+          trackingContext: TEST_TRACKING_CONTEXT,
+          trackingService:trackingServiceMock
         })
       ).rejects.toThrow('Queue unavailable');
     });

@@ -9,6 +9,7 @@ const routes: FastifyPluginAsync = async (f) => {
   const fastify = f.withTypeProvider<ZodTypeProvider>();
   const { attachmentRepo } = fastify.repos;
   const s3Service = fastify.s3Service;
+  const trackingService = fastify.trackingService;
 
   fastify.post(
     '/',
@@ -31,7 +32,10 @@ const routes: FastifyPluginAsync = async (f) => {
           originalName: data!.filename,
           userId: req.userProfile.id,
           buffer: await data!.toBuffer()
-        }
+        },
+        organizationId: req.userOrganization?.organizationId || null!,
+        trackingContext: req.trackingContext,
+        trackingService
       });
     }
   );

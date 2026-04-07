@@ -8,7 +8,8 @@ export const mockUserRepo: jest.Mocked<IUserRepo> = {
   create: jest.fn(),
   getByEmail: jest.fn(),
   updateUser: jest.fn(),
-  getUserByCognitoUserId: jest.fn()
+  getUserByCognitoUserId: jest.fn(),
+  getByEmailOrFail: jest.fn()
 };
 
 mockUserRepo.reconnect.mockImplementation(() => mockUserRepo);

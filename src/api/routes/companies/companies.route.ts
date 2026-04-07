@@ -15,6 +15,7 @@ const SCHEMA_TAGS = ['Company'];
 const routes: FastifyPluginAsync = async (f) => {
   const fastify = f.withTypeProvider<ZodTypeProvider>();
   const { companyRepo } = fastify.repos;
+  const trackingService = fastify.trackingService;
 
   fastify.post(
     '/',
@@ -32,7 +33,11 @@ const routes: FastifyPluginAsync = async (f) => {
           source: SourceTypeEnum.MANUAL,
           organizationId: req.userOrganization.organizationId
         },
-        companyRepo
+        companyRepo,
+        userId: req.userProfile.id,
+        organizationId: req.userOrganization.organizationId,
+        trackingContext: req.trackingContext,
+        trackingService
       });
     }
   );
@@ -69,7 +74,10 @@ const routes: FastifyPluginAsync = async (f) => {
         id: req.params.id,
         organizationId: req.userOrganization.organizationId,
         companyData: req.body,
-        companyRepo
+        companyRepo,
+        userId: req.userProfile.id,
+        trackingContext: req.trackingContext,
+        trackingService
       });
     }
   );
@@ -86,7 +94,10 @@ const routes: FastifyPluginAsync = async (f) => {
       await deleteCompanyByIdAndOrgId({
         id: req.params.id,
         organizationId: req.userOrganization.organizationId,
-        companyRepo
+        companyRepo,
+        userId: req.userProfile.id,
+        trackingContext: req.trackingContext,
+        trackingService
       });
     }
   );

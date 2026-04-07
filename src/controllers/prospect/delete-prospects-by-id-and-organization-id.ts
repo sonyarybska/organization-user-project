@@ -1,9 +1,23 @@
 import { DeleteProspectByIdAndOrganizationIdDto } from 'src/types/dtos/prospect/DeleteProspectByIdAndOrganizationId';
+import { EventResourceTypeEnum } from 'src/types/enums/EventResourceTypeEnum';
+import { EventTypeEnum } from 'src/types/enums/EventTypeEnum';
 
-export function deleteProspectsByIdAndOrganizationId({
+export async function deleteProspectsByIdAndOrganizationId({
   id,
   organizationId,
-  prospectRepo
+  prospectRepo,
+  userId,
+  trackingContext,
+  trackingService
 }: DeleteProspectByIdAndOrganizationIdDto) {
-  return prospectRepo.deleteByIdAndOrganizationId(id, organizationId);
+  await prospectRepo.deleteByIdAndOrganizationId(id, organizationId);
+
+  trackingService.track({
+    eventType: EventTypeEnum.ProspectDeleted,
+    resourceType: EventResourceTypeEnum.Prospect,
+    resourceId: id,
+    userId,
+    organizationId,
+    trackingContext
+  });
 }

@@ -10,6 +10,7 @@ export interface IUserRepo extends Reconnector<IUserRepo, TypeOrmConnection> {
   getById(id: string): Promise<User>;
   create(user: Partial<User>): Promise<User>;
   getByEmail(email: string): Promise<User | null>;
+  getByEmailOrFail(email: string): Promise<User>;
   updateUser(id: string, userData: Partial<User>): Promise<User>;
   getUserByCognitoUserId(cognitoUserId: string): Promise<User>;
 }
@@ -77,6 +78,15 @@ export function getUserRepo(db: DataSource | EntityManager): IUserRepo {
         return await userRepository.findOne({ where: { email } });
       } catch (error) {
         throw new DBError(`User with email ${email} not found`, error);
+      }
+    },
+
+    async getByEmailOrFail(email: string): Promise<User> {
+      try {
+        const user = await userRepository.findOneOrFail({ where: { email } });
+        return user;
+      } catch (error) {
+        throw new DBError(`Failed to get user with email ${email}`, error);
       }
     },
 
