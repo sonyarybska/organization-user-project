@@ -23,9 +23,7 @@ const routes: FastifyPluginAsync = async (f) => {
         body: RegisterUserReqSchema
       },
       config: {
-        skipAuth: true,
-        skipConfirmEmail: true,
-        skipUserOrganization: true
+        skipAuth: true
       }
     },
     async (req) => {
@@ -53,9 +51,7 @@ const routes: FastifyPluginAsync = async (f) => {
         response: { 200: JwtTokensSchema }
       },
       config: {
-        skipAuth: true,
-        skipConfirmEmail: true,
-        skipUserOrganization: true
+        skipAuth: true
       }
     },
     async (req) => {
@@ -78,10 +74,6 @@ const routes: FastifyPluginAsync = async (f) => {
         tags: SCHEMA_TAGS,
         body: RefreshTokenSchema,
         response: { 200: AccessTokenSchema }
-      },
-      config: {
-        skipConfirmEmail: true,
-        skipUserOrganization: true
       }
     },
     async (req) => {

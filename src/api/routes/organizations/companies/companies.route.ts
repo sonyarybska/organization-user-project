@@ -4,11 +4,11 @@ import { createCompany } from 'src/controllers/company/create-company';
 import { getCompanyByIdAndOrgId } from 'src/controllers/company/get-company-by-id-and-org-id';
 import { updateCompanyByIdAndOrgId } from 'src/controllers/company/update-company-by-id-and-org-id';
 import { deleteCompanyByIdAndOrgId } from 'src/controllers/company/delete-company-by-id-and-org-id';
-import { IdUUIDSchema } from '../schemas/IdUUIDSchema';
 import { CompanyResSchema } from './schemas/CompanyResSchema';
 import { UpdateCompanyReqSchema } from './schemas/UpdateCompanyReqSchema';
 import { CreateCompanyReqSchema } from './schemas/CreateCompanyReqSchema';
 import { SourceTypeEnum } from 'src/types/enums/SourceTypeEnum';
+import { IdUUIDSchema } from 'src/api/routes/schemas/IdUUIDSchema';
 
 const SCHEMA_TAGS = ['Company'];
 

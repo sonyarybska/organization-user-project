@@ -24,9 +24,7 @@ const routes: FastifyPluginAsync = async (f) => {
         body: TokenReqSchema
       },
       config: {
-        skipUserOrganization: true,
-        skipAuth: true,
-        skipConfirmEmail: true
+        skipAuth: true
       }
     },
     async (req) => {
@@ -52,9 +50,7 @@ const routes: FastifyPluginAsync = async (f) => {
         body: TokenReqSchema
       },
       config: {
-        skipUserOrganization: true,
-        skipAuth: true,
-        skipConfirmEmail: true
+        skipAuth: true
       }
     },
     async (req) => {

@@ -19,9 +19,6 @@ const routes: FastifyPluginAsync = async (f) => {
       schema: {
         tags: SCHEMA_TAGS,
         response: { 200: UserResSchema }
-      },
-      config: {
-        skipUserOrganization: true
       }
     },
     async (req) => {
@@ -40,9 +37,6 @@ const routes: FastifyPluginAsync = async (f) => {
       schema: {
         tags: SCHEMA_TAGS,
         body: UpdateUserReqSchema
-      },
-      config: {
-        skipUserOrganization: true
       }
     },
     async (req) => {

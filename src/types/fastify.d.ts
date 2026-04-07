@@ -24,7 +24,6 @@ declare module 'fastify' {
 
   interface FastifyContextConfig {
     skipAuth?: boolean;
-    skipConfirmEmail?: boolean;
     skipUserOrganization?: boolean;
   }
 
