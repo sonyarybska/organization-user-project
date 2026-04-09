@@ -17,6 +17,8 @@ import { EventResourceTypeEnum } from 'src/types/enums/EventResourceTypeEnum';
 import { EventSourceEnum } from 'src/types/enums/EventSourceEnum';
 import { CreateTrackingEventDto } from 'src/types/dtos/tracking/CreateTrackingEventDto';
 import { ProcessProspectCsvRowMessageDto } from 'src/types/dtos/prospect/ProcessProspectCsvRowMessageDto';
+import { NotificationTypeEnum } from 'src/types/enums/NotificationTypeEnum';
+import { CreateNotificationMessageDto } from 'src/types/dtos/notification/CreateNotificationMessageDto';
 
 interface StartCsvImportMessage {
   importRecordId: string;
@@ -143,6 +145,14 @@ export const handler: SQSHandler = async (event: SQSEvent) => {
         resourceType: EventResourceTypeEnum.CsvImport,
         resourceId: importRecordId,
         sourceName: 'start-process-csv'
+      });
+
+      await sqs.sendMessageToQueue<CreateNotificationMessageDto>(process.env.AWS_SQS_NOTIFICATION_QUEUE_URL, {
+        userId,
+        organizationId,
+        type: NotificationTypeEnum.CsvImportFailed,
+        title: 'CSV Import Failed',
+        message: `Your CSV import has failed with error: ${errorMessage}`
       });
 
       console.error('Error processing CSV import:', errorMessage);

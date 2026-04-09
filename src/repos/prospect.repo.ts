@@ -11,6 +11,7 @@ export interface IProspectRepo extends Reconnector<IProspectRepo, TypeOrmConnect
   existsByEmailAndOrganizationId(email: string, organizationId: string): Promise<boolean>;
   getByIdAndOrganizationId(prospectId: string, organizationId: string): Promise<Prospect>;
   deleteByIdAndOrganizationId(prospectId: string, organizationId: string): Promise<void>;
+  countMonthlyByOrganizationId(organizationId: string): Promise<number>;
 }
 
 export function getProspectRepo(db: DataSource | EntityManager): IProspectRepo {
@@ -79,6 +80,18 @@ export function getProspectRepo(db: DataSource | EntityManager): IProspectRepo {
         await prospectRepo.delete({ id: prospectId, organizationId });
       } catch (error) {
         throw new DBError(`Failed to delete prospect with id ${prospectId}`, error);
+      }
+    },
+
+    async countMonthlyByOrganizationId(organizationId: string): Promise<number> {
+      try {
+        return await prospectRepo
+          .createQueryBuilder('prospect')
+          .where('prospect.organizationId = :organizationId', { organizationId })
+          .andWhere("prospect.createdAt >= date_trunc('month', CURRENT_DATE)")
+          .getCount();
+      } catch (error) {
+        throw new DBError(`Failed to count monthly prospects for organization ${organizationId}`, error);
       }
     }
   };

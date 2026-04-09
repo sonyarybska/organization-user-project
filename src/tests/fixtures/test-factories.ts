@@ -32,6 +32,7 @@ export function createTestOrganization(overrides: Partial<Organization> = {}): O
   return {
     id: uuid(),
     name: 'Test Organization',
+    monthlyImportLimit: 1000,
     ...overrides
   };
 }

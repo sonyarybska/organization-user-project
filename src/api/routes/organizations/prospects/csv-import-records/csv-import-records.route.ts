@@ -9,7 +9,7 @@ const SCHEMA_TAGS = ['CSVImport'];
 const routes: FastifyPluginAsync = async (f) => {
   const fastify = f.withTypeProvider<ZodTypeProvider>();
 
-  const { csvImportRecordRepo } = fastify.repos;
+  const { csvImportRecordRepo, prospectRepo, organizationRepo } = fastify.repos;
   const s3Service = fastify.s3Service;
   const sqsService = fastify.sqsService;
   const trackingService = fastify.trackingService;
@@ -56,7 +56,9 @@ const routes: FastifyPluginAsync = async (f) => {
         csvImportRecordRepo,
         trackingContext: req.trackingContext,
         trackingService,
-        userEmail: req.userProfile.email
+        userEmail: req.userProfile.email,
+        prospectRepo,
+        organizationRepo
       });
     }
   );
