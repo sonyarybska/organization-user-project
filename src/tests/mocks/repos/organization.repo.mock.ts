@@ -4,6 +4,7 @@ import { IOrganizationRepo } from 'src/repos/organization.repo';
 export const mockOrganizationRepo: jest.Mocked<IOrganizationRepo> = {
   reconnect: jest.fn(),
   create: jest.fn(),
+  getByIdForUpdate: jest.fn(),
   getByIdAndUserId: jest.fn(),
   getByUserId: jest.fn()
 };

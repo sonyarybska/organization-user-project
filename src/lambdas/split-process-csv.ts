@@ -15,6 +15,9 @@ import { EventSourceEnum } from 'src/types/enums/EventSourceEnum';
 import { CreateTrackingEventDto } from 'src/types/dtos/tracking/CreateTrackingEventDto';
 import { ProcessProspectCsvRowMessageDto } from 'src/types/dtos/prospect/ProcessProspectCsvRowMessageDto';
 import { getUserRepo } from 'src/repos/user.repo';
+import { getOrganizationRepo } from 'src/repos/organization.repo';
+import { CreateNotificationMessageDto } from 'src/types/dtos/notification/CreateNotificationMessageDto';
+import { NotificationTypeEnum } from 'src/types/enums/NotificationTypeEnum';
 
 export const handler: SQSHandler = async (event: SQSEvent) => {
   if (!event.Records.length) {
@@ -35,6 +38,7 @@ export const handler: SQSHandler = async (event: SQSEvent) => {
   const companyRepo = getCompanyRepo(db);
   const importRepo = getCsvImportRecordRepo(db);
   const userRepo = getUserRepo(db);
+  const organizationRepo = getOrganizationRepo(db);
 
   const sqs = getAwsSqsService(process.env.AWS_REGION);
 
@@ -57,18 +61,31 @@ export const handler: SQSHandler = async (event: SQSEvent) => {
         continue;
       }
 
-      const emailExists = await prospectRepo.existsByEmailAndOrganizationId(row.email!.toLowerCase(), row.organizationId!);
-
-      if (emailExists) {
-        console.log('Duplicate email found in database, skipping:', row.email);
-        await importRepo.incrementSkippedRows(importRecordId);
-        continue;
-      }
-
       await transactionService.run(async (connection) => {
         const prospectRepoTx = prospectRepo.reconnect(connection);
         const companyRepoTx = companyRepo.reconnect(connection);
         const importRepoTx = importRepo.reconnect(connection);
+        const organizationRepoTx = organizationRepo.reconnect(connection);
+
+        const { monthlyImportLimit } = await organizationRepoTx.getByIdForUpdate(row.organizationId!);
+
+        const emailExists = await prospectRepoTx.existsByEmailAndOrganizationId(row.email!.toLowerCase(), row.organizationId!);
+
+        if (emailExists) {
+          console.log('Duplicate email found in database, skipping:', row.email);
+          await importRepoTx.incrementSkippedRows(importRecordId);
+          return;
+        }
+
+        const currentCount = await prospectRepoTx.countMonthlyByOrganizationId(row.organizationId!);
+
+        if (currentCount >= monthlyImportLimit) {
+          console.log(
+            `Monthly prospect limit reached for organization ${row.organizationId}. Current: ${currentCount}, limit: ${monthlyImportLimit}`
+          );
+          await importRepoTx.incrementSkippedRows(importRecordId);
+          return;
+        }
 
         const { companyName, companyAddress, companyLinkedinUrl, ...prospectData } = row;
 
@@ -124,6 +141,14 @@ export const handler: SQSHandler = async (event: SQSEvent) => {
           resourceType: EventResourceTypeEnum.CsvImport,
           resourceId: importRecordId,
           sourceName: 'split-process-csv'
+        });
+
+        await sqs.sendMessageToQueue<CreateNotificationMessageDto>(process.env.AWS_SQS_NOTIFICATION_QUEUE_URL, {
+          userId: importRecord.userId,
+          organizationId: importRecord.organizationId,
+          type: NotificationTypeEnum.CsvImportCompleted,
+          title: 'CSV Import Completed',
+          message: `Your CSV import has completed. Processed rows: ${importRecord.processedRows}, Skipped rows: ${importRecord.skippedRows}`
         });
       }
     }

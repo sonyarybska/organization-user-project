@@ -7,6 +7,7 @@ import { getAttachmentRepo } from './attachment.repo';
 import { getProspectRepo } from './prospect.repo';
 import { getCsvImportRecordRepo } from './csv-import-record.repo';
 import { getCompanyRepo } from './company.repo';
+import { getNotificationRepo } from './notification.repo';
 
 export interface IRepos {
   userRepo: ReturnType<typeof getUserRepo>;
@@ -17,6 +18,7 @@ export interface IRepos {
   prospectRepo: ReturnType<typeof getProspectRepo>;
   csvImportRecordRepo: ReturnType<typeof getCsvImportRecordRepo>;
   companyRepo: ReturnType<typeof getCompanyRepo>;
+  notificationRepo: ReturnType<typeof getNotificationRepo>;
 }
 
 export function getRepos(db: DataSource) {
@@ -28,6 +30,7 @@ export function getRepos(db: DataSource) {
     attachmentRepo: getAttachmentRepo(db),
     prospectRepo: getProspectRepo(db),
     csvImportRecordRepo: getCsvImportRecordRepo(db),
-    companyRepo: getCompanyRepo(db)
+    companyRepo: getCompanyRepo(db),
+    notificationRepo: getNotificationRepo(db)
   };
 }

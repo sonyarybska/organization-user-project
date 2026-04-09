@@ -8,6 +8,7 @@ import { ProspectEntity } from './entities/ProspectEntity';
 import { CsvImportRecordEntity } from './entities/CsvImportRecordEntity';
 import { CompanyEntity } from './entities/CompanyEntity';
 import { TrackingEventEntity } from './entities/TrackingEventEntity';
+import { NotificationEntity } from './entities/NotificationEntity';
 
 export function getDataSource(opts: {
   host: string;
@@ -37,7 +38,8 @@ export function getDataSource(opts: {
       ProspectEntity,
       CsvImportRecordEntity,
       CompanyEntity,
-      TrackingEventEntity
+      TrackingEventEntity,
+      NotificationEntity
     ],
     dropSchema: opts.dropSchema || false
   });

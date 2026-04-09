@@ -1,8 +1,10 @@
 import { importProspectsFromCsv } from 'src/controllers/csv-import-record/import-prospects-from-csv';
-import { createTestCsvImportRecord } from 'src/tests/fixtures/test-factories';
+import { createTestCsvImportRecord, createTestOrganization } from 'src/tests/fixtures/test-factories';
 import { mockCsvImportRecordRepo } from 'src/tests/mocks/repos/csv-import-record.repo.mock';
 import { mockS3Service } from 'src/tests/mocks/services/s3.service.mock';
 import { mockSqsService } from 'src/tests/mocks/services/sqs.service.mock';
+import { mockProspectRepo } from 'src/tests/mocks/repos/prospect.repo.mock';
+import { mockOrganizationRepo } from 'src/tests/mocks/repos/organization.repo.mock';
 import { CsvImportStatusEnum } from 'src/types/enums/CsvImportStatusEnum';
 import { TEST_USER_IDS, TEST_ORG_IDS, TEST_TRACKING_CONTEXT, TEST_EMAILS } from 'src/tests/fixtures/test-constants';
 import { trackingServiceMock } from 'src/tests/mocks/services/tracking.service.mock';
@@ -16,6 +18,8 @@ describe('importProspectsFromCsv', () => {
   beforeEach(() => {
     jest.clearAllMocks();
     jest.spyOn(Date, 'now').mockReturnValue(MOCK_TIMESTAMP);
+    mockProspectRepo.countMonthlyByOrganizationId.mockResolvedValue(0);
+    mockOrganizationRepo.getByIdAndUserId.mockResolvedValue(createTestOrganization({ monthlyImportLimit: 1000 }));
   });
 
   describe('on successful import', () => {
@@ -32,6 +36,8 @@ describe('importProspectsFromCsv', () => {
         s3Service: mockS3Service,
         sqsService: mockSqsService,
         csvImportRecordRepo: mockCsvImportRecordRepo,
+        prospectRepo: mockProspectRepo,
+        organizationRepo: mockOrganizationRepo,
         buffer: sampleCsvBuffer,
         mapping: csvMapping,
         organizationId: TEST_ORG_IDS.FIRST,
@@ -74,6 +80,8 @@ describe('importProspectsFromCsv', () => {
           s3Service: mockS3Service,
           sqsService: mockSqsService,
           csvImportRecordRepo: mockCsvImportRecordRepo,
+          prospectRepo: mockProspectRepo,
+          organizationRepo: mockOrganizationRepo,
           buffer: singleRowCsv,
           mapping: { email: 'email' },
           organizationId: TEST_ORG_IDS.FIRST,
@@ -107,6 +115,8 @@ describe('importProspectsFromCsv', () => {
           s3Service: mockS3Service,
           sqsService: mockSqsService,
           csvImportRecordRepo: mockCsvImportRecordRepo,
+          prospectRepo: mockProspectRepo,
+          organizationRepo: mockOrganizationRepo,
           buffer: singleRowCsv,
           mapping: { email: 'email' },
           organizationId: TEST_ORG_IDS.FIRST,

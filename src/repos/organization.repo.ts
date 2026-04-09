@@ -9,6 +9,7 @@ import { DataSource, EntityManager, QueryFailedError } from 'typeorm';
 
 export interface IOrganizationRepo extends Reconnector<IOrganizationRepo, TypeOrmConnection> {
   create(organization: Partial<Organization>): Promise<Organization>;
+  getByIdForUpdate(organizationId: string): Promise<Organization>;
   getByIdAndUserId(organizationId: string, userId: string): Promise<Organization>;
   getByUserId(userId: string): Promise<Organization[]>;
 }
@@ -19,6 +20,17 @@ export function getOrganizationRepo(db: DataSource | EntityManager): IOrganizati
   return {
     reconnect(connection: TypeOrmConnection): IOrganizationRepo {
       return getOrganizationRepo(connection.entityManager);
+    },
+
+    async getByIdForUpdate(organizationId: string): Promise<OrganizationEntity> {
+      try {
+        return await organizationRepo.findOneOrFail({
+          where: { id: organizationId },
+          lock: { mode: 'pessimistic_write' }
+        });
+      } catch (error) {
+        throw new DBError(`Organization with id ${organizationId} not found`, error);
+      }
     },
 
     async getByUserId(userId: string): Promise<OrganizationEntity[]> {

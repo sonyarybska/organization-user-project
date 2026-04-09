@@ -13,10 +13,11 @@ const SCHEMA_TAGS = ['Invite'];
 
 const routes: FastifyPluginAsync = async (f) => {
   const fastify = f.withTypeProvider<ZodTypeProvider>();
-  const { organizationInviteRepo, organizationRepo } = fastify.repos;
+  const { organizationInviteRepo, organizationRepo, userRepo } = fastify.repos;
   const sendGridService = fastify.sendGridService;
   const hmacService = fastify.hmacService;
   const trackingService = fastify.trackingService;
+  const sqsService = fastify.sqsService;
 
   fastify.get(
     '/',
@@ -54,7 +55,9 @@ const routes: FastifyPluginAsync = async (f) => {
         hmacService,
         trackingContext: req.trackingContext,
         trackingService,
-        userEmail: req.body.email
+        userEmail: req.body.email,
+        userRepo,
+        sqsService
       });
     }
   );
